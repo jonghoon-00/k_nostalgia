@@ -8,8 +8,13 @@ export async function POST(request: NextRequest) {
   const supabase = createClient();
 
   const {
-    data: { user }
+    data: { user}, error
   } = await supabase.auth.signInWithPassword({ email, password });
+
+  
+  if (error ) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 
   return NextResponse.json(user);
 }

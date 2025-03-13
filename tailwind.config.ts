@@ -18,17 +18,16 @@ const config = {
       colors: {
         //색 설정
         //background
-        'normal': '#FAF8F5',
+        normal: '#FAF8F5',
 
         //label 색상
         'label-strong': '#151515',
         'label-normal': '#3A3835',
-        'label-alternative': '#3A3835',
+        'label-alternative': '#79746D',
         'label-assistive': '#A49F99',
         'label-disable': '#DDDAD7',
         'label-light': '#F6F5F3',
 
-    
         //primary 색상
         'primary-heavy': '#755428',
         'primary-strong': '#A87939',
@@ -44,7 +43,6 @@ const config = {
         'primary-70': '#F6E5CE',
         'primary-80': '#FFF3E3',
         'primary-90': '#FFF8EF',
-       
 
         //secondary 색상
         'secondary-heavy': '#586452',
@@ -62,10 +60,11 @@ const config = {
         'secondary-80': '#EFF9EB',
         'secondary-90': '#F6FFF2',
 
-
         //status 색상
         'status-negative': '#ED1B18',
         'status-positive': '#2A62F4',
+
+        'product-custom': 'rgba(0, 0, 0, 0.20)',
 
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -102,9 +101,12 @@ const config = {
         }
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)'
+        sm: 'calc(var(--radius) - 2px)',
+        md: 'calc(var(--radius) - 4px)',
+        lg: 'calc(var(--radius) - 8px)',
+        // lg: 'var(--radius)',
+        // md: 'calc(var(--radius) - 2px)',
+        // sm: 'calc(var(--radius) - 4px)'
       },
       keyframes: {
         'accordion-down': {
@@ -125,16 +127,15 @@ const config = {
       },
       boxShadow: {
         custom: '0px -2px 8px 0px rgba(31, 30, 30, 0.08)',
-        custom2:
-          '0px 1px 2px 0px rgba(0, 0, 0, 0.24), 0px 0px 1px 0px rgba(0, 0, 0, 0.08), 0px 0px 1px 0px rgba(0, 0, 0, 0.08)'
+        chatCustom : '0px 1px 2px 0px rgba(0, 0, 0, 0.24), 0px 0px 1px 0px rgba(0, 0, 0, 0.08), 0px 0px 1px 0px rgba(0, 0, 0, 0.08)'
       },
       fontFamily: {
-        custom: ['"YeojuCeramic TTF"', 'sans-serif']
+        pretendard: ['var(--font-pretendard)'],
+        custom: ['YeojuCeramic']
       }
     }
   },
-  plugins: [require('tailwindcss-animate'), require('tailwind-scrollbar-hide')],
+  plugins: [require('tailwindcss-animate'), require('tailwind-scrollbar-hide')]
 } satisfies Config;
 
 export default config;
-

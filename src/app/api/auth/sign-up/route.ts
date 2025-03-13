@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (userDataError ) {
-    return NextResponse.json({ error: userDataError .message }, { status: 400 });
+    return NextResponse.json({ error: userDataError.message }, { status: 400 });
   }
 
   const userId = userData.user?.id;

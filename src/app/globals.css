@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: YeojuCeramic;
+  src: url('../fonts/YeojuCeramic.ttf');
+}
+
+*::-webkit-scrollbar {
+  background-color: #f4e9db;
+  width: 14px;
+  border-radius: 4px;
+}
+
+/* 스크롤바 막대 꾸미기 */
+*::-webkit-scrollbar-thumb {
+  background-color: #ab834e;
+  border-radius: 4px;
+}
+
+/* 스크롤바 트랙 꾸미기 */
+*::-webkit-scrollbar-track {
+  background-color: #f4e9db;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-button {
+  height: 0.3rem;
+  background-color: #f4e9db;
+}
+
 /* 시장, 특산물 페이지 필터 버튼 css */
 .filter-button-container {
   scrollbar-width: none;
@@ -12,16 +40,15 @@
   display: none;
 }
 
-/* 메인 시장 슬라이드 */
+/* 슬라이드 공통 css */
 .swiper {
   width: 100%;
   height: 100%;
+  /* overflow: visible !important; */
 }
 
 .swiper-slide {
   text-align: left;
-  border-top-right-radius: 12px;
-  border-top-left-radius: 12px;
 
   /* Center slide text vertically */
   display: flex;
@@ -34,15 +61,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-top-right-radius: 12px;
-  border-top-left-radius: 12px;
 }
 
 .swiper-pagination {
-  width: 164px !important;
-  background-color: #e8c18e;
+  width: 204px !important;
+  background-color: rgba(232, 193, 142, 0.64) !important;
   border-radius: 8px;
-  padding: 12px 20px;
+  padding: 5px 20px;
 }
 
 .swiper-horizontal > .swiper-pagination-bullets,
@@ -51,8 +76,65 @@
   transform: translateX(-50%);
 }
 
+.swiper-pagination-bullet {
+  background-color: #bd873f !important;
+  opacity: 1 !important;
+}
+
 .swiper-pagination-bullet-active {
   background-color: #755428 !important;
   width: 64px !important;
   border-radius: 4px !important;
+}
+
+/* mo 특산물 디테일 슬라이드 인디케이터 디자인 */
+.detailSwiper .swiper-pagination {
+  width: 164px !important;
+  bottom: 32px !important;
+  background-color: rgba(250, 248, 245, 0.8) !important;
+}
+
+/* pc 특산물 디테일 슬라이드 */
+.swiper-slide {
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+
+.mySwiper2 {
+  width: 100%;
+  height: 590px;
+}
+
+.mySwiper {
+  margin-top: 12px;
+  height: 20%;
+  box-sizing: border-box;
+  padding: 10px 0;
+}
+
+.mySwiper .swiper-slide {
+  width: 25%;
+  height: 100%;
+  opacity: 0.4;
+}
+
+.mySwiper .swiper-slide-thumb-active {
+  opacity: 1;
+  border: 1px solid #9c6d2e;
+}
+
+/* 장바구니 nth-child(2) 스타일 지정 */
+.nth-2\:hidden:nth-child(2) {
+  display: none;
+}
+.nth-3\:w-115px:nth-child(3) {
+  width: 115px; /* 원하는 너비를 설정 */
+}
+
+/* 체크박스 스타일 지정 */
+[type='checkbox'] {
+  width: 24px;
+  height: 24px;
+  accent-color: #9c6d2e;
 }

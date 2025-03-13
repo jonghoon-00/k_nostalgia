@@ -29,41 +29,45 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
 
-  // const {
-  //   data: { user }
-  // } = await supabase.auth.getUser();
+  const guestCookie = request.cookies.get('guest');
+  const isGuest = guestCookie?.value === 'true';
 
-  // TODO 39-49 잠깐 주석 처리
-  // if (
-  //   !user &&
-  //   !request.nextUrl.pathname.startsWith('/log-in') &&
-  //   !request.nextUrl.pathname.startsWith('/api') &&
-  //   !request.nextUrl.pathname.startsWith('/sign-up')
-  // ) {
-  //   // no user, potentially respond by redirecting the user to the login page
+  const publicRoutes = ['/sign-up', '/log-in', '/api']; // 누구나 접근 가능 
+  const protectedRoutes = ['/my-page']; // 비회원 접근 불가능 
 
-  //   const url = request.nextUrl.clone()
-  //   url.pathname = '/log-in'
-  //   return NextResponse.redirect(url)
+  const url = request.nextUrl.clone();
+  const path = request.nextUrl.pathname;
+  // 비회원이 불가능 경로에 접근하려고 할 때 리다이렉트
+  if (!user && isGuest && protectedRoutes.includes(request.nextUrl.pathname)) {
+    url.pathname = '/log-in'; 
+    return NextResponse.redirect(url);
+  }
 
-  // }
+  if(!user && !isGuest && !publicRoutes.some((route) => path.startsWith(route))){
+    url.pathname = '/log-in';
+    return NextResponse.redirect(url);
+  }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
+  //some은 순회 method 포함하는거 찾을때 일치하는거 찾으면 true 반환 
+
+  // 비회원 접근 허용 페이지 또는 인증되지 않은 사용자 허용 페이지 접근 허용
+  if (user && publicRoutes.includes(request.nextUrl.pathname)) {
+    url.pathname = '/my-page'; 
+    
+    return NextResponse.redirect(url);
+  }
+
+
+  // 로그인한 사용자에게는 모든 페이지 접근 허용
+  if (user) {
+    // 로그인 성공 시 비회원 쿠키 삭제
+    supabaseResponse.cookies.delete('guest');
+    return supabaseResponse;
+}
 
   return supabaseResponse;
 }

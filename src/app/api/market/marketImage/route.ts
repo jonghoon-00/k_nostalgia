@@ -39,7 +39,7 @@ export const GET = async (req: NextRequest) => {
         const data = await response.json();
         // console.log('이것은 data', data)
         if (data.items && data.items.length > 0) {            
-            console.log('여기야 여기', data.items)
+            // console.log('여기야 여기', data.items)
             return NextResponse.json(data.items)
         } else {
             
