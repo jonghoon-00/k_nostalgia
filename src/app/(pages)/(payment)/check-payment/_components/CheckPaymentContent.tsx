@@ -24,6 +24,7 @@ const CheckPaymentContent = () => {
     useState<boolean>(false);
 
   //TODO 결제  후 ZUSTAND STORAGE 비우기
+  //TODO useEffect 내부 로직 별도 분리
   useEffect(() => {
     const handlePayment = async () => {
       if (code === 'FAILURE_TYPE_PG') {

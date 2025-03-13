@@ -105,7 +105,7 @@ export const ProductDetail = ({
             />
             <PayButton
               product={product}
-              orderNameArr={[orderData.food_name]}
+              orderNameArr={[orderData.food_name as string]}
               text={'바로 구매하기'}
             />
           </div>

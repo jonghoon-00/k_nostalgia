@@ -1,9 +1,9 @@
-import React, { forwardRef, useImperativeHandle } from 'react';
 import { toast } from '@/components/ui/use-toast';
+import useDeviceSize from '@/hooks/useDeviceSize';
 import api from '@/service/service';
 import { useRouter } from 'next/navigation';
+import { forwardRef, useImperativeHandle } from 'react';
 import Swal from 'sweetalert2';
-import useDeviceSize from '@/hooks/useDeviceSize';
 
 export interface CancelUserHandle {
   handleDeleteUser: () => void;
@@ -74,5 +74,7 @@ const CancelUser = forwardRef<CancelUserHandle>((_, ref) => {
     </div>
   );
 });
+
+CancelUser.displayName = 'CancelUser';
 
 export default CancelUser;
