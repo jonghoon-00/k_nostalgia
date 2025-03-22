@@ -46,6 +46,7 @@ const OrderPageContainer = ({ initialAddresses, user }: Props) => {
 
   const { products, resetState, payMethod } = usePaymentRequestStore();
 
+  // TODO 데스크탑에서만 주문/결제 이미지 표시
   return (
     <main className="max-w-md mx-auto p-4 bg-normal mb-14 mt-16">
       {/* 배송지 */}
