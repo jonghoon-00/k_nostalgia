@@ -8,9 +8,9 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 
 type Props = {
-  //toolTipContentArray: 툴팁 내부 내용. 줄바꿈 단위로 나눠서 배열에 넣을 것
+  //툴팁 내부 텍스트. 줄바꿈 단위로 나눠서 배열에 넣을 것
   toolTipContentArray: string[];
-  //isIncludeIconHighlighting : info 아이콘 하이라이팅(강조 효과 여부)
+  //info 아이콘 하이라이팅 여부
   isIncludeIconHighlighting: boolean;
 };
 
@@ -82,9 +82,10 @@ const HeaderWithInfoIcon = ({
   }, [isIncludeIconHighlighting]);
 
   return (
-    <header className="flex justify-between items-center mb-4 md:mt-16 m-1">
+    // 앱헤더
+    <header className="flex fixed w-full justify-between items-center pt-5 pb-2 mb-4 m-1 md:hidden">
       {/* 뒤로가기 버튼 */}
-      <button onClick={() => router.back()}>
+      <button onClick={() => router.back()} className="p-1">
         <BackButton />
       </button>
 
@@ -94,13 +95,13 @@ const HeaderWithInfoIcon = ({
       <div className="flex items-center justify-center">
         <div className="relative">
           <div
-            className="text-white rounded-lg focus:outline-none cursor-pointer"
+            className="text-white rounded-lg focus:outline-none cursor-pointer p-1"
             onClick={handleTooltipToggle} // 클릭 시 툴팁 상태 토글
           >
             <InfoIcon
               color={iconHighLight ? '#9C6D2E' : '#959595'}
-              width="24"
-              height="24"
+              width="28"
+              height="28"
             />
           </div>
 
