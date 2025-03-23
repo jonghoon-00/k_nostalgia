@@ -1,11 +1,17 @@
 'use client';
 
+import DownButton from '@/components/icons/DownButton';
 import PlusIcon from '@/components/icons/PlusIcon';
+import UpButton from '@/components/icons/UpButton';
 import { AllAddresses } from '@/types/deliveryAddress';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger
+} from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { SetStateAction, useEffect } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
 
 interface Props {
   initialData: AllAddresses;
@@ -23,6 +29,8 @@ const DeliveryAddress = ({
   setShouldStoreDeliveryRequest
 }: Props) => {
   const router = useRouter();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   const { defaultAddress, addresses } = initialData;
 
   const { selectedAddressId, setAddress } = useDeliveryStore();
@@ -58,6 +66,7 @@ const DeliveryAddress = ({
           배송지
         </h2>
       </div>
+
       {/* 배송지 없을 경우(추가 버튼) */}
       {!defaultAddress ? (
         <Link href={`${ADD_ADDRESS_PAGE}?from=payment`} className="w-full">
@@ -99,6 +108,16 @@ const DeliveryAddress = ({
       {/* 구분선 */}
       <div className="w-full h-[2px] my-1 bg-[#F2F2F2]"></div>
 
+      {/* 요청 사항 dropdown 메뉴 */}
+      <DropdownMenu>
+        <DropdownMenuTrigger onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+          <button className="w-full flex justify-between items-center gap-2 px-4 py-3 h-10 border-[1px] rounded-[8px]">
+            요청사항 직접 입력하기
+            <span>{isDropdownOpen ? <DownButton /> : <UpButton />}</span>
+          </button>
+        </DropdownMenuTrigger>
+      </DropdownMenu>
+
       <div>
         <textarea
           className="resize-none h-[100px] w-full border border-gray-300 rounded mt-2 p-2 text-sm"
@@ -112,7 +131,7 @@ const DeliveryAddress = ({
           <input
             type="checkbox"
             className="mr-2"
-            checked={shouldStoreDeliveryRequest}
+            checked={shouldStoreDeliveryRequest || shippingRequest !== ''}
             onChange={(e) => setShouldStoreDeliveryRequest(e.target.checked)}
           />
           <span className="text-gray-600 text-sm">다음에도 사용할게요</span>
