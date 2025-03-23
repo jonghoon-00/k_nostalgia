@@ -111,7 +111,7 @@ const DeliveryAddress = ({
       {/* 요청 사항 dropdown 메뉴 */}
       <DropdownMenu>
         <DropdownMenuTrigger onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-          <button className="w-full flex justify-between items-center gap-2 px-4 py-3 h-10 border-[1px] rounded-[8px]">
+          <button className="w-full flex justify-between items-center gap-2 px-4 py-3 h-10 border-[1px] rounded-[8px] border-gray-300 text-sm text-[#AFACA7]">
             요청사항 직접 입력하기
             <span>{isDropdownOpen ? <DownButton /> : <UpButton />}</span>
           </button>
