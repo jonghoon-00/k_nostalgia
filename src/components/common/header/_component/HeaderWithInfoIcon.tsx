@@ -83,9 +83,12 @@ const HeaderWithInfoIcon = ({
 
   return (
     // 앱헤더
-    <header className="flex fixed w-full justify-between items-center pt-5 pb-2 mb-4 m-1 md:hidden">
+    <header className="flex fixed bg-normal w-full justify-between items-center pt-5 pb-2 px-4 mb-4 m-1 md:hidden">
       {/* 뒤로가기 버튼 */}
-      <button onClick={() => router.back()} className="p-1">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center justify-center"
+      >
         <BackButton />
       </button>
 
