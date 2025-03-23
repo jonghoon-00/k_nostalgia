@@ -62,13 +62,15 @@ const OrderPageContainer = ({ initialAddresses, user }: Props) => {
       <OrderProducts products={products} resetState={resetState} />
 
       {/* 할인 쿠폰 */}
-      {/* TODO 추후 작업.(구매 전 쿠폰 적용 작업 이후) */}
+      {/* TODO  */}
       <CouponInPaymentPage />
 
       {/* 결제 수단 선택 */}
+      {/* TODO 아이콘 추가, 라디오 버튼 css 수정 */}
       <PaymentMethodSelect />
 
       {/* 결제 요약(가격) 및 결제 버튼 */}
+      {/* TODO 드롭다운 적용 */}
       <OrderSummary
         payMethod={payMethod}
         shippingRequest={shippingRequest}
