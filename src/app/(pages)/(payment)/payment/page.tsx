@@ -17,6 +17,18 @@ const Payment = async () => {
 
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
+  const user = data.user;
+
+  let shippingRequest = '';
+  if (user) {
+    const { data } = await supabase
+      .from('users')
+      .select('shippingRequest')
+      .eq('id', user.id)
+      .single();
+
+    shippingRequest = data?.shippingRequest || '';
+  }
 
   return (
     <>
@@ -24,7 +36,11 @@ const Payment = async () => {
         toolTipContentArray={toolTipContentArray}
         isIncludeIconHighlighting={true}
       />
-      <OrderPageContainer initialAddresses={allAddresses} user={data.user} />;
+      <OrderPageContainer
+        initialAddresses={allAddresses}
+        initialShippingRequest={shippingRequest}
+      />
+      ;
     </>
   );
 };
