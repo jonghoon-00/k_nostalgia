@@ -1,5 +1,6 @@
 'use client';
 import useCouponStore from '@/zustand/coupon/useCouponStore';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CouponList from './CouponList';
 import DownloadableCoupons from './DownloadableCoupons';
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const CouponContents = ({ coupon }: Props) => {
+  const pathName = usePathname();
   const [activeTab, setActiveTab] = useState('coupons');
 
   const { setCoupon } = useCouponStore();
@@ -52,9 +54,7 @@ const CouponContents = ({ coupon }: Props) => {
 
       <div className="border border-[#F2F2F2]" />
 
-      <div>
-        {activeTab === 'coupons' && coupon && <CouponList mode="view" />}
-      </div>
+      <div>{activeTab === 'coupons' && coupon && <CouponList />}</div>
 
       <div className="flex justify-center items-center">
         {activeTab === 'download' && <DownloadableCoupons />}

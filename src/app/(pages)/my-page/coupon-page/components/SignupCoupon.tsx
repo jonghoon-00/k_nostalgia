@@ -15,7 +15,7 @@ const SignupCoupon = () => {
       width={640}
       height={161}
       priority
-      className="w-auto h-[161px] mt-[15px] md:w-[640px] md:h-[280px]"
+      className="w-auto h-[161px] md:w-[640px] md:h-[280px]"
     />
   );
 };
