@@ -1,6 +1,5 @@
 'use client';
 import useCouponStore from '@/zustand/coupon/useCouponStore';
-import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import CouponList from './CouponList';
 import DownloadableCoupons from './DownloadableCoupons';
@@ -10,7 +9,6 @@ interface Props {
 }
 
 const CouponContents = ({ coupon }: Props) => {
-  const pathName = usePathname();
   const [activeTab, setActiveTab] = useState('coupons');
 
   const { setCoupon } = useCouponStore();
@@ -24,6 +22,7 @@ const CouponContents = ({ coupon }: Props) => {
 
   return (
     <>
+      {/* 쿠폰 탭 */}
       <div className="flex mt-[15px] mx-auto w-[95%] justify-between items-center md:items-center md:justify-center md:gap-4">
         <div>
           <button
@@ -37,7 +36,6 @@ const CouponContents = ({ coupon }: Props) => {
             사용 가능 쿠폰
           </button>
         </div>
-
         <div>
           <button
             className={`px-6 py-2 border-b-4 text-[16px] ${
@@ -54,8 +52,10 @@ const CouponContents = ({ coupon }: Props) => {
 
       <div className="border border-[#F2F2F2]" />
 
+      {/* 쿠폰 리스트 */}
       <div>{activeTab === 'coupons' && coupon && <CouponList />}</div>
 
+      {/* 다운로드 가능한 쿠폰 */}
       <div className="flex justify-center items-center">
         {activeTab === 'download' && <DownloadableCoupons />}
       </div>

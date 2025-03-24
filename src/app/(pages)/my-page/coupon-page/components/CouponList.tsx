@@ -3,18 +3,17 @@
 import useCouponStore from '@/zustand/coupon/useCouponStore';
 import SignupCoupon from './SignupCoupon';
 
-interface CouponListProps {
-  // mode: 'view' | 'apply';
-}
-
 const CouponList = () => {
   const mode = sessionStorage.getItem('mode');
   const { discountAmount } = useCouponStore();
+
   return (
     <>
+      {/* 쿠폰 리스팅(view) */}
       {mode !== 'apply' && <SignupCoupon />}
 
       {/* TODO 구현 이후 session storage 초기화 로직 추가 */}
+      {/* 쿠폰 적용 */}
       {mode === 'apply' && (
         <div>
           <p>현재 적용된 할인 금액은</p>
