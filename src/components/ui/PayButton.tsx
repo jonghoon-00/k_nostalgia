@@ -27,7 +27,6 @@ type Props = {
   orderNameArr: string[];
   product: ProductProps;
   text: string; //버튼 텍스트 - 버튼 비활성화 및 스타일링에 사용
-  //isCouponApplied: boolean
 };
 
 type setGlobalStateParams = {
@@ -76,28 +75,6 @@ const PayButton = ({ orderNameArr, product, text }: Props) => {
     setPayRequestDataInGlobalState({ orderNameArr, nowUser });
     router.push('/payment');
   };
-
-  // const [isPaymentOpen, setIsPaymentOpen] = useState<boolean>(false);
-
-  // useEffect(() => {
-  //   //결제 창 활성화 시 PopStateEvent 제한
-  //   const handlePopstate = (e: PopStateEvent) => {
-  //     if (isPaymentOpen) {
-  //       e.preventDefault();
-  //       window.history.pushState(null, '', window.location.href);
-  //       toast({
-  //         description: '결제창을 먼저 종료해주세요'
-  //       });
-  //     }
-  //   };
-  //   if (isPaymentOpen) {
-  //     window.history.pushState(null, '', window.location.href);
-  //     window.addEventListener('popstate', handlePopstate);
-  //   }
-  //   return () => {
-  //     window.removeEventListener('popstate', handlePopstate);
-  //   };
-  // }, [isPaymentOpen]);
 
   const ButtonStylesObj: ButtonStylesObj = {
     '바로 구매하기':

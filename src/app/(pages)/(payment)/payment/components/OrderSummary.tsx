@@ -66,6 +66,29 @@ const OrderSummary = ({
     }
 
     //TODO 결제 POPSTATE 제한 로직 추가(paybutton.tsx 주석 참고)
+
+    // const [isPaymentOpen, setIsPaymentOpen] = useState<boolean>(false);
+
+    // useEffect(() => {
+    //   //결제 창 활성화 시 PopStateEvent 제한
+    //   const handlePopstate = (e: PopStateEvent) => {
+    //     if (isPaymentOpen) {
+    //       e.preventDefault();
+    //       window.history.pushState(null, '', window.location.href);
+    //       toast({
+    //         description: '결제창을 먼저 종료해주세요'
+    //       });
+    //     }
+    //   };
+    //   if (isPaymentOpen) {
+    //     window.history.pushState(null, '', window.location.href);
+    //     window.addEventListener('popstate', handlePopstate);
+    //   }
+    //   return () => {
+    //     window.removeEventListener('popstate', handlePopstate);
+    //   };
+    // }, [isPaymentOpen]);
+
     if (shouldStoreDeliveryRequest && shippingRequest !== '') {
       await supabase
         .from('users')
