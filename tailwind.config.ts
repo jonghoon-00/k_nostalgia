@@ -19,6 +19,29 @@ const config = {
         //색 설정
         //background
         normal: '#FAF8F5',
+        //red
+        'red-0' : '#000000',
+        'red-10' : '#3C0404',
+        'red-20' : '#631111',
+        'red-30' : '#A62424',
+        'red-40' : '#DB3B3B',
+        'red-50' : '#EF6B6B',
+        'red-60' : '#FE8D8D',
+        'red-70' : '#FFB6B6',
+        'red-80' : '#FFD7D7',
+        'red-90' : '#FFF2F2',
+
+        //gray
+        'gray-5' : '#0B0B0B',
+        'gray-10' : '#333333',
+        'gray-20' : '#545454',
+        'gray-30' : '#6B6B6B',
+        'gray-40' : '#838383',
+        'gray-50' : '#959595',
+        'gray-60' : '#AFAFAF',
+        'gray-70' : '#C8C8C8',
+        'gray-80' : '#E0E0E0',
+        'gray-90' : '#F2F2F2',
 
         //label 색상
         'label-strong': '#151515',
