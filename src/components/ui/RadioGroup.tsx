@@ -1,3 +1,4 @@
+//
 import React from 'react';
 
 interface RadioOption {
@@ -31,17 +32,17 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
             value={option.value}
             checked={selectedValue === option.value}
             onChange={() => onChange(option.value)}
-            className="hidden"
+            className="hidden peer"
           />
           <div
-            className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ${
+            className={`w-[20px] h-[20px] rounded-full flex items-center justify-center ${
               selectedValue === option.value
-                ? 'border-blue-500'
-                : 'border-gray-400'
+                ? 'bg-primary-20 border-[1px] border-primary-20'
+                : 'border-gray-70 border-[1px]'
             }`}
           >
             {selectedValue === option.value && (
-              <div className="w-3 h-3 bg-blue-500 rounded-full" />
+              <div className="w-[10px] h-[10px] bg-white rounded-full" />
             )}
           </div>
           <span>{option.label}</span>
