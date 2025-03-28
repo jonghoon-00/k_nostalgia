@@ -25,6 +25,7 @@ type State = {
   products: Products;
   customer: Customer;
   payMethod: string;
+  isCouponApplied: boolean;
 }
 type Actions = {
   setOrderName: (orderName: string) => void;
@@ -32,6 +33,7 @@ type Actions = {
   setProducts: (products: Products) => void;
   setCustomer: (customer: Customer) => void;
   setPayMethod: (method: string) => void;
+  setIsCouponApplied: (isApplied: boolean) => void;
   resetState: () => void;
 }
 
@@ -51,7 +53,8 @@ const initialState : State = {
     email: '',
     address:{}
   },
-  payMethod: ''
+  payMethod: '',
+  isCouponApplied: false,
 }
 
 export const usePaymentRequestStore = create<State & Actions>()(
@@ -63,6 +66,7 @@ export const usePaymentRequestStore = create<State & Actions>()(
       setProducts: (products) => set((state) => ({ ...state, products })),
       setCustomer: (customer) => set((state) => ({...state, customer})),
       setPayMethod: (method) => set((state)=> ({...state, payMethod: method})),
+      setIsCouponApplied: (isApplied) => set((state) => ({...state, isCouponApplied: isApplied})),
       resetState: () => set(initialState),
     }),
     {

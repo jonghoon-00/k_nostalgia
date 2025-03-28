@@ -26,7 +26,8 @@ const OrderPageContainer = ({
   const [shouldStoreDeliveryRequest, setShouldStoreDeliveryRequest] =
     useState(false);
 
-  const { products, resetState, payMethod } = usePaymentRequestStore();
+  const { products, resetState, payMethod, isCouponApplied } =
+    usePaymentRequestStore();
 
   // TODO 데스크탑에서만 주문/결제 이미지 표시 (png 파일 있는지 확인 후 없으면 추가)
   return (
@@ -45,7 +46,7 @@ const OrderPageContainer = ({
 
       {/* 할인 쿠폰 */}
       {/* TODO 추후 작업.(구매 전 쿠폰 적용 작업 이후) */}
-      <CouponInPaymentPage />
+      <CouponInPaymentPage isCouponApplied={isCouponApplied} />
 
       {/* 결제 수단 선택 */}
       <PaymentMethodSelect />

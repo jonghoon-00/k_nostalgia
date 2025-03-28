@@ -45,7 +45,15 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
               <div className="w-[10px] h-[10px] bg-white rounded-full" />
             )}
           </div>
-          <span>{option.label}</span>
+          <span
+            className={`${
+              selectedValue === option.value
+                ? 'text-primary-20'
+                : 'text-label-normal'
+            }`}
+          >
+            {option.label}
+          </span>
         </label>
       ))}
     </div>

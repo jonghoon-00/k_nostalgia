@@ -1,8 +1,14 @@
 'use client';
+import useCouponStore from '@/zustand/coupon/useCouponStore';
 import { useRouter } from 'next/navigation';
 
-const CouponInPaymentPage = () => {
+interface Props {
+  isCouponApplied: boolean;
+}
+
+const CouponInPaymentPage = ({ isCouponApplied }: Props) => {
   const router = useRouter();
+  const { discountAmount } = useCouponStore();
 
   return (
     <div className="bg-white p-4 flex flex-col gap-2 rounded-[12px] border-2 border-[#E0E0E0] mb-4">
@@ -18,7 +24,12 @@ const CouponInPaymentPage = () => {
           변경
         </button>
       </div>
-      <p className="text-gray-700 mt-2">0원</p>
+      <div className="flex justify-between">
+        <p>할인 금액</p>
+        <p className="text-gray-700 mt-2">
+          {isCouponApplied && discountAmount ? `-${discountAmount}원` : '0원'}
+        </p>
+      </div>
     </div>
   );
 };
