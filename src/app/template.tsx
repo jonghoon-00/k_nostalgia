@@ -75,6 +75,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
   else if (pathName === '/my-page/coupon-page') {
     headerTitle = '할인쿠폰';
     showSearch = false;
+    showChat = false;
+    showCart = false;
   }
   // 회원가입
   else if (pathName === '/sign-up') {
