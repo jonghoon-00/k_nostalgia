@@ -45,7 +45,6 @@ const OrderPageContainer = ({
       <OrderProducts products={products} resetState={resetState} />
 
       {/* 할인 쿠폰 */}
-      {/* TODO 추후 작업.(구매 전 쿠폰 적용 작업 이후) */}
       <CouponInPaymentPage isCouponApplied={isCouponApplied} />
 
       {/* 결제 수단 선택 */}
@@ -56,7 +55,6 @@ const OrderPageContainer = ({
         payMethod={payMethod}
         shippingRequest={shippingRequest}
         shouldStoreDeliveryRequest={shouldStoreDeliveryRequest}
-        initialAddresses={initialAddresses}
       />
     </main>
   );
