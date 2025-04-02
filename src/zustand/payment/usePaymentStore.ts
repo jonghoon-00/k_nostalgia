@@ -53,7 +53,7 @@ const initialState : State = {
     email: '',
     address:{}
   },
-  payMethod: '',
+  payMethod: 'toss',
   isCouponApplied: false,
 }
 
