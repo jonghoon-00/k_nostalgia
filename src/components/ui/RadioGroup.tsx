@@ -3,7 +3,7 @@ import React from 'react';
 
 interface RadioOption {
   value: any;
-  label: string;
+  label: string | React.ReactNode;
 }
 
 interface RadioGroupProps {
