@@ -1,35 +1,40 @@
 'use client';
 
 import requestPayment from '@/app/api/payment/requestPayment';
+import Accordion from '@/components/ui/Accordion';
 import { toast } from '@/components/ui/use-toast';
 import { useUser } from '@/hooks/useUser';
-import { AllAddresses } from '@/types/deliveryAddress';
 import supabase from '@/utils/supabase/client';
+import useCouponStore from '@/zustand/coupon/useCouponStore';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface Props {
   payMethod: string;
   shippingRequest: string;
   shouldStoreDeliveryRequest: boolean;
-  initialAddresses: AllAddresses;
 }
 const OrderSummary = ({
   payMethod,
   shippingRequest,
-  shouldStoreDeliveryRequest,
-  initialAddresses
+  shouldStoreDeliveryRequest
 }: Props) => {
   const router = useRouter();
-  const { products, orderName, totalAmount } = usePaymentRequestStore();
+
+  const [isAccordionOpen, setIsAccordionOpen] = useState(true);
+
+  const { products, orderName, totalAmount, isCouponApplied } =
+    usePaymentRequestStore();
   const { address } = useDeliveryStore();
+  const { discountAmount } = useCouponStore();
+
   const amount = products.reduce((acc, product) => acc + product.amount, 0);
   const totalQuantity = products.reduce(
     (acc, product) => acc + product.quantity,
     0
   );
-  const isCouponApplied = false;
 
   const { data: user } = useUser();
   const payRequest = async () => {
@@ -100,23 +105,33 @@ const OrderSummary = ({
       `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
     );
   };
-  const DELIVERY_FEE = 2500;
+  // TODO 아코디언 열고 닫힐 때 스크롤 위치 고정
   return (
     <>
-      <div className="bg-white p-4 flex flex-col gap-2 rounded-[12px] border-2 border-[#E0E0E0] mb-4">
-        <div className="flex justify-between text-gray-700 mb-2">
-          <span>상품 금액</span>
-          <span>{amount}원</span>
+      <Accordion
+        title={
+          <div className="flex w-full justify-between text-gray-700 font-bold">
+            <span>결제 금액</span>
+            <span className="text-primary-20">
+              {totalAmount.toLocaleString('ko-KR')}원
+            </span>
+          </div>
+        }
+        isOpen={isAccordionOpen}
+        onToggle={setIsAccordionOpen}
+        containerClassName="bg-white p-4 w-full flex flex-col gap-2 rounded-[12px] border-2 border-[#E0E0E0]"
+      >
+        <div className="text-label-strong text-[16px] flex flex-col gap-2">
+          <div className="w-full flex justify-between">
+            <span>상품 금액</span>
+            <span>{amount.toLocaleString('ko-KR')}원</span>
+          </div>
+          <div className="flex justify-between">
+            <span>배송비</span>
+            <span>{discountAmount?.toLocaleString('ko-KR')}원</span>
+          </div>
         </div>
-        <div className="flex justify-between text-gray-700 mb-2">
-          <span>배송비</span>
-          <span>{DELIVERY_FEE}원</span>
-        </div>
-        <div className="flex justify-between text-gray-700 font-bold">
-          <span>결제 금액</span>
-          <span>{totalAmount}원</span>
-        </div>
-      </div>
+      </Accordion>
 
       {/* 결제 버튼 */}
       <div className="bg-[#FAF8F5] w-full fixed flex justify-center bottom-0 left-0 pt-3 pb-6 shadow-custom">
