@@ -12,12 +12,10 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface Props {
-  payMethod: string;
   shippingRequest: string;
   shouldStoreDeliveryRequest: boolean;
 }
 const OrderSummary = ({
-  payMethod,
   shippingRequest,
   shouldStoreDeliveryRequest
 }: Props) => {
@@ -25,16 +23,24 @@ const OrderSummary = ({
 
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
 
-  const { products, orderName, totalAmount, isCouponApplied } =
-    usePaymentRequestStore();
+  const {
+    products,
+    orderName,
+    totalAmount,
+    isCouponApplied,
+    payMethod,
+    totalQuantity,
+    setTotalQuantity
+  } = usePaymentRequestStore();
   const { address } = useDeliveryStore();
   const { discountAmount } = useCouponStore();
 
   const amount = products.reduce((acc, product) => acc + product.amount, 0);
-  const totalQuantity = products.reduce(
-    (acc, product) => acc + product.quantity,
-    0
-  );
+  if (products.length > 0) {
+    setTotalQuantity(
+      products.reduce((acc, product) => acc + product.quantity, 0)
+    );
+  }
 
   const { data: user } = useUser();
   const payRequest = async () => {
@@ -105,7 +111,6 @@ const OrderSummary = ({
       `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
     );
   };
-  // TODO 아코디언 열고 닫힐 때 스크롤 위치 고정
   return (
     <>
       <Accordion
@@ -139,7 +144,7 @@ const OrderSummary = ({
           onClick={payRequest}
           className="w-[90%] max-w-[420px] bg-primary-20 text-white py-3 rounded-[12px] font-bold"
         >
-          {totalAmount}원 결제하기
+          {totalAmount.toLocaleString('ko-KR')}원 결제하기
         </button>
       </div>
     </>

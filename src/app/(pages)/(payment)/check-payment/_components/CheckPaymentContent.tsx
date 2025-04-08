@@ -18,6 +18,7 @@ const CheckPaymentContent = () => {
   const paymentId = searchParams.get('paymentId');
   const code = searchParams.get('code');
   const totalQuantity = searchParams.get('totalQuantity');
+  //TODO TOTAL QUANTITY zustand에서 가져오기
   const isCouponApplied = searchParams.get('isCouponApplied');
 
   const [isPaymentHistoryLoaded, setIsPaymentHistoryLoaded] =

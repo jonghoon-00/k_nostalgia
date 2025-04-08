@@ -1,3 +1,8 @@
+// requestPayment 함수가 메인
+// 토스/카카오/이니시스 결제 요청 함수 위치
+
+// update : 25.04.08
+
 'use client';
 
 import { toast } from '@/components/ui/use-toast';
@@ -14,20 +19,19 @@ interface PayRequestParameters {
   user: Tables<'users'>;
   totalAmount: number;
   orderName: string;
-  products: Products
+  products: Products,
+
 }
 
+//결제 요청 함수
 export default async function requestPayment({
   payMethod,
   user,
   totalAmount,
   orderName,
-  products
+  products,
+
 }: PayRequestParameters) {
-  const totalQuantity = products.reduce(
-    (acc, product) => acc + product.quantity,
-    0
-  );
 
   toast({
     variant: 'destructive',
@@ -48,7 +52,6 @@ export default async function requestPayment({
       orderName,
       products,
       totalAmount,
-      totalQuantity
     );
   }
   if (payMethod === '카카오페이') {
@@ -57,7 +60,6 @@ export default async function requestPayment({
       orderName,
       products,
       totalAmount,
-      totalQuantity
     );
   }
   if (payMethod === '일반결제') {
@@ -66,14 +68,12 @@ export default async function requestPayment({
       orderName,
       products,
       totalAmount,
-      totalQuantity
     );
   }
   return response;
 }
 
 const date = dayjs(new Date(Date.now())).locale('ko').format('YYMMDD');
-const isCouponApplied = false; //TODO 추후 수정
 
 //이니시스 일반 결제
 async function requestInicisPayment(
@@ -81,7 +81,6 @@ async function requestInicisPayment(
   orderName: string,
   products: Products,
   totalAmount: number,
-  totalQuantity: number
 ) {
   const response = await PortOne.requestPayment({
     storeId: process.env.NEXT_PUBLIC_STORE_ID as string,
@@ -94,12 +93,12 @@ async function requestInicisPayment(
     products: products,
     redirectUrl:
       process.env.NODE_ENV === 'production'
-        ? `https://https://k-nostalgia-one.vercel.app/check-payment?totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
-        : `http://localhost:3000/check-payment?totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`,
+        ? `https://https://k-nostalgia-one.vercel.app/check-payment`
+        : `http://localhost:3000/check-payment`,
     appScheme:
       process.env.NODE_ENV === 'production'
-        ? `https://https://k-nostalgia-one.vercel.app/check-payment?totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
-        : `http://localhost:3000/check-payment?totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`,
+        ? `https://https://k-nostalgia-one.vercel.app/check-payment`
+        : `http://localhost:3000/check-payment`,
     noticeUrls: [
       //webhook url
       `https://k-nostalgia-one.vercel.app/api/payment/webhook`, //실 배포 url
@@ -130,7 +129,6 @@ async function requestTossPayment(
   orderName: string,
   products: Products,
   totalAmount: number,
-  totalQuantity: number
 ) {
   const response = await PortOne.requestPayment({
     storeId: process.env.NEXT_PUBLIC_STORE_ID as string,
@@ -146,8 +144,8 @@ async function requestTossPayment(
   //   products: products,
     redirectUrl:
       process.env.NODE_ENV === 'production'
-        ? `https://https://k-nostalgia-one.vercel.app/check-payment?totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
-        : `http://localhost:3000/check-payment?totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`,
+        ? `https://https://k-nostalgia-one.vercel.app/check-payment?`
+        : `http://localhost:3000/check-payment?`,
     // noticeUrls: [
     //   //webhook url
     //   `https://k-nostalgia-one.vercel.app/api/payment/webhook`, //실 배포 url
@@ -174,7 +172,6 @@ async function requestKakaoPayment(
   orderName: string,
   products: Products,
   totalAmount: number,
-  totalQuantity: number
 ) {
   const response = await PortOne.requestPayment({
     storeId: process.env.NEXT_PUBLIC_STORE_ID as string,
