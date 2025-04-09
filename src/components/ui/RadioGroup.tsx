@@ -24,11 +24,8 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   return (
     <div className="flex flex-col gap-2">
       {options.map((option, index) => (
-        <>
-          <label
-            key={option.value}
-            className="flex items-center gap-2 cursor-pointer"
-          >
+        <div key={option.value}>
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
               name={name}
@@ -61,7 +58,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
           {withDivider && index < options.length - 1 && (
             <hr className=" border-gray-90 h-[1px]" />
           )}
-        </>
+        </div>
       ))}
     </div>
   );
