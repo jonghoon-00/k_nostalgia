@@ -15,13 +15,16 @@ import dayjs from 'dayjs';
 import { uuid as uuidv4 } from 'uuidv4';
 
 interface PayRequestParameters {
-  payMethod: string;
+  payMethod: string; // toss | kakao | normal
   user: Tables<'users'>;
   totalAmount: number;
   orderName: string;
   products: Products,
 
 }
+
+const PRODUCTION_URL = 'https://k-nostalgia.vercel.app/';
+const DEV_URL = 'http://localhost:3000/';
 
 //결제 요청 함수
 export default async function requestPayment({
@@ -46,23 +49,19 @@ export default async function requestPayment({
 
   let response;
 
-  if (payMethod === '토스페이') {
+  if (payMethod === 'toss') {
     response = await requestTossPayment(
-      user,
       orderName,
-      products,
       totalAmount,
     );
   }
-  if (payMethod === '카카오페이') {
+  if (payMethod === 'kakao') {
     response = await requestKakaoPayment(
-      user,
       orderName,
-      products,
       totalAmount,
     );
   }
-  if (payMethod === '일반결제') {
+  if (payMethod === 'normal') {
     response = await requestInicisPayment(
       user,
       orderName,
@@ -93,16 +92,15 @@ async function requestInicisPayment(
     products: products,
     redirectUrl:
       process.env.NODE_ENV === 'production'
-        ? `https://https://k-nostalgia-one.vercel.app/check-payment`
-        : `http://localhost:3000/check-payment`,
+        ? `${PRODUCTION_URL}/check-payment`
+        : `${DEV_URL}/check-payment`,
     appScheme:
       process.env.NODE_ENV === 'production'
-        ? `https://https://k-nostalgia-one.vercel.app/check-payment`
-        : `http://localhost:3000/check-payment`,
+      ? `${PRODUCTION_URL}/check-payment`
+      : `${DEV_URL}/check-payment`,
     noticeUrls: [
       //webhook url
-      `https://k-nostalgia-one.vercel.app/api/payment/webhook`, //실 배포 url
-      'https://k-nostalgia-vdpl.vercel.app/api/payment/webhook', //테스트용 배포 url
+      `${PRODUCTION_URL}/api/payment/webhook`, //실 배포 url
       'https://7ac2-121-163-241-29.ngrok-free.app/api/payment/webhook' //테스트용 ngrok 서버
     ],
     customer: {
@@ -125,14 +123,12 @@ async function requestInicisPayment(
 }
 
 async function requestTossPayment(
-  user: Tables<'users'>,
   orderName: string,
-  products: Products,
   totalAmount: number,
 ) {
   const response = await PortOne.requestPayment({
     storeId: process.env.NEXT_PUBLIC_STORE_ID as string,
-    channelKey: process.env.NEXT_PUBLIC_TOSS_CHANNEL_KEY,
+    channelKey: process.env.NEXT_PUBLIC_TOSS_CHANEL_KEY,
     paymentId: `${date}-${uuidv4().slice(0, 13)}`,
     orderName,
     totalAmount,
@@ -141,49 +137,35 @@ async function requestTossPayment(
     easyPay:{
       easyPayProvider: 'EASY_PAY_PROVIDER_TOSSPAY'
     },
-  //   products: products,
     redirectUrl:
       process.env.NODE_ENV === 'production'
-        ? `https://https://k-nostalgia-one.vercel.app/check-payment?`
-        : `http://localhost:3000/check-payment?`,
-    // noticeUrls: [
-    //   //webhook url
-    //   `https://k-nostalgia-one.vercel.app/api/payment/webhook`, //실 배포 url
-    //   'https://k-nostalgia-vdpl.vercel.app/api/payment/webhook', //테스트용 배포 url
-    //   'https://7ac2-121-163-241-29.ngrok-free.app/api/payment/webhook' //테스트용 ngrok 서버
-    // ],
-    // customer: {
-      
-    //   customerId: user.id,
-    //   email: user.email as string,
-    //   phoneNumber: '01000000000',
-    //   fullName: user.name as string
-    // },
-  //   windowType: {
-  //     pc: 'IFRAME',
-  //     mobile: 'REDIRECTION'
-  //   },
+      ? `${PRODUCTION_URL}/check-payment`
+      : `${DEV_URL}/check-payment`,
   });
   return response;
 }
 
 async function requestKakaoPayment(
-  user: Tables<'users'>,
   orderName: string,
-  products: Products,
   totalAmount: number,
 ) {
   const response = await PortOne.requestPayment({
     storeId: process.env.NEXT_PUBLIC_STORE_ID as string,
-    channelKey: process.env.NEXT_PUBLIC_KAKAO_CHANNEL_KEY,
+    channelKey: process.env.NEXT_PUBLIC_KAKAO_CHANEL_KEY,
     paymentId: `${date}-${uuidv4().slice(0, 13)}`,
     orderName,
     totalAmount,
     currency: 'CURRENCY_KRW',
     payMethod: 'EASY_PAY',
-    easyPay:{
-      easyPayProvider: 'EASY_PAY_PROVIDER_KAKAOPAY'
+    bypass: {
+      kakaopay: {
+        custom_message: "테스트용 가결제입니다"
+      }
     },
+    redirectUrl:
+    process.env.NODE_ENV === 'production'
+    ? `${PRODUCTION_URL}/check-payment`
+    : `${DEV_URL}/check-payment`,
   });
   return response;
 }
