@@ -10,8 +10,8 @@ import {
   DropdownMenuTrigger
 } from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { SetStateAction, useEffect, useState } from 'react';
+import AddressChangeButton from './AddressChangeButton';
 
 interface Props {
   initialData: AllAddresses;
@@ -28,7 +28,6 @@ const DeliveryAddress = ({
   shouldStoreDeliveryRequest,
   setShouldStoreDeliveryRequest
 }: Props) => {
-  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { defaultAddress, addresses } = initialData;
@@ -57,8 +56,8 @@ const DeliveryAddress = ({
   const zipCode = baseAddress.match(/\((\d+)\)/)?.[1];
   const baseAddressWithoutZipCode = baseAddress.split('(')[0];
 
-  const ADDRESS_LIST_PAGE = '/my-page/setting/delivery-address';
   const ADD_ADDRESS_PAGE = '/my-page/setting/delivery-address/add-new';
+
   return (
     <div className="bg-white p-4 flex flex-col gap-2 rounded-[12px] border-2 border-[#E0E0E0] mb-4">
       <div className="flex flex-col justify-between items-center">
@@ -81,17 +80,8 @@ const DeliveryAddress = ({
             <p className="text-label-strong text-[16px] font-semibold">
               {addressName}
             </p>
-
-            <button
-              className="text-xs font-normal text-[#79746D] border-[1px] border-[#959595] rounded-[6px] py-1 px-2"
-              onClick={() => {
-                router.replace(
-                  `${ADDRESS_LIST_PAGE}?from=payment&addressId=${id}`
-                );
-              }}
-            >
-              변경
-            </button>
+            {/* 변경 버튼 */}
+            <AddressChangeButton selectedAddressId={id} />
           </div>
           <p className="text-label-strong">{receiverName}</p>
           <p className="text-label-alternative">{phoneNumber}</p>
