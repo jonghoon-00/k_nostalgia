@@ -28,7 +28,6 @@ const OrderPageContainer = ({
 
   const { products, resetState, isCouponApplied } = usePaymentRequestStore();
 
-  // TODO 데스크탑에서만 주문/결제 이미지 표시 (png 파일 있는지 확인 후 없으면 추가)
   return (
     <>
       <main className="mx-auto md:max-w-[1080px] p-4 md:p-0 bg-normal mb-14 mt-16 md:mt-0 md:flex md:gap-6">
