@@ -9,7 +9,7 @@ import useCouponStore from '@/zustand/coupon/useCouponStore';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface Props {
   shippingRequest: string;
@@ -36,21 +36,11 @@ const OrderSummary = ({
   const { discountAmount } = useCouponStore();
 
   const amount = products.reduce((acc, product) => acc + product.amount, 0);
-  if (products.length > 0) {
-    setTotalQuantity(
-      products.reduce((acc, product) => acc + product.quantity, 0)
-    );
-  }
 
   const { data: user } = useUser();
   const payRequest = async () => {
     if (!user) {
       return console.error('유저 정보 가져올 수 없음');
-    }
-    if (!payMethod) {
-      return toast({
-        description: '결제 수단을 선택해주세요'
-      });
     }
     if (!address) {
       return toast({
@@ -68,12 +58,11 @@ const OrderSummary = ({
 
     //response.code가 존재 === 결제 실패
     if (response?.code != null) {
-      toast({
+      console.log(response.code);
+      return toast({
         variant: 'destructive',
         description: '결제에 실패했습니다 다시 시도해주세요'
       });
-      console.log(response.code);
-      return response;
     }
 
     //TODO 결제 POPSTATE 제한 로직 추가(paybutton.tsx 주석 참고)
@@ -107,10 +96,21 @@ const OrderSummary = ({
         .eq('id', user.id);
     }
 
-    router.push(
-      `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
-    );
+    if (response?.code) {
+      router.push(
+        `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
+      );
+    }
   };
+
+  useEffect(() => {
+    if (products.length > 0) {
+      setTotalQuantity(
+        products.reduce((acc, product) => acc + product.quantity, 0)
+      );
+    }
+  }, [products]);
+
   return (
     <>
       <Accordion
@@ -139,10 +139,10 @@ const OrderSummary = ({
       </Accordion>
 
       {/* 결제 버튼 */}
-      <div className="bg-[#FAF8F5] w-full fixed flex justify-center bottom-0 left-0 pt-3 pb-6 shadow-custom">
+      <div className="bg-normal w-full fixed md:relative flex justify-center bottom-0 left-0 pt-3 pb-6 md:p-0 shadow-custom md:shadow-none">
         <button
           onClick={payRequest}
-          className="w-[90%] max-w-[420px] bg-primary-20 text-white py-3 rounded-[12px] font-bold"
+          className="w-[90%] md:w-full md:mt-4 max-w-[420px] bg-primary-20 text-white py-3 rounded-[12px] font-bold"
         >
           {totalAmount.toLocaleString('ko-KR')}원 결제하기
         </button>
