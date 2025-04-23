@@ -1,14 +1,14 @@
 interface ChevronRightIconProps {
-  width?: string;
-  height?: string;
+  width?: number;
+  height?: number;
   color?: string;
 }
 const ChevronRightIcon = ({ width, height, color }: ChevronRightIconProps) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={width ?? '16'}
-      height={height ?? '16'}
+      width={width ? `${width}` : '16'}
+      height={height ? `${height}` : '16'}
       viewBox="0 0 16 16"
       fill="none"
     >
