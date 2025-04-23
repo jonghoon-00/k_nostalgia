@@ -1,14 +1,30 @@
 'use client';
+import useDeviceSize from '@/hooks/useDeviceSize';
 import useCouponStore from '@/zustand/coupon/useCouponStore';
-import { useRouter } from 'next/navigation';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 interface Props {
   isCouponApplied: boolean;
+  setIsShowPaymentRender: Dispatch<SetStateAction<boolean>>;
 }
 
-const CouponInPaymentPage = ({ isCouponApplied }: Props) => {
-  const router = useRouter();
+const CouponInPaymentPage = ({
+  isCouponApplied,
+  setIsShowPaymentRender
+}: Props) => {
+  const [isShowCouponList, setIsShowCouponList] = useState(false);
+
   const { discountAmount } = useCouponStore();
+  const { isMobile } = useDeviceSize();
+
+  const handleChangeCoupon = () => {
+    setIsShowCouponList(!isShowCouponList);
+    setIsShowPaymentRender(false);
+
+    if (isMobile) {
+      // return <CouponList />;
+    }
+  };
 
   return (
     <div className="bg-white p-4 flex flex-col gap-2 rounded-[12px] border-2 border-[#E0E0E0] mb-4">
@@ -16,10 +32,11 @@ const CouponInPaymentPage = ({ isCouponApplied }: Props) => {
         <h2 className="text-gray-600 font-bold">할인/쿠폰</h2>
         <button
           className="text-xs font-normal text-[#79746D] border-[1px] border-[#959595] rounded-[6px] py-1 px-2"
-          onClick={() => {
-            router.push('/my-page/coupon-page');
-            sessionStorage.setItem('mode', 'apply');
-          }}
+          onClick={handleChangeCoupon}
+          // onClick={() => {
+          // router.push('/my-page/coupon-page');
+          // sessionStorage.setItem('mode', 'apply');
+          // }}
         >
           변경
         </button>

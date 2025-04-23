@@ -1,8 +1,9 @@
 'use client';
+
 import useCouponStore from '@/zustand/coupon/useCouponStore';
 import { useEffect, useState } from 'react';
-import CouponList from './CouponList';
 import DownloadableCoupons from './DownloadableCoupons';
+import SignupCoupon from './SignupCoupon';
 
 interface Props {
   coupon: string;
@@ -53,7 +54,13 @@ const CouponContents = ({ coupon }: Props) => {
       <div className="border border-[#F2F2F2]" />
 
       {/* 쿠폰 리스트 */}
-      <div>{activeTab === 'coupons' && coupon && <CouponList />}</div>
+      <div>
+        {activeTab === 'coupons' && coupon && (
+          <div className="p-4">
+            <SignupCoupon />
+          </div>
+        )}
+      </div>
 
       {/* 다운로드 가능한 쿠폰 */}
       <div className="flex justify-center items-center">

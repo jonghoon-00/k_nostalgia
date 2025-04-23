@@ -1,37 +1,42 @@
+'use client';
+
+import SignupCoupon from '@/app/(pages)/my-page/coupon-page/components/SignupCoupon';
 import RefreshIcon from '@/components/icons/RefreshIcon';
 import RadioGroup from '@/components/ui/RadioGroup';
 import useCouponStore from '@/zustand/coupon/useCouponStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import SignupCoupon from './SignupCoupon';
+import { useState } from 'react';
 
-const ApplyCoupon = () => {
-  const router = useRouter();
+const CouponList = () => {
+  //쿠폰 불러오기(csr)
+  //적용 로직(couponStore set)
+  //모바일 : 적용시 화면 전환
+  //데스크탑 : 모달
+
   const { coupon, discountAmount, setDiscountAmount, applyMaxDiscount } =
     useCouponStore();
   const { setIsCouponApplied } = usePaymentRequestStore();
 
-  const [isApplyDiscount, setIsApplyDiscount] = useState(false);
+  const [isApplyDiscount, setIsApplyDiscount] = useState(false); //라디오 그룹에 사용용
 
-  useEffect(() => {
-    if (isApplyDiscount && coupon) {
-      setDiscountAmount(coupon);
-    }
-    if (!isApplyDiscount) {
-      setDiscountAmount(null);
-    }
-  }, [isApplyDiscount]);
+  // useEffect(() => {
+  //   if (isApplyDiscount && coupon) {
+  //     setDiscountAmount(coupon);
+  //   }
+  //   if (!isApplyDiscount) {
+  //     setDiscountAmount(null);
+  //   }
+  // }, [isApplyDiscount]);
 
-  useEffect(() => {
-    if (discountAmount) {
-      setIsApplyDiscount(true);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (discountAmount) {
+  //     setIsApplyDiscount(true);
+  //   }
+  // }, []);
 
   return (
     <>
-      <div className="text-xl font-medium px-4">
+      <div className="text-xl font-medium px-4 mt-2 md:mt-6">
         <p>현재 적용된 할인 금액은</p>
         <p>
           <span className="text-primary-20">
@@ -39,7 +44,7 @@ const ApplyCoupon = () => {
           </span>
           원이에요
         </p>
-        <div className="bg-white p-4 mt-4 border-[#e0e0e0] rounded-xl border-[1px] flex flex-col justify-center items-start">
+        <div className="bg-white md:bg-normal p-4 mt-4 border-[#e0e0e0] md:border-none rounded-xl border-[1px] flex flex-col justify-center items-start">
           <SignupCoupon />
 
           <div className="flex gap-4 text-base mt-[18px]">
@@ -61,14 +66,12 @@ const ApplyCoupon = () => {
       </div>
 
       {/* 적용 버튼 */}
-      <div className="bg-normal z-[1000] fixed w-full mx-[-1rem] pt-4 px-4 bottom-6 shadow-custom">
+      <div className="bg-normal z-[1000] fixed md:relative w-full mx-[-1rem] pt-4 px-4 bottom-6 md:bottom-0 shadow-custom md:shadow-none md:mt-4">
         {isApplyDiscount && (
           <button
             className="w-full bg-primary-20 text-white py-4 rounded-[8px] text-base"
             onClick={() => {
               setIsCouponApplied(true);
-              sessionStorage.removeItem('mode');
-              router.push('/payment');
             }}
           >
             -{discountAmount}원 할인 적용
@@ -90,7 +93,6 @@ const ApplyCoupon = () => {
               className="w-full bg-primary-20 text-white py-4 rounded-[8px]"
               onClick={() => {
                 setIsCouponApplied(true);
-                router.push('/payment');
               }}
             >
               {discountAmount !== 0 && '-'}
@@ -103,4 +105,4 @@ const ApplyCoupon = () => {
   );
 };
 
-export default ApplyCoupon;
+export default CouponList;

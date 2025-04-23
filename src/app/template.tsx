@@ -15,14 +15,23 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const pathName = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [isGuest, setIsGuest] = useState<boolean>(false);
+  const [hasMounted, setHasMounted] = useState(false); //마운트여부
 
   useEffect(() => {
-    setIsClient(true);
+    if (!isClient) {
+      localStorage.setItem('isClient', 'true');
+      setIsClient(true);
+    }
+
     const guestCookie = Cookies.get('guest') === 'true';
     setIsGuest(guestCookie);
   }, []);
 
-  if (!isClient) {
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!isClient && hasMounted) {
     return <FirstLoading />;
   }
 
@@ -114,7 +123,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     }
   }
   // 장바구니
-  else if (pathName === '/cart') {
+  else if (pathName.includes('cart')) {
     headerTitle = '장바구니';
     showSearch = false;
     showCart = false;

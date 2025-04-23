@@ -2,6 +2,7 @@
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 import { Tables } from '@/types/supabase';
 import useCouponStore from '@/zustand/coupon/useCouponStore';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface CartProps {
@@ -11,6 +12,7 @@ interface CartProps {
 const DELIVERY_FEE = 2500;
 
 export const CartPriceList = ({ data, selectedItems }: CartProps) => {
+  const router = useRouter();
   const [totalAmount, setTotalAmount] = useState(0);
   const { discountAmount } = useCouponStore();
 
@@ -56,7 +58,10 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
           </p>
         </li>
         <li className="flex justify-between mb-4">
-          <div className="flex items-center gap-1">
+          <div
+            className="flex items-center gap-1"
+            onClick={() => router.push('/cart/coupon')}
+          >
             <p>쿠폰 할인</p>
             <ChevronRightIcon />
           </div>
