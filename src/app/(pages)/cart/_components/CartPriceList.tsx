@@ -1,5 +1,7 @@
 'use client';
+import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 import { Tables } from '@/types/supabase';
+import useCouponStore from '@/zustand/coupon/useCouponStore';
 import { useEffect, useState } from 'react';
 
 interface CartProps {
@@ -7,10 +9,10 @@ interface CartProps {
   selectedItems: string[];
 }
 const DELIVERY_FEE = 2500;
-const COUPON = 2000;
 
 export const CartPriceList = ({ data, selectedItems }: CartProps) => {
   const [totalAmount, setTotalAmount] = useState(0);
+  const { discountAmount } = useCouponStore();
 
   useEffect(() => {
     const calculator =
@@ -32,8 +34,11 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
     return null;
   }
 
+  const couponDiscountAmount =
+    typeof discountAmount === 'number' ? discountAmount : 0;
+
   //총 결제금액
-  const totalPrice = totalAmount + DELIVERY_FEE - COUPON;
+  const totalPrice = totalAmount + DELIVERY_FEE - couponDiscountAmount;
 
   return (
     <div className="bg-normal mt-2 pt-6 pb-[30%] md:pb-0">
@@ -51,10 +56,13 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
           </p>
         </li>
         <li className="flex justify-between mb-4">
-          <p>상품 할인 금액</p>
+          <div className="flex items-center gap-1">
+            <p>쿠폰 할인</p>
+            <ChevronRightIcon />
+          </div>
           <p>
             {selectedItems.length > 0
-              ? `-${COUPON.toLocaleString()} 원`
+              ? `${discountAmount?.toLocaleString()} 원`
               : `0 원`}
           </p>
         </li>
