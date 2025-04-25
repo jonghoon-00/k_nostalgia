@@ -15,23 +15,14 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const pathName = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [isGuest, setIsGuest] = useState<boolean>(false);
-  const [hasMounted, setHasMounted] = useState(false); //마운트여부
 
   useEffect(() => {
-    if (!isClient) {
-      localStorage.setItem('isClient', 'true');
-      setIsClient(true);
-    }
-
+    setIsClient(true);
     const guestCookie = Cookies.get('guest') === 'true';
     setIsGuest(guestCookie);
   }, []);
 
-  useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  if (!isClient && hasMounted) {
+  if (!isClient) {
     return <FirstLoading />;
   }
 
