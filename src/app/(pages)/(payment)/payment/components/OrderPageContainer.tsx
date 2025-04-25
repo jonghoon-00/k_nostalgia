@@ -1,5 +1,12 @@
 'use client';
 
+//역할 분리 필요해보임
+// 상태 관리가 집중돼 있음, 렌더링 조건 분기까지 직접 처리, 모든 주요 UI를 직접 포함
+// OrderPageContainer : 레이아웃 및 상위 상태만 담당 (순수 컨테이너 역할)
+// OrderPageMain : 실제 UI 렌더링 (main 내부 렌더링 분리)
+// useOrderPageState.ts : 로컬 상태를 하나의 커스텀 훅으로 묶어서 로직 분리
+// + 해당 관심사 분리 정리 및 문서 혹은 블로그 글로 정리
+
 import { AllAddresses } from '@/types/deliveryAddress';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 import { useState } from 'react';
