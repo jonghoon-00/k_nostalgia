@@ -59,7 +59,7 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
         </li>
         <li className="flex justify-between mb-4">
           <div
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 cursor-pointer"
             onClick={() => router.push('/cart/coupon')}
           >
             <p>쿠폰 할인</p>
