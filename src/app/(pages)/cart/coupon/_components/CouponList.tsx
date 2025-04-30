@@ -21,6 +21,9 @@ const CouponList = ({ coupon }: CouponListProps) => {
 
   return (
     <>
+      {/* TODO 쿠폰 - 상품 리스트에서 적용하는 부분 삭제됨 */}
+      {/* 쿠폰 리스트 띄우고, 거기에서 클릭 시 전에 금액에 적용 */}
+      {/* 쿠폰이 있을 경우 기본값 : 적용 상태 + 적용 취소 가능해야함 */}
       {!isSelectingProduct && (
         <div className="flex justify-between items-center px-4">
           <SignupCoupon />

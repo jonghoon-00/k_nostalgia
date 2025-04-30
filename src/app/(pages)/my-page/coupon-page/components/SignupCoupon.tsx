@@ -7,6 +7,9 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 const SignupCoupon = () => {
+  //TODO couponList 로 이름 변경
+  //coupon 을 list props로 받고,
+  //map으로 띄우는 형식으로 변경
   const [isLoading, setIsLoading] = useState(true);
 
   const { coupon } = useCouponStore();

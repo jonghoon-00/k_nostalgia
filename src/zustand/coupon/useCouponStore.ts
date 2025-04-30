@@ -2,6 +2,8 @@ import { create } from "zustand";
 
 type State = {
   coupon: string | null;
+  //TODO coupon : string[] 로 변경
+  // 쿠폰, 할인 금액 등 set하는 부분 변경한 coupon(list로변경) 에 맞게 수정정
   discountAmount: number | null;
   availableCoupons: string[];
 }
