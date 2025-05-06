@@ -6,11 +6,17 @@ const CouponPage = async () => {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
 
-  const { data: coupon } = await supabase
+  const { data: couponCodeList } = await supabase
     .from('users')
-    .select('coupon')
+    .select('coupons')
     .eq('id', data.user?.id as string)
     .single();
+
+  /* TODO : 쿠폰이 없을 때 처리(ui) */
+  if (!couponCodeList?.coupons || couponCodeList.coupons.length === 0) {
+    return <div>쿠폰 없음</div>;
+  }
+  const { coupons } = couponCodeList;
 
   return (
     <div className=" p-4 bg-normal mt-20">
@@ -24,7 +30,9 @@ const CouponPage = async () => {
         />
       </div>
 
-      <CouponContents coupon={coupon?.coupon as string} />
+      <>
+        <CouponContents couponCodeList={coupons} />
+      </>
     </div>
   );
 };

@@ -1,24 +1,49 @@
 'use client';
 
-import useCouponStore from '@/zustand/coupon/useCouponStore';
-import { useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+import supabase from '@/utils/supabase/client';
+import React, { useEffect, useState } from 'react';
+import CouponItem from './CouponItem';
 import DownloadableCoupons from './DownloadableCoupons';
-import SignupCoupon from './SignupCoupon';
 
 interface Props {
-  coupon: string;
+  couponCodeList: string[];
 }
 
-const CouponContents = ({ coupon }: Props) => {
+const CouponContents: React.FC<Props> = ({ couponCodeList }) => {
   const [activeTab, setActiveTab] = useState('coupons');
+  const [imageUrlList, setImageUrlList] = useState<string[]>([]);
 
-  const { setCoupon } = useCouponStore();
+  const [isLoading, setIsLoading] = useState(true);
+
+  const getCouponCodeList = async (couponCodeList: string[]) => {
+    // 쿠폰이 없을 때 처리는 page.tsx에 되어있음
+    const { data: imageUrlListFromDB } = await supabase
+      .from('coupons')
+      .select('image_url')
+      .in('code', couponCodeList);
+
+    if (!imageUrlListFromDB || imageUrlListFromDB.length === 0) {
+      return console.error('이미지 url get 에러');
+    }
+
+    return imageUrlListFromDB.filter((item) => item.image_url !== null) as {
+      image_url: string;
+    }[];
+  };
+
+  const getImageUrlArray = (imageUrlListFromDB: { image_url: string }[]) => {
+    const imageUrls = imageUrlListFromDB?.map((item) => item.image_url);
+    setImageUrlList(imageUrls);
+  };
 
   useEffect(() => {
-    setCoupon(coupon);
-    return () => {
-      setCoupon(null);
-    };
+    getCouponCodeList(couponCodeList).then((imageUrlListFromDB) => {
+      if (imageUrlListFromDB) {
+        getImageUrlArray(imageUrlListFromDB);
+      }
+      setIsLoading(false);
+    });
   }, []);
 
   return (
@@ -55,9 +80,16 @@ const CouponContents = ({ coupon }: Props) => {
 
       {/* 쿠폰 리스트 */}
       <div>
-        {activeTab === 'coupons' && coupon && (
+        {activeTab === 'coupons' && (
           <div className="p-4">
-            <SignupCoupon />
+            {isLoading
+              ? // 로딩 스켈레톤
+                Array.from({ length: 2 }, (_, index) => (
+                  <Skeleton className="w-[311px] h-[161px] md:w-[640px] md:h-[280px] bg-label-disable rounded-xl mb-4" />
+                ))
+              : imageUrlList.map((imageUrl) => (
+                  <CouponItem imageUrl={imageUrl} key={imageUrl} />
+                ))}
           </div>
         )}
       </div>
