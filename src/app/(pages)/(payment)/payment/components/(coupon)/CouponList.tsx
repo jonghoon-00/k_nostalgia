@@ -1,6 +1,6 @@
 'use client';
 
-import SignupCoupon from '@/app/(pages)/my-page/coupon-page/components/SignupCoupon';
+import SignupCoupon from '@/app/(pages)/my-page/coupon-page/components/CouponItem';
 import RefreshIcon from '@/components/icons/RefreshIcon';
 import RadioGroup from '@/components/ui/RadioGroup';
 import useCouponStore from '@/zustand/coupon/useCouponStore';

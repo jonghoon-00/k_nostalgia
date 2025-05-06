@@ -1,15 +1,15 @@
 'use client';
 
-import SignupCoupon from '@/app/(pages)/my-page/coupon-page/components/SignupCoupon';
+import SignupCoupon from '@/app/(pages)/my-page/coupon-page/components/CouponItem';
 import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
 import useCouponStore from '@/zustand/coupon/useCouponStore';
 import { useEffect, useState } from 'react';
 
 interface CouponListProps {
-  coupon: string;
+  couponList: string[];
 }
 
-const CouponList = ({ coupon }: CouponListProps) => {
+const CouponList = ({ couponList }: CouponListProps) => {
   const { setCoupon } = useCouponStore();
   const [isSelectingProduct, setIsSelectingProduct] = useState(false);
 
