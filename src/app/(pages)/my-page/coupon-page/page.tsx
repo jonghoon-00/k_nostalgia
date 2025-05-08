@@ -1,22 +1,9 @@
-import { createClient } from '@/utils/supabase/server';
+import { getCouponImageUrlList } from '@/app/api/coupon/getCouponList';
 import Image from 'next/image';
 import CouponContents from './components/CouponContents';
 
 const CouponPage = async () => {
-  const supabase = createClient();
-  const { data } = await supabase.auth.getUser();
-
-  const { data: couponCodeList } = await supabase
-    .from('users')
-    .select('coupons')
-    .eq('id', data.user?.id as string)
-    .single();
-
-  /* TODO : 쿠폰이 없을 때 처리(ui) */
-  if (!couponCodeList?.coupons || couponCodeList.coupons.length === 0) {
-    return <div>쿠폰 없음</div>;
-  }
-  const { coupons } = couponCodeList;
+  const { couponImageUrlList, hasNoList } = await getCouponImageUrlList();
 
   return (
     <div className=" p-4 bg-normal mt-20">
@@ -31,7 +18,10 @@ const CouponPage = async () => {
       </div>
 
       <>
-        <CouponContents couponCodeList={coupons} />
+        <CouponContents
+          imageUrlList={couponImageUrlList}
+          hasNoList={hasNoList}
+        />
       </>
     </div>
   );

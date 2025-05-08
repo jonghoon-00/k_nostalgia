@@ -1,50 +1,26 @@
 'use client';
 
-import { Skeleton } from '@/components/ui/skeleton';
-import supabase from '@/utils/supabase/client';
-import React, { useEffect, useState } from 'react';
+import NoList from '@/components/common/NoList';
+import React, { useState } from 'react';
 import CouponItem from './CouponItem';
-import DownloadableCoupons from './DownloadableCoupons';
 
 interface Props {
-  couponCodeList: string[];
+  imageUrlList: string[];
+  hasNoList?: boolean;
 }
 
-const CouponContents: React.FC<Props> = ({ couponCodeList }) => {
+const CouponContents: React.FC<Props> = ({ imageUrlList, hasNoList }) => {
   const [activeTab, setActiveTab] = useState('coupons');
-  const [imageUrlList, setImageUrlList] = useState<string[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  let couponListContent: JSX.Element | JSX.Element[];
 
-  const getCouponCodeList = async (couponCodeList: string[]) => {
-    // 쿠폰이 없을 때 처리는 page.tsx에 되어있음
-    const { data: imageUrlListFromDB } = await supabase
-      .from('coupons')
-      .select('image_url')
-      .in('code', couponCodeList);
-
-    if (!imageUrlListFromDB || imageUrlListFromDB.length === 0) {
-      return console.error('이미지 url get 에러');
-    }
-
-    return imageUrlListFromDB.filter((item) => item.image_url !== null) as {
-      image_url: string;
-    }[];
-  };
-
-  const getImageUrlArray = (imageUrlListFromDB: { image_url: string }[]) => {
-    const imageUrls = imageUrlListFromDB?.map((item) => item.image_url);
-    setImageUrlList(imageUrls);
-  };
-
-  useEffect(() => {
-    getCouponCodeList(couponCodeList).then((imageUrlListFromDB) => {
-      if (imageUrlListFromDB) {
-        getImageUrlArray(imageUrlListFromDB);
-      }
-      setIsLoading(false);
-    });
-  }, []);
+  if (hasNoList) {
+    couponListContent = <NoList message="사용 가능한 쿠폰이 없어요" />;
+  } else {
+    couponListContent = imageUrlList.map((imageUrl) => (
+      <CouponItem imageUrl={imageUrl} key={imageUrl} />
+    ));
+  }
 
   return (
     <>
@@ -79,25 +55,18 @@ const CouponContents: React.FC<Props> = ({ couponCodeList }) => {
       <div className="border border-[#F2F2F2]" />
 
       {/* 쿠폰 리스트 */}
-      <div>
+      <>
         {activeTab === 'coupons' && (
-          <div className="p-4">
-            {isLoading
-              ? // 로딩 스켈레톤
-                Array.from({ length: 2 }, (_, index) => (
-                  <Skeleton className="w-[311px] h-[161px] md:w-[640px] md:h-[280px] bg-label-disable rounded-xl mb-4" />
-                ))
-              : imageUrlList.map((imageUrl) => (
-                  <CouponItem imageUrl={imageUrl} key={imageUrl} />
-                ))}
-          </div>
+          <div className="p-4 md:p-8">{couponListContent}</div>
         )}
-      </div>
 
-      {/* 다운로드 가능한 쿠폰 */}
-      <div className="flex justify-center items-center">
-        {activeTab === 'download' && <DownloadableCoupons />}
-      </div>
+        {/* 다운로드 가능한 쿠폰 */}
+        <div className="flex justify-center items-center">
+          {activeTab === 'download' && (
+            <NoList message="다운로드 가능한 쿠폰이 없어요" />
+          )}
+        </div>
+      </>
     </>
   );
 };
