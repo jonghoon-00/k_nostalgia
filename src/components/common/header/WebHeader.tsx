@@ -121,7 +121,7 @@ const WebHeader = () => {
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 h-14 border-b border-[#C8C8C8] bg-normal">
-      <div className="flex justify-between flex-1 max-w-screen-xl mx-auto md:px-3 xl:px-0">
+      <div className="flex justify-between flex-1 mx-auto md:mx-3 xl:px-0">
         <div className="flex gap-2 lg:gap-12">
           <div
             className="flex items-center justify-center cursor-pointer pt-[10px] pb-[14px]"
