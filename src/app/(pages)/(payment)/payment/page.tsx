@@ -18,17 +18,18 @@ const Payment = async () => {
 
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
-  const user = data.user;
 
   let shippingRequest = '';
-  if (user) {
-    const { data } = await supabase
+  if (data.user) {
+    const user = data.user;
+
+    const { data: shippingRequestObj } = await supabase
       .from('users')
       .select('shippingRequest')
       .eq('id', user.id)
       .single();
 
-    shippingRequest = data?.shippingRequest || '';
+    shippingRequest = shippingRequestObj?.shippingRequest || '';
   }
 
   return (
