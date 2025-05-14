@@ -56,7 +56,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
             </span>
           </label>
           {withDivider && index < options.length - 1 && (
-            <hr className=" border-gray-90 h-[1px]" />
+            <hr className=" border-gray-90 h-[1px] mt-2" />
           )}
         </div>
       ))}
