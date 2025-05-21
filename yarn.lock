@@ -5193,10 +5193,10 @@ sucrase@^3.32.0:
     pirates "^4.0.1"
     ts-interface-checker "^0.1.9"
 
-supabase@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/supabase/-/supabase-2.1.1.tgz#540717c26798d5afab87b5597f403d7f80913ccc"
-  integrity sha512-KPP4LrvMmu6IWIcqSOcPbepTGT2Fv05TMiYwbcEaKgCVUznDNtlyXQTImJhjP+8FhNuJ+tF9SLoQgMQqDei+jA==
+supabase@^2.23.4:
+  version "2.23.4"
+  resolved "https://registry.yarnpkg.com/supabase/-/supabase-2.23.4.tgz#b16bfb3041dfa7ef0cc5fc01b2104b345ceb4b50"
+  integrity sha512-zuGxvy9qQqZtbc3ehZ2pP6j0r/dcNOW0hU93XPBJ7zSWfLlmQ/erlQHa/o36R4f2zpfR0REVF6023yuNCUdpMA==
   dependencies:
     bin-links "^5.0.0"
     https-proxy-agent "^7.0.2"
