@@ -55,7 +55,7 @@
     "react-responsive": "^10.0.0",
     "react-spinners": "^0.14.1",
     "shadcn-ui": "^0.8.0",
-    "supabase": "^2.1.1",
+    "supabase": "^2.23.4",
     "sweetalert2": "^11.12.4",
     "swiper": "^11.1.8",
     "tailwind-merge": "^2.4.0",
