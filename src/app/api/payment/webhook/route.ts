@@ -1,15 +1,5 @@
 //webhook api(포트원)
-
 //해당 파일 위치가 webhook url 입니다
-
-//feat1) 환불 시, 'orderd_list' 테이블 status 항목 업데이트
-// - 사업자 등록 안 된 가결제라 자정 전 일괄 환불됨
-// - 해당 환불 로직 추적 및 db 업데이트 위해 필요
-
-//feat2) 환불 시 users 테이블에 쿠폰 다시 추가
-// - 쿠폰이 현재는 하나인데, 추가 될 경우에는 구조 변경 필요
-
-//update: 24.10.23
 
 import supabase from "@/utils/supabase/client";
 import { NextRequest } from "next/server";
@@ -24,16 +14,22 @@ type WebhookRes = {
   }
 }
 
-//회원가입 쿠폰
-const MEMBERSHIP_COUPON : string = 'https://kejbzqdwablccrontqrb.supabase.co/storage/v1/object/public/images/Coupon.png'
-
 export const POST = async (request: NextRequest) => {
   try {
     const response : WebhookRes = await request.json();
     const paymentId = response.data.paymentId
 
     if(response.type === 'Transaction.Cancelled'){
-      //주문 내역 status 결제 취소로 업데이트
+      //결제때 사용한 쿠폰 코드 가져오기
+      const {data : usedCouponCode , error : usedCouponCodeError} = await supabase
+      .from('orderd_list')
+      .select('used_coupon_code')
+      .eq('payment_id', paymentId)
+      .single()
+      
+      if(usedCouponCodeError) return console.error('error_failed get to used coupon code ,', usedCouponCode);
+
+      //결제 status 업데이트
       const {data: newHistoryData, error : historyUpdateError} = await supabase
       .from('orderd_list')
       .update({status:'CANCELLED'})
@@ -41,16 +37,16 @@ export const POST = async (request: NextRequest) => {
       .select()
       .single()
 
-      if(historyUpdateError) console.error('error_failed update order history,', historyUpdateError);
+      if(historyUpdateError) return console.error('error_failed update order history,', historyUpdateError);
 
-      //쿠폰 되살리기
+      //사용 회원가입 쿠폰 복구
       if(newHistoryData){
         const {error : addCouponError} = await supabase
         .from('users')
-        .update({coupon: MEMBERSHIP_COUPON})
+        .update({coupons: usedCouponCode?.used_coupon_code})
         .eq('id', newHistoryData.user_id as string)
 
-        if(addCouponError) console.log('error_failed add again membership coupon,',addCouponError);
+        if(addCouponError) return console.log('error_failed add again membership coupon,',addCouponError);
       }
     }
 

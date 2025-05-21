@@ -290,6 +290,7 @@ export type Database = {
           products: Json | null
           shipping_request: string | null
           status: string | null
+          used_coupon_code: string[] | null
           user_email: string | null
           user_id: string | null
           user_name: string | null
@@ -308,6 +309,7 @@ export type Database = {
           products?: Json | null
           shipping_request?: string | null
           status?: string | null
+          used_coupon_code?: string[] | null
           user_email?: string | null
           user_id?: string | null
           user_name?: string | null
@@ -326,6 +328,7 @@ export type Database = {
           products?: Json | null
           shipping_request?: string | null
           status?: string | null
+          used_coupon_code?: string[] | null
           user_email?: string | null
           user_id?: string | null
           user_name?: string | null
