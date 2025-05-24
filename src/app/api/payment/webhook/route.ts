@@ -20,14 +20,14 @@ export const POST = async (request: NextRequest) => {
     const paymentId = response.data.paymentId
 
     if(response.type === 'Transaction.Cancelled'){
-      //결제때 사용한 쿠폰 코드 가져오기
+      //결제때 사용한 쿠폰 코드 get
       const {data : usedCouponCode , error : usedCouponCodeError} = await supabase
       .from('orderd_list')
       .select('used_coupon_code')
       .eq('payment_id', paymentId)
       .single()
       
-      if(usedCouponCodeError) return console.error('error_failed get to used coupon code ,', usedCouponCode);
+      if(usedCouponCodeError) return console.error('Failed to get used coupon code :', usedCouponCodeError);
 
       //결제 status 업데이트
       const {data: newHistoryData, error : historyUpdateError} = await supabase
@@ -37,7 +37,7 @@ export const POST = async (request: NextRequest) => {
       .select()
       .single()
 
-      if(historyUpdateError) return console.error('error_failed update order history,', historyUpdateError);
+      if(historyUpdateError) return console.error('Failed to update order status : ', historyUpdateError);
 
       //사용 회원가입 쿠폰 복구
       if(newHistoryData){
@@ -46,7 +46,7 @@ export const POST = async (request: NextRequest) => {
         .update({coupons: usedCouponCode?.used_coupon_code})
         .eq('id', newHistoryData.user_id as string)
 
-        if(addCouponError) return console.log('error_failed add again membership coupon,',addCouponError);
+        if(addCouponError) return console.log('Failed to restore membership coupon :', addCouponError);
       }
     }
 
@@ -57,7 +57,7 @@ export const POST = async (request: NextRequest) => {
       },
     });
   } catch (error) {
-    console.error('webhook error:', error);
+    console.error('Unhandled webhook error:', error);
     return new Response(JSON.stringify({ message: 'error' }), {
       status: 500,
       headers: {
