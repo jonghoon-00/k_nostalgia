@@ -54,9 +54,7 @@ const WebHeader = () => {
     setActiveIndex(targetNavIndex);
   }, [pathName]);
 
-  const handleNaviBox = (index: number) => {
-    if (isLoading) return;
-
+  const pageRouting = (index: number) => {
     // 디테일 페이지에서 전체 보드로 이동/그 외의 경우 return
     if (index === currentIndex) {
       // 디테일 페이지일 경우 전체 리스트 페이지로 이동
@@ -67,7 +65,16 @@ const WebHeader = () => {
       }
       return;
     }
+  };
 
+  const handleNaviBox = (index: number) => {
+    if (isLoading) return;
+
+    // 현재 탭 클릭 시
+    if (index === currentIndex) {
+      pageRouting(index);
+      return;
+    }
     setIsLoading(true);
 
     // 홈 = 0 일 때는 무조건 양수 : 4, 2
@@ -80,28 +87,30 @@ const WebHeader = () => {
       let startIndex = currentIndex;
       const activeInterval = setInterval(() => {
         if (startIndex <= index) {
+          router.push(HeaderNav[index].path);
+          clearInterval(activeInterval);
           setIsLoading(false);
           setActiveIndex(-1);
-          clearInterval(activeInterval);
-          router.push(HeaderNav[index].path);
         }
+
         setActiveIndex(startIndex);
         startIndex--;
-      }, 400);
+      }, 200);
 
       // 양수 - 정방향 : 홈일 때 혹은 전통시장에서 특산물로 갈 때 0,1,2,3,4
     } else {
       let startIndex = currentIndex;
       const activeInterval = setInterval(() => {
         if (startIndex >= index) {
+          router.push(HeaderNav[index].path);
+          clearInterval(activeInterval);
           setIsLoading(false);
           setActiveIndex(-1);
-          clearInterval(activeInterval);
-          router.push(HeaderNav[index].path);
         }
+
         setActiveIndex(startIndex);
         startIndex++;
-      }, 400);
+      }, 200);
     }
   };
 
