@@ -1,5 +1,5 @@
 'use client';
-import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
+import CouponSelectorTrigger from '@/app/(pages)/cart/_components/coupon/CouponSelectorTriger';
 import { Tables } from '@/types/supabase';
 import useCouponStore from '@/zustand/coupon/useCouponStore';
 import { useRouter } from 'next/navigation';
@@ -57,19 +57,9 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
               : `0 원`}
           </p>
         </li>
-        <li className="flex justify-between mb-4">
-          <div
-            className="flex items-center gap-1 cursor-pointer"
-            onClick={() => router.push('/cart/coupon')}
-          >
-            <p>쿠폰 할인</p>
-            <ChevronRightIcon />
-          </div>
-          <p>
-            {selectedItems.length > 0
-              ? `${discountAmount?.toLocaleString()} 원`
-              : `0 원`}
-          </p>
+        <li className="mb-4">
+          {/* 쿠폰 */}
+          <CouponSelectorTrigger />
         </li>
         <li className="flex justify-between text-lg text-label-strong md:text-primary-20 font-semibold border-t-2 border-[#F2F2F2] pt-4">
           <p>결제 예정 금액</p>
