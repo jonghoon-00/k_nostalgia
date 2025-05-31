@@ -9,7 +9,8 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
 
-  modalHeader?: React.ReactNode;
+  // modalHeader?: React.ReactNode;
+  headerTitle?: string;
   className?: string;
   width?: string;
   height?: string;
@@ -20,9 +21,9 @@ interface ModalProps {
  *
  * 모바일 - isFullOnMobile=true일 경우 전체화면 대응
  *
- * @property {boolean} isModalOpen - 모달 오픈 여부 state
- * @property {() => void} onClose - 모달 닫기 function
- * @property {React.ReactNode} children
+ * @property {boolean} isModalOpen - 모달 오픈 여부 state (필수)
+ * @property {() => void} onClose - 모달 닫기 function (필수)
+ * @property {React.ReactNode} children (필수)
  * @property {React.ReactNode} modalHeader - 모달 헤더
  * @property {string} [className] - 모달 컨테이너에 추가할 스타일(class)
  * @property {string} [width] - 데스크탑 기준 모달 너비(px)
@@ -35,7 +36,7 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   className,
-  modalHeader,
+  headerTitle,
   width,
   height,
   isFullOnMobile
@@ -49,38 +50,46 @@ export const Modal: React.FC<ModalProps> = ({
         'bg-black bg-opacity-50',
         'flex items-center justify-center'
       )}
-      // className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[9999]"
       onClick={onClose}
     >
       <div
         className={clsx(
           'bg-white',
-          isFullOnMobile
-            ? 'rounded-none w-full h-full max-h-none'
-            : 'md:rounded-2xl',
+          isFullOnMobile && 'rounded-none max-h-none w-full h-full',
+          !isFullOnMobile && 'rounded-xl',
+          'md:rounded-2xl md:h-auto md:w-auto',
           className
         )}
         style={{
-          width: isFullOnMobile ? undefined : width ? `${width}px` : 'auto',
-          height: isFullOnMobile ? undefined : height ? `${height}px` : 'auto',
+          width: isFullOnMobile ? undefined : width ? `${width}px` : undefined,
+          height: isFullOnMobile
+            ? undefined
+            : height
+            ? `${height}px`
+            : undefined,
           maxHeight: isFullOnMobile ? undefined : 'calc(100vh - 40px)'
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {isFullOnMobile && (
-          <div
-            className={clsx(
-              'md:hidden flex justify-between items-center',
-              'px-4 py-3 border-b'
-            )}
-          >
-            <button onClick={onClose}>
-              <BackButton />
-            </button>
-            <div>{modalHeader}</div>
-          </div>
-        )}
-        {!isFullOnMobile && <div>{modalHeader}</div>}
+        {/* 모달 헤더 */}
+
+        <div
+          className={clsx(
+            'md:hidden',
+            'flex justify-between items-center',
+            'px-3 py-2',
+            'border-b'
+          )}
+        >
+          <button onClick={onClose}>
+            <BackButton />
+          </button>
+          <h3>{headerTitle ? headerTitle : ''}</h3>
+          <div className="w-7 h-7">{''}</div>
+          {/* TODO X 버튼 추가 + 타이틀 TEXT 받아서 넣는 형식으로 추가 */}
+          {/* <div>{modalHeader}</div> */}
+        </div>
+
         <div>{children}</div>
       </div>
     </div>
