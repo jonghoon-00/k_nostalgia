@@ -1,3 +1,4 @@
+import { CouponSelection } from '@/components/common/coupon/CouponSelection';
 import { Modal } from '@/components/ui/Modal';
 import clsx from 'clsx';
 import { ChevronRightIcon } from 'lucide-react';
@@ -5,6 +6,17 @@ import { useState } from 'react';
 
 const CouponSelectorTrigger = () => {
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+
+  // const [selectedCouponId, setSelectedCouponId] = useState<string | null>(null);
+  // const [discountAmount, setDiscountAmount] = useState<number>(0);
+
+  const [selectedCouponIds, setSelectedCouponIds] = useState<string[]>([]);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
+
+  const handleCouponChange = (amount: number, selectedIds: string[]) => {
+    setDiscountAmount(amount);
+    setSelectedCouponIds(selectedIds);
+  };
 
   return (
     <>
@@ -29,7 +41,7 @@ const CouponSelectorTrigger = () => {
         isFullOnMobile
         className=""
       >
-        <div>쿠폰 내부 요소 - 공용 컴포넌트 넣기</div>
+        <CouponSelection onChange={handleCouponChange} />
       </Modal>
     </>
   );

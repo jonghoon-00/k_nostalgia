@@ -139,20 +139,20 @@ export type Database = {
       }
       coupons: {
         Row: {
-          amount: number | null
-          code: string | null
+          amount: number
+          code: string
           id: string
           image_url: string | null
         }
         Insert: {
-          amount?: number | null
-          code?: string | null
+          amount: number
+          code: string
           id: string
           image_url?: string | null
         }
         Update: {
-          amount?: number | null
-          code?: string | null
+          amount?: number
+          code?: string
           id?: string
           image_url?: string | null
         }
