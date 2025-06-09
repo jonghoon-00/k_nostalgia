@@ -1,6 +1,7 @@
 'use client';
 
 import { getCouponList } from '@/app/api/coupon/getCouponForClient';
+import RefreshIcon from '@/components/icons/RefreshIcon';
 import useDeviceSize from '@/hooks/useDeviceSize';
 import { Tables } from '@/types/supabase';
 import { calculateDiscount } from '@/utils/coupons';
@@ -59,11 +60,12 @@ export const CouponSelection: React.FC<Props> = ({ onChange }) => {
 
   // );
   return (
-    <div className={clsx('px-4 py-4')}>
+    <div className={clsx('pb-4', isMobile ? 'px-0' : 'px-0')}>
       <div
         className={clsx(
           'flex flex-col items-start',
           'text-xl text-black font-medium'
+          // !isMobile && 'min-h-16'
         )}
       >
         현재 적용된 할인 금액은
@@ -75,7 +77,7 @@ export const CouponSelection: React.FC<Props> = ({ onChange }) => {
         </div>
       </div>
 
-      <div className={clsx('')}>
+      <div className={clsx(!isMobile && 'min-h-[190px] min-w-[420px]')}>
         {coupons.map((coupon) => (
           <CouponItem
             key={coupon.id}
@@ -89,26 +91,35 @@ export const CouponSelection: React.FC<Props> = ({ onChange }) => {
       {/* 버튼 영역 */}
       <div
         className={clsx(
-          isMobile ? 'fixed bottom-0 left-0 w-full' : 'mt-6',
-          'px-4 py-3',
+          'gap-3',
+          isMobile
+            ? 'fixed bottom-0 left-0 w-full shadow-custom px-4 py-3'
+            : 'mt-6',
           isMobile ? 'bg-white border-t' : '',
           'flex justify-between items-center'
         )}
       >
         <button
           onClick={applyMaxDiscount}
-          className={clsx('text-sm underline', 'text-gray-700')}
+          className={clsx(
+            'basis-1/3 flex items-center justify-center gap-1',
+            'px-4 py-3',
+            'text-gray-30 text-sm underline',
+            'border border-gray-30 rounded-xl'
+          )}
         >
+          <RefreshIcon />
           최대 할인
         </button>
         <button
           className={clsx(
-            'px-4 py-2',
+            'basis-2/3 flex items-center justify-center',
+            'px-4 py-3',
             'bg-primary-20 text-white font-semibold',
-            'rounded'
+            'rounded-xl'
           )}
         >
-          -{discountAmount.toLocaleString()}원 할인 적용
+          {discountAmount.toLocaleString()}원 할인 적용
         </button>
       </div>
     </div>
