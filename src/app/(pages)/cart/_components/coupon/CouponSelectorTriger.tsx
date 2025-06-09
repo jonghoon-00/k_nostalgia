@@ -7,8 +7,12 @@ import { useState } from 'react';
 const CouponSelectorTrigger = () => {
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
-  // const [selectedCouponId, setSelectedCouponId] = useState<string | null>(null);
-  // const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const openModal = () => {
+    setIsCouponModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsCouponModalOpen(false);
+  };
 
   const [selectedCouponIds, setSelectedCouponIds] = useState<string[]>([]);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
@@ -25,7 +29,7 @@ const CouponSelectorTrigger = () => {
           'flex items-center justify-between gap-1',
           'cursor-pointer'
         )}
-        onClick={() => setIsCouponModalOpen(true)}
+        onClick={() => openModal()}
       >
         <div className="flex">
           <p>쿠폰 할인</p>
@@ -36,7 +40,7 @@ const CouponSelectorTrigger = () => {
       </div>
       <Modal
         isModalOpen={isCouponModalOpen}
-        onClose={() => setIsCouponModalOpen(false)}
+        onClose={() => closeModal()}
         headerTitle="할인 쿠폰"
         isFullOnMobile
         className=""
