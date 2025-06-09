@@ -5,9 +5,9 @@ const CouponPageInCart = async () => {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
 
-  const { data: coupon, error } = await supabase
+  const { data: coupons, error } = await supabase
     .from('users')
-    .select('coupon')
+    .select('coupons')
     .eq('id', data.user?.id as string)
     .single();
 
@@ -17,7 +17,7 @@ const CouponPageInCart = async () => {
 
   return (
     <div className="mt-20">
-      <CouponList coupon={coupon?.coupon as string} />
+      <CouponList coupons={coupons} />
     </div>
   );
 };
