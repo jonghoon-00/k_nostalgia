@@ -1,8 +1,8 @@
-import React, { PropsWithChildren } from 'react';
-import WebHeader from './header/WebHeader';
-import Footer from './Footer';
+import { PropsWithChildren } from 'react';
 import { Chat } from '../chat/Chat';
 import TopButton from '../icons/TopButton';
+import Footer from './Footer';
+import WebHeader from './header/WebHeader';
 
 interface DefaultWebLayoutProps {
   showWebHeader?: boolean;
@@ -19,9 +19,9 @@ const DefaultWebLayout = ({
   showWebTopButton = true
 }: PropsWithChildren<DefaultWebLayoutProps>) => {
   return (
-    <div>
+    <div className="hidden md:block min-h-screen flex flex-col">
       {showWebHeader && <WebHeader />}
-      <main className="mx-auto">{children}</main>
+      <main className="flex-grow mx-auto">{children}</main>
       <div className="flex flex-col fixed bottom-[40px] right-[41px] z-50 gap-3">
         {showWebChat && <Chat />}
         {showWebTopButton && <TopButton />}
