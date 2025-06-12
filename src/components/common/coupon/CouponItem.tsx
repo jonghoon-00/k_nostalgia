@@ -3,25 +3,26 @@ import { Skeleton } from '@/components/ui/skeleton';
 import useDeviceSize from '@/hooks/useDeviceSize';
 import { Tables } from '@/types/supabase';
 import { calculateDiscount } from '@/utils/coupons';
+import { useCouponStore } from '@/zustand/coupon/useCouponStore';
 import clsx from 'clsx';
 import React, { useState } from 'react';
 
 interface Props {
   coupon: Tables<'coupons'>;
-  isSelected: boolean;
-  onChange: (apply: boolean) => void;
 }
 
-export const CouponItem: React.FC<Props> = ({
-  coupon,
-  isSelected,
-  onChange
-}) => {
+export const CouponItem: React.FC<Props> = ({ coupon }) => {
   const { isMobile } = useDeviceSize();
 
   const discount = calculateDiscount([coupon]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const selectedCouponIds = useCouponStore((state) => state.selectedCouponIds);
+  const updateCouponSelect = useCouponStore(
+    (state) => state.updateCouponSelect
+  );
+
+  const isSelected = selectedCouponIds.includes(coupon.id);
   // RadioGroup에 넘겨줄 옵션
   const options = [
     {
@@ -45,12 +46,12 @@ export const CouponItem: React.FC<Props> = ({
       <div
         className={clsx(
           'relative overflow-hidden rounded mb-2',
-          isMobile ? 'w-[90%] h-0 pb-[40%]' : 'w-[420px] h-0 pb-[45%]'
+          isMobile ? 'w-[98%] h-0 pb-[44%]' : 'w-[420px] h-0 pb-[45%]'
         )}
       >
         {isLoading && <Skeleton className={clsx('absolute inset-0')} />}
         <img
-          src={coupon.image_url}
+          src={coupon.image_url ? coupon.image_url : ''}
           alt="쿠폰 이미지"
           onLoad={() => setIsLoading(false)}
           className={clsx(
@@ -65,7 +66,7 @@ export const CouponItem: React.FC<Props> = ({
           name={`coupon-${coupon.id}`}
           options={options}
           selectedValue={isSelected}
-          onChange={(value: boolean) => onChange(value)}
+          onChange={(apply: boolean) => updateCouponSelect(coupon.id, apply)}
           withDivider={false}
           labelTextSize="15px"
         />

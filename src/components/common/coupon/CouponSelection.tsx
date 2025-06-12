@@ -1,90 +1,90 @@
+// components/CouponSelection.tsx
 'use client';
 
+import clsx from 'clsx';
+import React, { useEffect, useState } from 'react';
+
 import { getCouponList } from '@/app/api/coupon/getCouponForClient';
-import RefreshIcon from '@/components/icons/RefreshIcon';
 import useDeviceSize from '@/hooks/useDeviceSize';
 import { Tables } from '@/types/supabase';
 import { calculateDiscount } from '@/utils/coupons';
-import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+
+import RefreshIcon from '@/components/icons/RefreshIcon';
+import { useCouponStore } from '@/zustand/coupon/useCouponStore';
+import { useModalStore } from '@/zustand/useModalStore ';
 import { CouponItem } from './CouponItem';
 
 interface Props {
-  onChange: (discountAmount: number, selectedCouponIds: string[]) => void;
+  handleCouponChange: (
+    discountAmount: number,
+    selectedCouponIds: string[]
+  ) => void;
 }
 
-export const CouponSelection: React.FC<Props> = ({ onChange }) => {
-  const [coupons, setCoupons] = useState<Tables<'coupons'>[]>([]);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+export const CouponSelection: React.FC<Props> = ({ handleCouponChange }) => {
+  const { close } = useModalStore();
 
+  // zustand에서 선택된 ID들
+  const selectedIds = useCouponStore((s) => s.selectedCouponIds);
+  const clearCouponIds = useCouponStore((s) => s.clearCouponIds);
+
+  const [coupons, setCoupons] = useState<Tables<'coupons'>[]>([]);
   const { isMobile } = useDeviceSize();
 
+  // 쿠폰 리스트 조회
   useEffect(() => {
-    const fetchCoupons = async () => {
+    (async () => {
       const result = await getCouponList();
-
       if (!result || result.length === 0) {
         console.warn('No coupons available');
         setCoupons([]);
-        setSelectedIds([]);
-        onChange(0, []);
+        clearCouponIds();
+        handleCouponChange(0, []);
         return;
       }
       setCoupons(result);
-    };
+    })();
+  }, [clearCouponIds, handleCouponChange]);
 
-    fetchCoupons();
-  }, []);
+  // 선택된 ID가 바뀔 때마다 할인액 계산 및 상위 콜백 호출
+  useEffect(() => {
+    const applied = coupons.filter((c) => selectedIds.includes(c.id));
+    const amount = calculateDiscount(applied);
+    handleCouponChange(amount, selectedIds);
+  }, [selectedIds, coupons, handleCouponChange]);
 
-  const toggleCoupon = (id: string, apply: boolean) => {
-    let updated;
-    if (apply) {
-      updated = [...selectedIds, id];
-    } else {
-      updated = selectedIds.filter((cid) => cid !== id);
-    }
-    setSelectedIds(updated);
-    const selected = coupons.filter((c) => updated.includes(c.id));
-    onChange(calculateDiscount(selected), updated);
-  };
-
+  // 최대 할인 적용
   const applyMaxDiscount = () => {
     const allIds = coupons.map((c) => c.id);
-    setSelectedIds(allIds);
-    onChange(calculateDiscount(coupons), allIds);
+    useCouponStore.getState().setSelectedCouponIds(allIds);
   };
 
   const discountAmount = calculateDiscount(
     coupons.filter((c) => selectedIds.includes(c.id))
   );
 
-  // );
   return (
-    <div className={clsx('pb-4', isMobile ? 'px-0' : 'px-0')}>
+    <div className={clsx('md:pb-4', 'px-0')}>
+      {/* 할인액 표시 */}
       <div
         className={clsx(
           'flex flex-col items-start',
           'text-xl text-black font-medium'
-          // !isMobile && 'min-h-16'
         )}
       >
         현재 적용된 할인 금액은
         <div>
-          <span className={clsx('', 'text-primary-20')}>
-            {discountAmount > 0 ? `${discountAmount.toLocaleString()}` : '0'}
+          <span className="text-primary-20">
+            {discountAmount > 0 ? discountAmount.toLocaleString() : '0'}
           </span>
           <span>원이에요</span>
         </div>
       </div>
 
+      {/* 쿠폰 리스트 */}
       <div className={clsx(!isMobile && 'min-h-[190px] min-w-[420px]')}>
         {coupons.map((coupon) => (
-          <CouponItem
-            key={coupon.id}
-            coupon={coupon}
-            isSelected={selectedIds.includes(coupon.id)}
-            onChange={(apply) => toggleCoupon(coupon.id, apply)}
-          />
+          <CouponItem key={coupon.id} coupon={coupon} />
         ))}
       </div>
 
@@ -118,6 +118,7 @@ export const CouponSelection: React.FC<Props> = ({ onChange }) => {
             'bg-primary-20 text-white font-semibold',
             'rounded-xl'
           )}
+          onClick={close}
         >
           {discountAmount.toLocaleString()}원 할인 적용
         </button>

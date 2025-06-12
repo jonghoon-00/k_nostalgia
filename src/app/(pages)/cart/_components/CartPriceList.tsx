@@ -1,7 +1,6 @@
 'use client';
 import CouponSelectorTrigger from '@/app/(pages)/cart/_components/coupon/CouponSelectorTriger';
 import { Tables } from '@/types/supabase';
-import useCouponStore from '@/zustand/coupon/useCouponStore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -9,12 +8,12 @@ interface CartProps {
   data: Tables<'cart'>[] | null;
   selectedItems: string[];
 }
-const DELIVERY_FEE = 2500;
-
 export const CartPriceList = ({ data, selectedItems }: CartProps) => {
   const router = useRouter();
-  const [totalAmount, setTotalAmount] = useState(0);
-  const { discountAmount } = useCouponStore();
+  const DELIVERY_FEE = 2500; // 배송비
+
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
 
   useEffect(() => {
     const calculator =
@@ -36,11 +35,8 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
     return null;
   }
 
-  const couponDiscountAmount =
-    typeof discountAmount === 'number' ? discountAmount : 0;
-
   //총 결제금액
-  const totalPrice = totalAmount + DELIVERY_FEE - couponDiscountAmount;
+  const totalPrice = totalAmount + DELIVERY_FEE - discountAmount;
 
   return (
     <div className="bg-normal mt-2 pt-6 pb-[30%] md:pb-0">
@@ -59,7 +55,10 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
         </li>
         <li className="mb-4">
           {/* 쿠폰 */}
-          <CouponSelectorTrigger />
+          <CouponSelectorTrigger
+            discountAmount={discountAmount}
+            setDiscountAmount={setDiscountAmount}
+          />
         </li>
         <li className="flex justify-between text-lg text-label-strong md:text-primary-20 font-semibold border-t-2 border-[#F2F2F2] pt-4">
           <p>결제 예정 금액</p>

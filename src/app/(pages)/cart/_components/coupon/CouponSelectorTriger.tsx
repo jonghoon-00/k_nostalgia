@@ -1,21 +1,22 @@
 import { CouponSelection } from '@/components/common/coupon/CouponSelection';
 import { Modal } from '@/components/ui/Modal';
+import { useCouponStore } from '@/zustand/coupon/useCouponStore';
+import { useModalStore } from '@/zustand/useModalStore ';
 import clsx from 'clsx';
 import { ChevronRightIcon } from 'lucide-react';
-import { useState } from 'react';
+import React, { SetStateAction } from 'react';
 
-const CouponSelectorTrigger = () => {
-  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
+interface Props {
+  discountAmount: number;
+  setDiscountAmount: React.Dispatch<SetStateAction<number>>;
+}
 
-  const openModal = () => {
-    setIsCouponModalOpen(true);
-  };
-  const closeModal = () => {
-    setIsCouponModalOpen(false);
-  };
-
-  const [selectedCouponIds, setSelectedCouponIds] = useState<string[]>([]);
-  const [discountAmount, setDiscountAmount] = useState<number>(0);
+const CouponSelectorTrigger: React.FC<Props> = ({
+  discountAmount,
+  setDiscountAmount
+}) => {
+  const { open } = useModalStore();
+  const setSelectedCouponIds = useCouponStore((s) => s.setSelectedCouponIds);
 
   const handleCouponChange = (amount: number, selectedIds: string[]) => {
     setDiscountAmount(amount);
@@ -29,23 +30,16 @@ const CouponSelectorTrigger = () => {
           'flex items-center justify-between gap-1',
           'cursor-pointer'
         )}
-        onClick={() => openModal()}
+        onClick={open}
       >
         <div className="flex">
           <p>쿠폰 할인</p>
           <ChevronRightIcon />
         </div>
-        {/* TODO 모달에서 리턴된 할인 금액으로 변경 */}
-        <p>원</p>
+        <p>{discountAmount} 원</p>
       </div>
-      <Modal
-        isModalOpen={isCouponModalOpen}
-        onClose={() => closeModal()}
-        headerTitle="할인 쿠폰"
-        isFullOnMobile
-        className=""
-      >
-        <CouponSelection onChange={handleCouponChange} />
+      <Modal headerTitle="할인 쿠폰" isFullOnMobile className="">
+        <CouponSelection handleCouponChange={handleCouponChange} />
       </Modal>
     </>
   );
