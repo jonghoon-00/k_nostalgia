@@ -1,46 +1,54 @@
 'use client';
 
+import { useModalStore } from '@/zustand/useModalStore ';
 import clsx from 'clsx';
-import React from 'react';
+import { usePathname } from 'next/navigation';
+import React, { useEffect } from 'react';
 import { BackButton } from '../icons/BackButton';
 import { XClose } from '../icons/XClose';
 
 interface ModalProps {
-  isModalOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-
   headerTitle: string;
   className?: string;
   width?: string;
   height?: string;
   isFullOnMobile?: boolean;
+  children: React.ReactNode;
 }
 
 /**
- *
- * 모바일 - isFullOnMobile=true일 경우 전체화면 대응
- *
- * @property {boolean} isModalOpen - 모달 오픈 여부 state (필수)
- * @property {() => void} onClose - 모달 닫기 function (필수)
- * @property {React.ReactNode} children (필수)
- * @property {string} headerTitle - 헤더 타이틀 텍스트
- * @property {string} [className] - 모달 컨테이너에 추가할 스타일(class)
- * @property {string} [width] - 데스크탑 기준 모달 너비(px)
- * @property {string} [height] - 데스크탑 기준 모달 높이(px)
- * @property {boolean} [isFullOnMobile] - 모바일에서 전체 화면으로 표시 여부
- *
+ * Modal 컴포넌트 (Zustand 활용)
+ * @param {string} headerTitle - 헤더 타이틀 텍스트
+ * @param {string} [className] - 모달 컨테이너에 추가할 스타일(class)
+ * @param {string} [width] - 데스크탑 기준 모달 너비(px)
+ * @param {string} [height] - 데스크탑 기준 모달 높이(px)
+ * @param {boolean} [isFullOnMobile] - 모바일에서 전체 화면 표시 여부
  */
 export const Modal: React.FC<ModalProps> = ({
-  isModalOpen,
-  onClose,
-  children,
-  className,
   headerTitle,
+  className,
   width,
   height,
-  isFullOnMobile = false
+  isFullOnMobile,
+  children
 }) => {
+  const pathname = usePathname();
+
+  const isModalOpen = useModalStore((state) => state.isOpen);
+  const close = useModalStore((state) => state.close);
+
+  // 페이지 경로가 변경될 때 모달 닫기
+  useEffect(() => {
+    close();
+  }, [pathname, close]);
+
+  // 컴포넌트 언마운트 시 모달 닫기
+  useEffect(() => {
+    return () => {
+      close();
+    };
+  }, [close]);
+
   if (!isModalOpen) return null;
 
   return (
@@ -52,7 +60,7 @@ export const Modal: React.FC<ModalProps> = ({
           ? 'md:bg-black md:bg-opacity-50'
           : 'bg-black bg-opacity-50'
       )}
-      onClick={onClose}
+      onClick={close}
     >
       <div
         className={clsx(
@@ -82,7 +90,7 @@ export const Modal: React.FC<ModalProps> = ({
         >
           {/* 모바일: 뒤로가기, 데스크탑: 자리 확보 */}
           <button
-            onClick={onClose}
+            onClick={close}
             className={clsx(
               'w-7 h-7 flex items-center justify-center',
               'md:hidden'
@@ -99,7 +107,7 @@ export const Modal: React.FC<ModalProps> = ({
           {/* 모바일: 빈 공간, 데스크탑: 닫기 버튼 */}
           <div className="hidden md:block w-7 h-7" />
           <button
-            onClick={onClose}
+            onClick={close}
             className={clsx(
               'w-7 h-7 flex items-center justify-center text-xl font-bold',
               'hidden md:flex'
