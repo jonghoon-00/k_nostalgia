@@ -2,9 +2,12 @@ import { Tables } from "@/types/supabase";
 
 
 /**
- * 선택한 쿠폰 정보를 기반으로 할인 금액 계산
- * @param selectedCouponList - 선택된 쿠폰 [] (또는 null)
- * @returns 할인 금액 (기본값: 0)
+ * Calculates the total discount amount from a list of selected coupons.
+ *
+ * If no coupons are selected, returns 0. For a single coupon, returns its discount amount. For multiple coupons, returns the sum of their discount amounts.
+ *
+ * @param selectedCouponList - The list of selected coupons, or null if none are selected.
+ * @returns The total discount amount.
  */
 export function calculateDiscount(selectedCouponList: Tables<'coupons'>[] | null): number {
   let totalDiscount = 0;

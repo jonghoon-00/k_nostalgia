@@ -11,6 +11,13 @@ import { Navigation } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
+/**
+ * Provides a responsive layout wrapper that configures headers, navigation, and auxiliary UI elements based on the current route and client state.
+ *
+ * Dynamically adjusts the visibility and configuration of headers, navigation bars, chat, top button, and footer for both mobile and desktop views. The layout adapts to the current route and whether the user is a guest, ensuring appropriate UI for authentication, shopping, profile, and customer service pages.
+ *
+ * @param children - The page content to be rendered within the layout.
+ */
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathName = usePathname();
   const [isClient, setIsClient] = useState(false);

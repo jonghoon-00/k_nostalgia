@@ -6,6 +6,15 @@ type ButtonThrottleProps = {
   delay: number
 }
 
+/**
+ * Provides a throttled version of a function, ensuring it can only be called once per specified delay interval.
+ *
+ * @param fn - The function to throttle.
+ * @param delay - The minimum time interval in milliseconds between allowed function calls.
+ * @returns An object containing the throttled function as `throttleButtonClick` and a boolean `isDelay` indicating if the throttle delay is active.
+ *
+ * @remark The throttled function preserves the latest arguments passed to it, but will only execute once per delay interval.
+ */
 function useThrottle ({fn, delay} : ButtonThrottleProps) {
   const timer = useRef<NodeJS.Timeout | null>(null);
   const [isDelay, setIsDelay] = useState(false);

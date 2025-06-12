@@ -1,6 +1,14 @@
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 
+/**
+ * Handles OAuth code exchange and user upsert for authentication callback.
+ *
+ * Exchanges the provided OAuth `code` for a Supabase session, upserts user information into the `users` table with a default coupon, and redirects the client to the specified next path on success. If an error occurs during code exchange or user upsert, redirects to an authentication error page or returns a JSON error response.
+ *
+ * @param request - The incoming HTTP request containing query parameters for code exchange.
+ * @returns A redirect response to the next page on success, a JSON error response if user upsert fails, or a redirect to the authentication error page on failure.
+ */
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')

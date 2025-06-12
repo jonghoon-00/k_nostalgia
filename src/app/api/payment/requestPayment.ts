@@ -26,7 +26,21 @@ interface PayRequestParameters {
 const PRODUCTION_URL = 'https://k-nostalgia.vercel.app/';
 const DEV_URL = 'http://localhost:3000/';
 
-//결제 요청 함수
+/**
+ * Initiates a payment request using the specified payment method.
+ *
+ * Displays user notifications regarding provisional payment and refund policies, then processes the payment via Toss, Kakao, or Inicis based on {@link payMethod}.
+ *
+ * @param payMethod - The payment method to use ("toss", "kakao", or "normal").
+ * @param user - The user initiating the payment (required for "normal" payments).
+ * @param totalAmount - The total amount to be paid.
+ * @param orderName - The name or description of the order.
+ * @param products - The list of products included in the order.
+ * @returns The response from the selected payment provider's request function.
+ *
+ * @remark
+ * Users are notified that the payment is provisional and will be refunded by midnight, with immediate refunds available via the user dashboard.
+ */
 export default async function requestPayment({
   payMethod,
   user,
@@ -74,7 +88,18 @@ export default async function requestPayment({
 
 const date = dayjs(new Date(Date.now())).locale('ko').format('YYMMDD');
 
-//이니시스 일반 결제
+/**
+ * Initiates an Inicis card payment request using the PortOne SDK.
+ *
+ * @param user - The user making the payment.
+ * @param orderName - The name or description of the order.
+ * @param products - The list of products included in the order.
+ * @param totalAmount - The total payment amount in KRW.
+ * @returns The response from the PortOne payment request.
+ *
+ * @remark
+ * The payment window type is set to iframe on PC and redirection on mobile. Webhook URLs are configured for both production and test environments. A custom Inicis skin is applied via the bypass option.
+ */
 async function requestInicisPayment(
   user: Tables<'users'>,
   orderName: string,
@@ -122,6 +147,13 @@ async function requestInicisPayment(
   return response;
 }
 
+/**
+ * Initiates a Toss payment request using the PortOne SDK.
+ *
+ * @param orderName - The name or description of the order.
+ * @param totalAmount - The total payment amount in KRW.
+ * @returns The response from the PortOne payment request.
+ */
 async function requestTossPayment(
   orderName: string,
   totalAmount: number,
@@ -145,6 +177,15 @@ async function requestTossPayment(
   return response;
 }
 
+/**
+ * Initiates a KakaoPay payment request using the PortOne SDK.
+ *
+ * @param orderName - The name or description of the order.
+ * @param totalAmount - The total payment amount in KRW.
+ * @returns The response object from the PortOne payment request.
+ *
+ * @remark The payment request includes a custom message indicating it is a test provisional payment.
+ */
 async function requestKakaoPayment(
   orderName: string,
   totalAmount: number,

@@ -1,6 +1,13 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
+/**
+ * Handles user registration via a POST request, creating a new user in Supabase authentication and the users table.
+ *
+ * Extracts user details from the request body, registers the user with Supabase Auth, assigns a default profile image, and adds a welcome coupon code to the user's record.
+ *
+ * @returns A JSON response containing the registered user data, or an error message with the appropriate HTTP status code.
+ */
 export async function POST(request: NextRequest) {
   const data = await request.json(); 
   const email = data.email as string;
