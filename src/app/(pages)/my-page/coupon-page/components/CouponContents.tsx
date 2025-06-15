@@ -28,6 +28,7 @@ const CouponContents: React.FC<Props> = ({ imageUrlList, hasNoList }) => {
       <div className="flex mt-[15px] mx-auto w-[95%] justify-between items-center md:items-center md:justify-center md:gap-4">
         <div>
           <button
+            type="button"
             className={`px-6 py-2 border-b-4 text-[16px] ${
               activeTab === 'coupons'
                 ? 'text-primary-20 border-primary-20'
