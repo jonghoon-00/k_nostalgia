@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   // WELCOME01 : 회원가입 쿠폰 code
   const { error: insertError } = await supabase
     .from('users')
-    .insert({ id: userId, email, password, nickname, name, avatar: defaultimage.publicUrl, coupons: ['WELCOME01']});
+    .insert({ id: userId, email, nickname, name, avatar: defaultimage.publicUrl, coupons: ['WELCOME01']});
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 400 });

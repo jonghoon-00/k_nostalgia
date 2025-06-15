@@ -464,7 +464,6 @@ export type Database = {
           id: string
           name: string | null
           nickname: string | null
-          password: string | null
           phoneNumber: string | null
           reportedUserId: string[] | null
           shippingRequest: string | null
@@ -479,7 +478,6 @@ export type Database = {
           id: string
           name?: string | null
           nickname?: string | null
-          password?: string | null
           phoneNumber?: string | null
           reportedUserId?: string[] | null
           shippingRequest?: string | null
@@ -494,7 +492,6 @@ export type Database = {
           id?: string
           name?: string | null
           nickname?: string | null
-          password?: string | null
           phoneNumber?: string | null
           reportedUserId?: string[] | null
           shippingRequest?: string | null
