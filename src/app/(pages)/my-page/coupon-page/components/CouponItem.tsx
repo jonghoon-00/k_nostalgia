@@ -9,6 +9,12 @@ interface Props {
   alt?: string;
 }
 
+/**
+ *
+ * @param imageUrl - 쿠폰 이미지 URL(필수)
+ * @param alt - 이미지 대체 텍스트(선택)
+ * @returns 쿠폰 이미지지
+ */
 const CouponItem: React.FC<Props> = ({ imageUrl, alt }) => {
   const { isMobile } = useDeviceSize();
   return (
