@@ -18,12 +18,9 @@ export const getCouponList = async () => {
   const supabase = createClient();
   const couponCodeList = await getCouponCodeListForClient();
 
-  let couponList : Tables<'coupons'>[] | null = [];
-  if (
-    couponCodeList &&
-    couponCodeList.coupons &&
-    couponCodeList.coupons.length > 0
-  ) {
+  let couponList: Tables<'coupons'>[] | null = [];
+
+  if (couponCodeList?.coupons?.length) {
     const { coupons : couponCodes } = couponCodeList;
 
     const { data: couponListFromDb } = await supabase
@@ -31,7 +28,7 @@ export const getCouponList = async () => {
       .select('*')
       .in('code', couponCodes);
 
-      couponList = couponListFromDb
+      couponList = couponListFromDb;
   }
 
   return couponList;
