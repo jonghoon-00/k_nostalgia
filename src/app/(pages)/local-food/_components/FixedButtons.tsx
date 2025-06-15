@@ -33,14 +33,16 @@ const FixedButtons = ({
   return (
     <>
       <div className="bg-normal shadow-custom px-4 pt-3 pb-7 fixed bottom-0 left-0 right-0 z-10 md:hidden">
-        <div className="flex gap-3">
-          <AddCartButton
-            food={food}
-            count={count}
-            handleCartModalOpen={handleCartModalOpen}
-          />
+        <div className="flex gap-3 justify-center">
+          <div className="w-1/2">
+            <AddCartButton
+              food={food}
+              count={count}
+              handleCartModalOpen={handleCartModalOpen}
+            />
+          </div>
 
-          <div onClick={onPurchase} className="flex-1">
+          <div onClick={onPurchase} className="flex-1 w-1/2">
             {isModalOpen ? (
               <PayButton
                 product={product}

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gen": "supabase gen types typescript --project-id kejbzqdwablccrontqrb --schema public > src/types/supabase.ts"
+    "gen": "npx supabase gen types typescript --project-id kejbzqdwablccrontqrb --schema public > src/types/supabase.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -55,7 +55,6 @@
     "react-responsive": "^10.0.0",
     "react-spinners": "^0.14.1",
     "shadcn-ui": "^0.8.0",
-    "supabase": "^2.1.1",
     "sweetalert2": "^11.12.4",
     "swiper": "^11.1.8",
     "tailwind-merge": "^2.4.0",

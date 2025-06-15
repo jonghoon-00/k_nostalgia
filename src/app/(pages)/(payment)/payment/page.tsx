@@ -2,6 +2,7 @@ import HeaderWithInfoIcon from '@/components/common/header/_component/HeaderWith
 import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/getAddresses';
 import { AllAddresses } from '@/types/deliveryAddress';
 import { createClient } from '@/utils/supabase/server';
+import DesktopOrderHeader from './components/DesktopOrderHeader';
 import OrderPageContainer from './components/OrderPageContainer';
 
 const Payment = async () => {
@@ -18,13 +19,35 @@ const Payment = async () => {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
 
+  let shippingRequest = '';
+  if (data.user) {
+    const user = data.user;
+
+    const { data: shippingRequestObj } = await supabase
+      .from('users')
+      .select('shippingRequest')
+      .eq('id', user.id)
+      .single();
+
+    shippingRequest = shippingRequestObj?.shippingRequest || '';
+  }
+
   return (
     <>
+      {/* 모바일 : 툴팁이 포함된 앱 헤더 */}
       <HeaderWithInfoIcon
         toolTipContentArray={toolTipContentArray}
         isIncludeIconHighlighting={true}
       />
-      <OrderPageContainer initialAddresses={allAddresses} user={data.user} />;
+      {/* 데스크탑 : 주문/결제 이미지 및 안내 문구 표시 */}
+      <div className="hidden md:block md:mt-16">
+        <DesktopOrderHeader />
+      </div>
+      <OrderPageContainer
+        initialAddresses={allAddresses}
+        initialShippingRequest={shippingRequest}
+      />
+      ;
     </>
   );
 };

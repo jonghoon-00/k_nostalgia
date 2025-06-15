@@ -1,10 +1,14 @@
-export const BackButton = () => {
+interface Props {
+  width?: string;
+  height?: string;
+}
+export const BackButton = ({ width, height }: Props) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
+      width={width || '28'}
+      height={height || '28'}
+      viewBox="0 0 28 28"
       fill="none"
     >
       <path

@@ -37,20 +37,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'image insert error' }, { status: 500 });
   }
 
-
-   // 쿠폰
-   const { data: couponimage} = supabase.storage.from('images').getPublicUrl('Coupon.png');
-
-   if (!couponimage) {
-    console.error('이미지 넣기 에러');
-    return NextResponse.json({ error: 'image insert error' }, { status: 500 });
-  }
-
-
   // user 테이블에 추가
+  // WELCOME01 : 회원가입 쿠폰 code
   const { error: insertError } = await supabase
     .from('users')
-    .insert({ id: userId, email, password, nickname, name, avatar: defaultimage.publicUrl, coupon: couponimage.publicUrl});
+    .insert({ id: userId, email, nickname, name, avatar: defaultimage.publicUrl, coupons: ['WELCOME01']});
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 400 });

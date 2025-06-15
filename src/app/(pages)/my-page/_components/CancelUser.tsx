@@ -35,6 +35,7 @@ const CancelUser = forwardRef<CancelUserHandle>((_, ref) => {
         if (result.isConfirmed) {
           try {
             await api.auth.deleteUser();
+            await api.auth.logOut();
             toast({
               variant: 'destructive',
               description: '탈퇴되었습니다. 다음에 다시 이용해주세요.'

@@ -97,9 +97,7 @@ export const CartFixedButtons = ({ data, selectedItems }: CartButtonProps) => {
                   : `0 원`}
               </span>
             </p>
-            {/* <button onClick={() => console.log(selectedItems)}>
-              결제하기기기기기기기ㅣ
-            </button> */}
+
             <PayButton
               product={product}
               orderNameArr={orderNameArr}

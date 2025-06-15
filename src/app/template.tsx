@@ -1,17 +1,17 @@
 'use client';
 
-import DefaultAppLayout from '@/components/common/DefaultAppLayout';
-import DefaultWebLayout from '@/components/common/DefaultWebLayout';
-
-import useDeviceSize from '@/hooks/useDeviceSize';
-
+import { Chat } from '@/components/chat/Chat';
 import FirstLoading from '@/components/common/FirstLoading';
+import Footer from '@/components/common/Footer';
+import AppHeader from '@/components/common/header/AppHeader';
+import WebHeader from '@/components/common/header/WebHeader';
+import TopButton from '@/components/icons/TopButton';
 import Cookies from 'js-cookie';
+import { Navigation } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 export default function Template({ children }: { children: React.ReactNode }) {
-  const { isDesktop } = useDeviceSize();
   const pathName = usePathname();
   const [isClient, setIsClient] = useState(false);
   const [isGuest, setIsGuest] = useState<boolean>(false);
@@ -75,6 +75,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
   else if (pathName === '/my-page/coupon-page') {
     headerTitle = '할인쿠폰';
     showSearch = false;
+    showChat = false;
+    showCart = false;
   }
   // 회원가입
   else if (pathName === '/sign-up') {
@@ -112,7 +114,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     }
   }
   // 장바구니
-  else if (pathName === '/cart') {
+  else if (pathName.includes('cart')) {
     headerTitle = '장바구니';
     showSearch = false;
     showCart = false;
@@ -212,28 +214,38 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }
   /* 데스크탑 레이아웃 끝*/
 
-  return isDesktop ? (
-    <DefaultWebLayout
-      showWebHeader={showWebHeader}
-      showFooter={showFooter}
-      showWebChat={showWebChat}
-      showWebTopButton={showWebTopButton}
-    >
-      {children}
-    </DefaultWebLayout>
-  ) : (
-    <DefaultAppLayout
-      showHeader={showHeader}
-      showLogo={showLogo}
-      showBackButton={showBackButton}
-      headerTitle={headerTitle}
-      showSearch={showSearch}
-      showCart={showCart}
-      showChat={showChat}
-      showTopButton={showTopButton}
-      showNavigation={showNavigation}
-    >
-      {children}
-    </DefaultAppLayout>
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* 헤더 - 모바일/데스크톱 공용 */}
+      <div className="md:hidden">
+        {showHeader && (
+          <AppHeader
+            headerTitle={headerTitle}
+            showBackButton={showBackButton}
+            showLogo={showLogo}
+            showSearch={showSearch}
+            showCart={showCart}
+          />
+        )}
+      </div>
+      <div className="hidden md:block">{showHeader && <WebHeader />}</div>
+
+      {/* 본문 */}
+      <main className="flex-grow">{children}</main>
+
+      {/* 채팅/탑 버튼 */}
+      <div className="fixed bottom-[86px] right-3 z-50 flex-col gap-3 md:hidden">
+        {showChat && <Chat />}
+        {showTopButton && <TopButton />}
+      </div>
+      <div className="fixed bottom-[40px] right-[41px] z-50 flex-col gap-3 hidden md:flex">
+        {showChat && <Chat />}
+        {showTopButton && <TopButton />}
+      </div>
+
+      {/* nav 바/푸터 */}
+      <div className="md:hidden">{showNavigation && <Navigation />}</div>
+      <div className="hidden md:block">{showFooter && <Footer />}</div>
+    </div>
   );
 }
