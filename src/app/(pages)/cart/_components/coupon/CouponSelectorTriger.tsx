@@ -25,9 +25,11 @@ const CouponSelectorTrigger: React.FC<Props> = ({
 
   return (
     <>
-      <div
+      <button
+        type="button"
         className={clsx(
           'flex items-center justify-between gap-1',
+          'w-full',
           'cursor-pointer'
         )}
         onClick={open}
@@ -37,7 +39,7 @@ const CouponSelectorTrigger: React.FC<Props> = ({
           <ChevronRightIcon />
         </div>
         <p>{discountAmount} 원</p>
-      </div>
+      </button>
       <Modal headerTitle="할인 쿠폰" isFullOnMobile className="">
         <CouponSelection handleCouponChange={handleCouponChange} />
       </Modal>
