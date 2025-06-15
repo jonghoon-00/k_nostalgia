@@ -10,11 +10,20 @@ export const getCouponCodeList = async () => {
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
 
-  const { data: couponCodeList } = await supabase
+  if (!data.user?.id) {
+    console.error('User ID is not available');
+    return null;
+  }
+
+  const { data: couponCodeList, error } = await supabase
     .from('users')
     .select('coupons')
     .eq('id', data.user?.id as string)
     .single();
+  
+    if (error) {
+      throw new Error(`Error fetching coupon codes: ${error.message}`);
+    }
 
   return couponCodeList;
 }
@@ -22,10 +31,11 @@ export const getCouponCodeList = async () => {
 /**
  * 
  * @description 서버 컴포넌트에서 사용.
- * 'users' Table에서 쿠폰 코드 리스트 get -> 'coupons' Table에서 code 대입해 쿠폰 이미지 URL 리스트 get
- * @returns couponImageUrlList, hasNoList(boolean)
+ * 
  */
-export const getCouponImageUrlList = async () => {
+export const getCouponImageUrlList = async () : Promise<{ 
+  couponImageUrlList: string[]; hasNoList: boolean; 
+  }>=> {
   const supabase = createClient();
   const couponCodeList = await getCouponCodeList();
 
@@ -39,10 +49,14 @@ export const getCouponImageUrlList = async () => {
   ) {
     const { coupons } = couponCodeList;
 
-    const { data: imageUrlListFromDB } = await supabase
+    const { data: imageUrlListFromDB, error } = await supabase
       .from('coupons')
       .select('image_url')
       .in('code', coupons as string[]);
+
+    if (error) {
+      throw new Error(`Error fetching coupon codes: ${error.message}`);
+    }
 
     if (!imageUrlListFromDB || imageUrlListFromDB.length === 0) {
       console.error('이미지 url get 에러');
