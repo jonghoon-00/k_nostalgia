@@ -6,15 +6,16 @@ import React from 'react';
 
 interface Props {
   imageUrl: string;
+  alt?: string;
 }
 
-const CouponItem: React.FC<Props> = ({ imageUrl }) => {
+const CouponItem: React.FC<Props> = ({ imageUrl, alt }) => {
   const { isMobile } = useDeviceSize();
   return (
     <>
       <Image
         src={imageUrl}
-        alt="profile"
+        alt={alt ?? '쿠폰 이미지'}
         width={isMobile ? 311 : 640}
         height={161}
         priority
