@@ -1,6 +1,6 @@
 'use client';
 
-import { useModalStore } from '@/zustand/useModalStore ';
+import { useModalStore } from '@/zustand/useModalStore';
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';

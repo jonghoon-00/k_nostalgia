@@ -11,7 +11,7 @@ import { calculateDiscount } from '@/utils/coupons';
 
 import RefreshIcon from '@/components/icons/RefreshIcon';
 import { useCouponStore } from '@/zustand/coupon/useCouponStore';
-import { useModalStore } from '@/zustand/useModalStore ';
+import { useModalStore } from '@/zustand/useModalStore';
 import { CouponItem } from './CouponItem';
 
 interface Props {

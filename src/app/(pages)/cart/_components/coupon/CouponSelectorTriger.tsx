@@ -1,7 +1,7 @@
 import { CouponSelection } from '@/components/common/coupon/CouponSelection';
 import { Modal } from '@/components/ui/Modal';
 import { useCouponStore } from '@/zustand/coupon/useCouponStore';
-import { useModalStore } from '@/zustand/useModalStore ';
+import { useModalStore } from '@/zustand/useModalStore';
 import clsx from 'clsx';
 import { ChevronRightIcon } from 'lucide-react';
 import React, { SetStateAction } from 'react';

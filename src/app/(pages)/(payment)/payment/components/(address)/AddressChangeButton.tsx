@@ -7,9 +7,8 @@
 
 'use client';
 
-import useDeviceSize from '@/hooks/useDeviceSize';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React from 'react';
 
 interface Props {
   selectedAddressId: string;
@@ -19,10 +18,6 @@ const AddressChangeButton: React.FC<Props> = ({ selectedAddressId }) => {
   //TODO selectAddressId 가 빈 문자열일 때 처리 추가
   const router = useRouter();
   const ADDRESS_LIST_PAGE = '/my-page/setting/delivery-address';
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { isMobile, isDesktop } = useDeviceSize();
 
   const handleClick = () => {
     // if (isMobile) {
