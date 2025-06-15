@@ -16,6 +16,7 @@ interface Props {
 }
 
 const AddressChangeButton: React.FC<Props> = ({ selectedAddressId }) => {
+  //TODO selectAddressId 가 빈 문자열일 때 처리 추가
   const router = useRouter();
   const ADDRESS_LIST_PAGE = '/my-page/setting/delivery-address';
 
