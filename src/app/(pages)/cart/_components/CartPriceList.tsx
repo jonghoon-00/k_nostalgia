@@ -1,7 +1,6 @@
 'use client';
 import CouponSelectorTrigger from '@/app/(pages)/cart/_components/coupon/CouponSelectorTriger';
 import { Tables } from '@/types/supabase';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 interface CartProps {
@@ -9,7 +8,6 @@ interface CartProps {
   selectedItems: string[];
 }
 export const CartPriceList = ({ data, selectedItems }: CartProps) => {
-  const router = useRouter();
   const DELIVERY_FEE = 2500; // 배송비
 
   const [totalAmount, setTotalAmount] = useState<number>(0);
