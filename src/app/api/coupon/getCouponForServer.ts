@@ -43,9 +43,7 @@ export const getCouponImageUrlList = async () : Promise<{
 
   if (
     // 보유한 쿠폰 코드가 있는 경우에만 DB에서 이미지 URL을 가져옴
-    couponCodeList &&
-    couponCodeList.coupons &&
-    couponCodeList.coupons.length > 0
+    couponCodeList?.coupons?.length
   ) {
     const { coupons } = couponCodeList;
 
