@@ -39,6 +39,7 @@ const CouponInPaymentPage: React.FC<Props> = ({
       <div className="flex justify-between">
         <h2 className="text-gray-600 font-bold">할인/쿠폰</h2>
         <button
+          type="button"
           className="text-xs font-normal text-[#79746D] border-[1px] border-[#959595] rounded-[6px] py-1 px-2"
           onClick={open}
         >
