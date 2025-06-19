@@ -29,9 +29,7 @@ const OrderPageContainer = ({
 }: Props) => {
   const selectedIds = useCouponStore((state) => state.selectedCouponIds);
   const [coupons, setCoupons] = useState<Tables<'coupons'>[]>([]);
-  const [discountAmount, setDiscountAmount] = useState<number>(
-    coupons.reduce((acc, coupon) => acc + (coupon.amount ?? 0), 0)
-  );
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
 
   useEffect(() => {
     const loadCoupons = async () => {
@@ -100,7 +98,7 @@ const OrderPageContainer = ({
         {/* 결제 요약(가격) 및 결제 버튼 */}
         <div className="md:w-[375px] md:shrink-0">
           <OrderSummary
-            totalDiscountAmount={discountAmount}
+            discountAmount={discountAmount}
             shippingRequest={shippingRequest}
             shouldStoreDeliveryRequest={shouldStoreDeliveryRequest}
           />
