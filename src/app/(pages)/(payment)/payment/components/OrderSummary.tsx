@@ -5,7 +5,6 @@ import Accordion from '@/components/ui/Accordion';
 import { toast } from '@/components/ui/use-toast';
 import { useUser } from '@/hooks/useUser';
 import supabase from '@/utils/supabase/client';
-import useCouponStore from '@/zustand/coupon/useCouponStore';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 import { useRouter } from 'next/navigation';
@@ -14,10 +13,14 @@ import { useEffect, useState } from 'react';
 interface Props {
   shippingRequest: string;
   shouldStoreDeliveryRequest: boolean;
+  discountAmount?: number;
+  totalDiscountAmount: number; // 추가된 prop, 쿠폰 할인액
 }
 const OrderSummary = ({
   shippingRequest,
-  shouldStoreDeliveryRequest
+  shouldStoreDeliveryRequest,
+  discountAmount,
+  totalDiscountAmount
 }: Props) => {
   const router = useRouter();
 
@@ -33,7 +36,7 @@ const OrderSummary = ({
     setTotalQuantity
   } = usePaymentRequestStore();
   const { address } = useDeliveryStore();
-  const { discountAmount } = useCouponStore();
+  // const { discountAmount } = useCouponStore();
 
   const amount = products.reduce((acc, product) => acc + product.amount, 0);
 
@@ -144,7 +147,7 @@ const OrderSummary = ({
           onClick={payRequest}
           className="w-[90%] md:w-full md:mt-4 max-w-[420px] bg-primary-20 text-white py-3 rounded-[12px] font-bold"
         >
-          {totalAmount.toLocaleString('ko-KR')}원 결제하기
+          {totalDiscountAmount.toLocaleString('ko-KR')}원 결제하기
         </button>
       </div>
     </>
