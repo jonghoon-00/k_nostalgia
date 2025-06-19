@@ -14,6 +14,7 @@ const CouponPage = async () => {
           width={141}
           height={88}
           className="w-[141px] h-[88px]"
+          priority
         />
       </div>
 

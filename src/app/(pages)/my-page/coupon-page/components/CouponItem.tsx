@@ -1,6 +1,7 @@
 'use client';
 
 import useDeviceSize from '@/hooks/useDeviceSize';
+import clsx from 'clsx';
 import Image from 'next/image';
 import React from 'react';
 
@@ -18,16 +19,14 @@ interface Props {
 const CouponItem: React.FC<Props> = ({ imageUrl, alt }) => {
   const { isMobile } = useDeviceSize();
   return (
-    <>
-      <Image
-        src={imageUrl}
-        alt={alt ?? '쿠폰 이미지'}
-        width={isMobile ? 311 : 640}
-        height={161}
-        priority
-        className="w-auto h-[161px] md:w-[640px] md:h-[280px]"
-      />
-    </>
+    <Image
+      src={imageUrl}
+      alt={alt ?? '쿠폰 이미지'}
+      width={isMobile ? 311 : 640}
+      height={161}
+      priority
+      className={clsx('w-full h-full md:w-[640px]')}
+    />
   );
 };
 

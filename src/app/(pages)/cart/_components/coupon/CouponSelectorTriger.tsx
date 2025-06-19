@@ -40,7 +40,7 @@ const CouponSelectorTrigger: React.FC<Props> = ({
         </div>
         <p>{discountAmount} 원</p>
       </button>
-      <Modal headerTitle="할인 쿠폰" isFullOnMobile className="">
+      <Modal headerTitle="할인 쿠폰" isFullOnMobile>
         <CouponSelection handleCouponChange={handleCouponChange} />
       </Modal>
     </>

@@ -118,7 +118,7 @@ const CheckPaymentContent = () => {
             return router.replace(`/local-food`);
           }
 
-          //쿠폰 사용 시 users 테이블 coupon 항목 비움
+          //TODO 사용 쿠폰 ID OR CODDE 확인 후 일치 방목 제거
           if (isCouponApplied === 'true') {
             await supabase
               .from('users')
