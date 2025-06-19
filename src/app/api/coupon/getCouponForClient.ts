@@ -33,3 +33,24 @@ export const getCouponList = async () => {
 
   return couponList;
 }
+
+/**
+ * 주어진 쿠폰 ID 배열과 일치하는 쿠폰 레코드를 반환
+ * @param {string[]} ids - 쿠폰 ID 배열 
+ */
+export const fetchCouponsByIds = async (
+  ids: string[]
+): Promise<Tables<'coupons'>[] | null> => {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('coupons')
+    .select('*')
+    .in('id', ids);
+
+  if (error) {
+    console.error("fetchCouponsByIds error:", error);
+    return null;
+  }
+
+  return data;
+}
