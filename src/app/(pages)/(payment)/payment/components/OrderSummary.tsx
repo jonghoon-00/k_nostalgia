@@ -13,14 +13,12 @@ import { useEffect, useState } from 'react';
 interface Props {
   shippingRequest: string;
   shouldStoreDeliveryRequest: boolean;
-  discountAmount?: number;
-  totalDiscountAmount: number; // 추가된 prop, 쿠폰 할인액
+  discountAmount: number;
 }
 const OrderSummary = ({
   shippingRequest,
   shouldStoreDeliveryRequest,
-  discountAmount,
-  totalDiscountAmount
+  discountAmount
 }: Props) => {
   const router = useRouter();
 
@@ -36,7 +34,6 @@ const OrderSummary = ({
     setTotalQuantity
   } = usePaymentRequestStore();
   const { address } = useDeliveryStore();
-  // const { discountAmount } = useCouponStore();
 
   const amount = products.reduce((acc, product) => acc + product.amount, 0);
 
@@ -147,7 +144,7 @@ const OrderSummary = ({
           onClick={payRequest}
           className="w-[90%] md:w-full md:mt-4 max-w-[420px] bg-primary-20 text-white py-3 rounded-[12px] font-bold"
         >
-          {totalDiscountAmount.toLocaleString('ko-KR')}원 결제하기
+          {discountAmount.toLocaleString('ko-KR')}원 결제하기
         </button>
       </div>
     </>
