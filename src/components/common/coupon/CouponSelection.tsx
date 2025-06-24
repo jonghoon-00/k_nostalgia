@@ -1,66 +1,31 @@
 'use client';
 
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
-import { getCouponList } from '@/app/api/coupon/getCouponForClient';
 import useDeviceSize from '@/hooks/useDeviceSize';
-import { Tables } from '@/types/supabase';
-import { calculateDiscount } from '@/utils/coupons';
 
 import RefreshIcon from '@/components/icons/RefreshIcon';
+import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
+import { useGetAllCoupons } from '@/hooks/coupon/useGetAllCoupons';
 import { useCouponStore } from '@/zustand/coupon/useCouponStore';
 import { useModalStore } from '@/zustand/useModalStore';
 import { CouponItem } from './CouponItem';
 
-interface Props {
-  handleCouponChange: (
-    discountAmount: number,
-    selectedCouponIds: string[]
-  ) => void;
-}
-
-export const CouponSelection: React.FC<Props> = ({ handleCouponChange }) => {
-  const { close } = useModalStore();
-
-  // zustand에서 선택된 ID들
-  const selectedIds = useCouponStore((s) => s.selectedCouponIds);
-  const clearCouponIds = useCouponStore((s) => s.clearCouponIds);
-
-  const [coupons, setCoupons] = useState<Tables<'coupons'>[]>([]);
+export const CouponSelection: React.FC = () => {
   const { isMobile } = useDeviceSize();
+  const close = useModalStore((state) => state.close);
 
-  // 쿠폰 리스트 조회
-  useEffect(() => {
-    (async () => {
-      const result = await getCouponList();
-      if (!result || result.length === 0) {
-        console.warn('No coupons available');
-        setCoupons([]);
-        clearCouponIds();
-        handleCouponChange(0, []);
-        return;
-      }
-      setCoupons(result);
-    })();
-  }, [clearCouponIds, handleCouponChange]);
-
-  // 선택된 ID가 바뀔 때마다 할인액 계산 및 상위 콜백 호출
-  useEffect(() => {
-    const applied = coupons.filter((c) => selectedIds.includes(c.id));
-    const amount = calculateDiscount(applied);
-    handleCouponChange(amount, selectedIds);
-  }, [selectedIds, coupons, handleCouponChange]);
-
-  // 최대 할인 적용
-  const applyMaxDiscount = () => {
-    const allIds = coupons.map((c) => c.id);
-    useCouponStore.getState().setSelectedCouponIds(allIds);
-  };
-
-  const discountAmount = calculateDiscount(
-    coupons.filter((c) => selectedIds.includes(c.id))
+  const setSelectedCouponIds = useCouponStore(
+    (state) => state.setSelectedCouponIds
   );
+
+  const coupons = useGetAllCoupons();
+  const discountAmount = useCouponDiscount();
+
+  const applyMaxDiscount = () => {
+    setSelectedCouponIds(coupons.map((c) => c.id));
+  };
 
   return (
     <div className={clsx('md:pb-4', 'px-0')}>
