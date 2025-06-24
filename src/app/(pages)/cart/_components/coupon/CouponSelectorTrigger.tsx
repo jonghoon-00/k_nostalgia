@@ -1,27 +1,14 @@
 import { CouponSelection } from '@/components/common/coupon/CouponSelection';
 import { Modal } from '@/components/ui/Modal';
-import { useCouponStore } from '@/zustand/coupon/useCouponStore';
+import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
 import { useModalStore } from '@/zustand/useModalStore';
 import clsx from 'clsx';
 import { ChevronRightIcon } from 'lucide-react';
-import React, { SetStateAction } from 'react';
+import React from 'react';
 
-interface Props {
-  discountAmount: number;
-  setDiscountAmount: React.Dispatch<SetStateAction<number>>;
-}
-
-const CouponSelectorTrigger: React.FC<Props> = ({
-  discountAmount,
-  setDiscountAmount
-}) => {
+const CouponSelectorTrigger: React.FC = () => {
   const { open } = useModalStore();
-  const setSelectedCouponIds = useCouponStore((s) => s.setSelectedCouponIds);
-
-  const handleCouponChange = (amount: number, selectedIds: string[]) => {
-    setDiscountAmount(amount);
-    setSelectedCouponIds(selectedIds);
-  };
+  const discountAmount = useCouponDiscount();
 
   return (
     <>
@@ -41,7 +28,7 @@ const CouponSelectorTrigger: React.FC<Props> = ({
         <p>{discountAmount} 원</p>
       </button>
       <Modal headerTitle="할인 쿠폰" isFullOnMobile>
-        <CouponSelection handleCouponChange={handleCouponChange} />
+        <CouponSelection />
       </Modal>
     </>
   );
