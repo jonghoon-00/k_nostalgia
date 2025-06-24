@@ -1,14 +1,16 @@
 import InfoIcon from '@/components/icons/InfoIcon';
+import Image from 'next/image';
 
 const DesktopOrderHeader = () => {
   return (
     <div className="flex flex-col items-center gap-2">
-      <img
+      <Image
         src="/image/payment_tiger.png"
         alt="주문/결제 페이지 아이콘"
         width={135}
         height={88}
         className="py-8"
+        priority
       />
       <div className="bg-gray-90 flex py-3 px-4 w-full md:max-w-[1080px] md:mb-4">
         <InfoIcon width="20" height="20" />
