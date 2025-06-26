@@ -2,6 +2,7 @@ import HeaderWithInfoIcon from '@/components/common/header/_component/HeaderWith
 import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/getAddresses';
 import { AllAddresses } from '@/types/deliveryAddress';
 import { createClient } from '@/utils/supabase/server';
+import DeliveryAddress from './components/(address)/DeliveryAddress ';
 import CouponInPaymentPage from './components/CouponInPaymentPage';
 import DesktopOrderHeader from './components/DesktopOrderHeader';
 import PaymentMethodSelect from './components/PaymentMethodSelect';
@@ -50,11 +51,11 @@ const Payment = async () => {
       <main className="mx-auto md:max-w-[1080px] p-4 md:p-0 bg-normal mb-14 mt-16 md:mt-0 md:flex md:gap-6">
         {/* 좌측: 배송지, 주문상품, 쿠폰, 결제수단 */}
         <section className="md:flex-1 md:max-w-[681px] space-y-6">
-          {/* <DeliveryAddress
-            initialData={allAddresses}
-            initialRequest={initialShippingRequest}
+          <DeliveryAddress
+            initialAddress={allAddresses}
+            initialShippingRequest={shippingRequest}
           />
-          <OrderProducts /> */}
+          {/* <OrderProducts /> */}
           <CouponInPaymentPage />
           <PaymentMethodSelect />
         </section>
