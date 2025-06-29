@@ -4,9 +4,9 @@ import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/getAddres
 
 import { AllAddresses } from '@/types/deliveryAddress';
 
+import NoList from '@/components/common/NoList';
 import AddNewAddressButton from './_components/AddNewAddressButton';
 import AddressesList from './_components/AddressesList';
-import NoDeliveryAddress from './_components/NoDeliveryAddress';
 
 const DeliveryAddressManagement = async () => {
   const allAddresses: AllAddresses = await getAddressesInServerComponent();
@@ -18,7 +18,9 @@ const DeliveryAddressManagement = async () => {
   return (
     <>
       {hasNoAddresses ? (
-        <NoDeliveryAddress />
+        <NoList
+          message={['등록된 배송지가 없어요', '새 배송지를 추가해 주세요.']}
+        />
       ) : (
         <div className="max-w-md mx-auto flex flex-col p-4 bg-normal">
           <AddressesList initialData={allAddresses} />

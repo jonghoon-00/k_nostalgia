@@ -1,8 +1,3 @@
-// 배송지 입력 폼(input + button)
-
-// react-daum-postcode 사용
-// code update: 24.12.27
-
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -17,6 +12,7 @@ import { validateName, validatePhoneNumber } from '@/utils/validate';
 
 import { toast } from '@/components/ui/use-toast';
 import useDaumPostcode from '@/hooks/deliveryAddress/daumPostCode/usePopup';
+import clsx from 'clsx';
 import { v4 as uuidv4 } from 'uuid';
 
 const AddAddressForm = () => {
@@ -305,8 +301,26 @@ const AddAddressForm = () => {
       </div>
 
       {/* 등록 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] px-4 pt-3 pb-6">
-        <button className="w-full bg-primary-20 text-white text-center py-3 rounded-[8px]">
+      <div
+        className={clsx(
+          // 레이아웃 및 패딩
+          'fixed inset-x-0 bottom-0 pt-3 pb-6 w-full',
+          // 모바일 그림자
+          'shadow-[0_-4px_10px_rgba(0,0,0,0.1)]',
+          // 데스크탑에서 배경·그림자 해제
+          'md:static md:bg-normal md:shadow-none'
+        )}
+      >
+        <button
+          className={clsx(
+            // 공통 버튼 스타일
+            'w-full py-3 rounded-[8px] text-center',
+            // 모바일 배경·텍스트 색상
+            'bg-primary-20 text-white'
+            // (필요 시) 데스크탑에서 다른 색상 적용
+            // 'md:bg-normal md:text-inherit'
+          )}
+        >
           등록하기
         </button>
       </div>

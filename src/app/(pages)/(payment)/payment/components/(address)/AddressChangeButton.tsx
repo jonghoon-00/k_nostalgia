@@ -20,15 +20,14 @@ const AddressChangeButton: React.FC<Props> = ({ selectedAddressId }) => {
   const ADDRESS_LIST_PAGE = '/my-page/setting/delivery-address';
 
   const handleClick = () => {
-    // if (isMobile) {
-    router.push(
-      `${ADDRESS_LIST_PAGE}?from=payment&addressId=${selectedAddressId}`
-    );
-    // }
-
-    // if (isDesktop) {
-    //   setIsModalOpen(true);
-    // }
+    // // if (isMobile) {
+    // router.push(
+    //   `${ADDRESS_LIST_PAGE}?from=payment&addressId=${selectedAddressId}`
+    // );
+    // // }
+    // // if (isDesktop) {
+    // //   setIsModalOpen(true);
+    // // }
   };
 
   return (
