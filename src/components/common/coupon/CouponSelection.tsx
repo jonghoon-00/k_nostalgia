@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import useDeviceSize from '@/hooks/useDeviceSize';
 
@@ -26,6 +26,12 @@ export const CouponSelection: React.FC = () => {
   const applyMaxDiscount = () => {
     setSelectedCouponIds(coupons.map((c) => c.id));
   };
+
+  useEffect(() => {
+    return () => {
+      close();
+    };
+  }, [close]);
 
   return (
     <div className={clsx('md:pb-4', 'px-0')}>
