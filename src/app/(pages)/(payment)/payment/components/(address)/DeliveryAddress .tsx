@@ -8,89 +8,108 @@ import {
   DropdownMenu,
   DropdownMenuTrigger
 } from '@radix-ui/react-dropdown-menu';
-import { SetStateAction, useEffect, useState } from 'react';
+import clsx from 'clsx';
+import { useEffect, useState } from 'react';
 import AddAddressButton from './AddAddressButton';
 import AddressSummaryCard from './AddressSummaryCard';
 
 interface Props {
-  initialData: AllAddresses;
-  shippingRequest: string;
-  setShippingRequest: React.Dispatch<SetStateAction<string>>;
-  shouldStoreDeliveryRequest: boolean;
-  setShouldStoreDeliveryRequest: React.Dispatch<SetStateAction<boolean>>;
+  initialAddress: AllAddresses;
+  initialShippingRequest: string;
 }
 
-const DeliveryAddress = ({
-  initialData,
-  shippingRequest,
-  setShippingRequest,
-  shouldStoreDeliveryRequest,
-  setShouldStoreDeliveryRequest
-}: Props) => {
+export default function DeliveryAddressClient({
+  initialAddress,
+  initialShippingRequest
+}: Props) {
+  const { defaultAddress, addresses } = initialAddress;
+
+  // Zustand store
+  const shippingRequest = useDeliveryStore((s) => s.shippingRequest);
+  const selectedAddressId = useDeliveryStore((s) => s.selectedAddressId);
+  const shouldStoreDeliveryRequest = useDeliveryStore(
+    (s) => s.shouldStoreDeliveryRequest
+  );
+  const { setAddress, setShippingRequest, setShouldStoreDeliveryRequest } =
+    useDeliveryStore((s) => ({
+      setAddress: s.setAddress,
+      setShippingRequest: s.setShippingRequest,
+      setShouldStoreDeliveryRequest: s.setShouldStoreDeliveryRequest
+    }));
+
+  // Local state for dropdown and custom input
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const { defaultAddress, addresses } = initialData;
-
-  const { selectedAddressId, setAddress } = useDeliveryStore();
-
+  // Determine selected address
   const selectedAddress = selectedAddressId
-    ? [defaultAddress, ...addresses].find(
-        (address) => address.id === selectedAddressId
-      ) || defaultAddress
+    ? [defaultAddress, ...addresses].find((a) => a.id === selectedAddressId) ||
+      defaultAddress
     : defaultAddress;
 
+  // Initialize store from props
   useEffect(() => {
     setAddress(selectedAddress);
   }, [selectedAddress, setAddress]);
+  useEffect(() => {
+    setShippingRequest(initialShippingRequest);
+  }, [initialShippingRequest, setShippingRequest]);
 
   return (
-    <div className="bg-white p-4 flex flex-col gap-2 rounded-[12px] border-2 border-[#E0E0E0] mb-4">
-      <div className="flex flex-col justify-between items-center">
-        <h2 className="w-full text-label-strong text-[18px] font-semibold">
-          배송지
-        </h2>
-      </div>
+    <div
+      className={clsx(
+        'bg-white p-4 mb-4 flex flex-col gap-2',
+        'border-2 border-[#E0E0E0] rounded-[12px]'
+      )}
+    >
+      <h2 className="w-full text-label-strong text-[18px] font-semibold">
+        배송지
+      </h2>
 
-      {!selectedAddress || !defaultAddress ? (
+      {!selectedAddress ? (
         <AddAddressButton />
       ) : (
         <AddressSummaryCard selectedAddress={selectedAddress} />
       )}
 
-      {/* 구분선 */}
-      <div className="w-full h-[2px] my-1 bg-[#F2F2F2]"></div>
+      <div className="w-full h-px bg-gray-200 my-2" />
 
-      {/* 요청 사항 dropdown 메뉴 */}
       <DropdownMenu>
-        <DropdownMenuTrigger onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-          <button className="w-full flex justify-between items-center gap-2 px-4 py-3 h-10 border-[1px] rounded-[8px] border-gray-300 text-sm text-[#AFACA7]">
-            요청사항 직접 입력하기
-            <span>{isDropdownOpen ? <DownButton /> : <UpButton />}</span>
+        <DropdownMenuTrigger asChild>
+          <button
+            className={clsx(
+              'w-full flex justify-between items-center',
+              'px-4 py-3 border rounded-lg text-sm text-gray-500 bg-white'
+            )}
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            {shippingRequest || '직접 입력하기'}
+            {isDropdownOpen ? <UpButton /> : <DownButton />}
           </button>
         </DropdownMenuTrigger>
       </DropdownMenu>
 
-      <div>
-        <textarea
-          className="resize-none h-[100px] w-full border border-gray-300 rounded mt-2 p-2 text-sm"
-          placeholder="요청사항을 입력해주세요 :)"
-          name="shippingRequest"
-          rows={2}
-          value={shippingRequest}
-          onChange={(e) => setShippingRequest(e.target.value)}
-        ></textarea>
-        <label className="flex items-center mt-2">
-          <input
-            type="checkbox"
-            className="mr-2"
-            checked={shouldStoreDeliveryRequest || shippingRequest !== ''}
-            onChange={(e) => setShouldStoreDeliveryRequest(e.target.checked)}
-          />
-          <span className="text-gray-600 text-sm">다음에도 사용할게요</span>
-        </label>
-      </div>
+      <textarea
+        className={clsx(
+          'mt-2 p-2 w-full h-24 border rounded-lg text-sm resize-none'
+        )}
+        placeholder="요청사항을 입력해주세요 :)"
+        value={shippingRequest ?? ''}
+        onChange={(e) => setShippingRequest(e.target.value)}
+      />
+
+      <label
+        className={clsx(
+          'flex items-center mt-2 text-sm text-gray-600 cursor-pointer'
+        )}
+      >
+        <input
+          type="checkbox"
+          className="mr-2"
+          checked={shouldStoreDeliveryRequest}
+          onChange={(e) => setShouldStoreDeliveryRequest(e.target.checked)}
+        />
+        다음에도 사용할게요
+      </label>
     </div>
   );
-};
-
-export default DeliveryAddress;
+}

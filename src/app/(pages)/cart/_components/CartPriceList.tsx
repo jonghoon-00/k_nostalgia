@@ -1,5 +1,6 @@
 'use client';
-import CouponSelectorTrigger from '@/app/(pages)/cart/_components/coupon/CouponSelectorTriger';
+import CouponSelectorTrigger from '@/app/(pages)/cart/_components/coupon/CouponSelectorTrigger';
+import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
 import { Tables } from '@/types/supabase';
 import { useEffect, useState } from 'react';
 
@@ -11,7 +12,7 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
   const DELIVERY_FEE = 2500; // 배송비
 
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const discountAmount = useCouponDiscount();
 
   useEffect(() => {
     const calculator =
@@ -53,10 +54,7 @@ export const CartPriceList = ({ data, selectedItems }: CartProps) => {
         </li>
         <li className="mb-4">
           {/* 쿠폰 */}
-          <CouponSelectorTrigger
-            discountAmount={discountAmount}
-            setDiscountAmount={setDiscountAmount}
-          />
+          <CouponSelectorTrigger />
         </li>
         <li className="flex justify-between text-lg text-label-strong md:text-primary-20 font-semibold border-t-2 border-[#F2F2F2] pt-4">
           <p>결제 예정 금액</p>

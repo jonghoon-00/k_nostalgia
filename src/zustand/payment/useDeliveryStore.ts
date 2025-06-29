@@ -6,11 +6,13 @@ type State = {
   selectedAddressId: string | null;
   shippingRequest: string | null;
   address: Address | null;
+  shouldStoreDeliveryRequest: boolean;
 }
 type Actions = {
   setSelectedAddressId: (id: string) => void;
   setShippingRequest: (req: string) => void;
   setAddress: (state: Address) => void;
+  setShouldStoreDeliveryRequest: (shouldStore: boolean) => void;
 }
 
 const useDeliveryStore = create<State&Actions>()(
@@ -19,13 +21,15 @@ const useDeliveryStore = create<State&Actions>()(
   selectedAddressId: null,
   shippingRequest: null,
   address: null,
-
+  shouldStoreDeliveryRequest: false,
+  
   setSelectedAddressId:(id)=>set({selectedAddressId: id}),
   setShippingRequest: (req) => set({shippingRequest: req}),
   setAddress: (address) =>
     set((state) =>
       state.address !== address ? { address } : state
-    ),
+),
+setShouldStoreDeliveryRequest: (shouldStore) => set({shouldStoreDeliveryRequest: shouldStore}),
   
 }),{
   name: 'delivery-address-storage',
