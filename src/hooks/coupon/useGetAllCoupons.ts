@@ -1,4 +1,3 @@
-// File: hooks/coupon/useAllCoupons.ts
 import { getCouponList } from '@/app/api/coupon/getCouponForClient';
 import { Tables } from '@/types/supabase';
 import { useEffect, useState } from 'react';
@@ -19,7 +18,7 @@ export function useGetAllCoupons(): Tables<'coupons'>[] {
           setCoupons(list);
         }
       } catch (error) {
-        console.error('useAllCoupons error:', error);
+        console.error('useGetAllCoupons error:', error);
         if (isMounted) setCoupons([]);
       }
     })();
