@@ -1,14 +1,15 @@
 // stores/modalStore.ts
+import { ModalId } from '@/components/ui/Modal';
 import create from 'zustand';
 
 interface ModalState {
-  isOpen: boolean;
-  open: () => void;
+  openModalId: ModalId | null;
+  open: (id: ModalId) => void;
   close: () => void;
 }
 
 export const useModalStore = create<ModalState>(set => ({
-  isOpen: false,
-  open:  () => set({ isOpen: true }),
-  close: () => set({ isOpen: false }),
+  openModalId: null,
+  open: (id) => set({ openModalId: id }),
+  close: () => set({ openModalId: null }),
 }));

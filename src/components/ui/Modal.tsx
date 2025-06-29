@@ -1,5 +1,6 @@
 'use client';
 
+import { MODAL_IDS } from '@/constants';
 import { useModalStore } from '@/zustand/useModalStore';
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
@@ -7,7 +8,13 @@ import React, { useEffect } from 'react';
 import { BackButton } from '../icons/BackButton';
 import { XClose } from '../icons/XClose';
 
+/**
+ * MODAL_IDS 값들 중 하나만 허용
+ */
+export type ModalId = (typeof MODAL_IDS)[keyof typeof MODAL_IDS];
+
 interface ModalProps {
+  modalId: ModalId;
   headerTitle: string;
   className?: string;
   width?: string;
@@ -17,7 +24,8 @@ interface ModalProps {
 }
 
 /**
- * Modal 컴포넌트 (Zustand 활용)
+ * Modal 컴포넌트 (Zustand 활용, modalId 기준 제어)
+ * @param {string} modalId - 모달 식별자 (Zustand 상태 관리용)
  * @param {string} headerTitle - 헤더 타이틀 텍스트
  * @param {string} [className] - 모달 컨테이너에 추가할 스타일(class)
  * @param {string} [width] - 데스크탑 기준 모달 너비(px)
@@ -25,6 +33,7 @@ interface ModalProps {
  * @param {boolean} [isFullOnMobile] - 모바일에서 전체 화면 표시 여부
  */
 export const Modal: React.FC<ModalProps> = ({
+  modalId,
   headerTitle,
   className,
   width,
@@ -34,7 +43,7 @@ export const Modal: React.FC<ModalProps> = ({
 }) => {
   const pathname = usePathname();
 
-  const isModalOpen = useModalStore((state) => state.isOpen);
+  const openModalId = useModalStore((state) => state.openModalId);
   const close = useModalStore((state) => state.close);
 
   // 페이지 경로가 변경될 때 모달 닫기
@@ -49,7 +58,9 @@ export const Modal: React.FC<ModalProps> = ({
     };
   }, [close]);
 
-  if (!isModalOpen) return null;
+  // 자신이 열린 모달인지 체크
+  const isThisOpen = openModalId === modalId;
+  if (!isThisOpen) return null;
 
   return (
     <div

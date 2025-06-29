@@ -1,5 +1,6 @@
 import { CouponSelection } from '@/components/common/coupon/CouponSelection';
 import { Modal } from '@/components/ui/Modal';
+import { MODAL_IDS } from '@/constants';
 import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
 import { useModalStore } from '@/zustand/useModalStore';
 import clsx from 'clsx';
@@ -19,7 +20,7 @@ const CouponSelectorTrigger: React.FC = () => {
           'w-full',
           'cursor-pointer'
         )}
-        onClick={open}
+        onClick={() => open(MODAL_IDS.COUPON)}
       >
         <div className="flex">
           <p>쿠폰 할인</p>
@@ -27,7 +28,7 @@ const CouponSelectorTrigger: React.FC = () => {
         </div>
         <p>{discountAmount} 원</p>
       </button>
-      <Modal headerTitle="할인 쿠폰" isFullOnMobile>
+      <Modal modalId={MODAL_IDS.COUPON} headerTitle="할인 쿠폰" isFullOnMobile>
         <CouponSelection />
       </Modal>
     </>
