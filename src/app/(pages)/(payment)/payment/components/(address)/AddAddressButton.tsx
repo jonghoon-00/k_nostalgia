@@ -5,11 +5,8 @@ import { useModalStore } from '@/zustand/useModalStore';
 import clsx from 'clsx';
 
 const AddAddressButton = () => {
-  // const ADD_ADDRESS_PAGE = '/my-page/setting/delivery-address/add-new';
-
   const open = useModalStore((state) => state.open);
   return (
-    // <Link href={`${ADD_ADDRESS_PAGE}?from=payment`} className="w-full">
     <>
       <button
         type="button"
@@ -34,7 +31,6 @@ const AddAddressButton = () => {
         <div>dd</div>
       </Modal>
     </>
-    // </Link>
   );
 };
 
