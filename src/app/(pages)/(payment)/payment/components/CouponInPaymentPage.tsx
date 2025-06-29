@@ -23,14 +23,10 @@ export const CouponInPaymentPage = () => {
         >
           변경
         </button>
-        <Modal
-          modalId={MODAL_IDS.COUPON}
-          headerTitle="할인 쿠폰"
-          isFullOnMobile
-        >
-          <CouponSelection />
-        </Modal>
       </div>
+      <Modal modalId={MODAL_IDS.COUPON} headerTitle="할인 쿠폰" isFullOnMobile>
+        <CouponSelection />
+      </Modal>
       <div className="flex justify-between">
         <span>할인 금액</span>
         <span>{discount.toLocaleString()}원</span>
