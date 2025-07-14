@@ -1,5 +1,3 @@
-// 배송지 관리 페이지
-
 import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/getAddresses';
 
 import { AllAddresses } from '@/types/deliveryAddress';
@@ -15,6 +13,8 @@ const DeliveryAddressManagement = async () => {
   const hasNoDefaultAddress: boolean = defaultAddress === null;
   const hasNoAddresses: boolean = hasNoDefaultAddress && addresses === null;
 
+  //TODO defaultAddress, addresses를 하나의 배열로 prop 넘기기
+  console.log(allAddresses);
   return (
     <>
       {hasNoAddresses ? (

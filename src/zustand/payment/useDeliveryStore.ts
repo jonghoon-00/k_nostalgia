@@ -9,6 +9,7 @@ type State = {
   shouldStoreDeliveryRequest: boolean;
 }
 type Actions = {
+  //TODO setSelectedAddressId 필요할지 고려
   setSelectedAddressId: (id: string) => void;
   setShippingRequest: (req: string) => void;
   setAddress: (state: Address) => void;

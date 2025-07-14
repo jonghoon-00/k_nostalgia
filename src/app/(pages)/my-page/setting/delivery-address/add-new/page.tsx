@@ -1,8 +1,3 @@
-//배송지 추가 페이지
-
-//결제 진행 중에서 추가할 경우, 해당 페이지로 바로 이동되어야해서
-//별도 페이지로 제작했습니다
-
 import InfoIcon from '@/components/icons/InfoIcon';
 import AddAddressForm from './_components/AddAddressForm';
 
