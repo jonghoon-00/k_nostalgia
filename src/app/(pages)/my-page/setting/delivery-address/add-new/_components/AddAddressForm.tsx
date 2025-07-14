@@ -6,18 +6,17 @@ import { useEffect, useState } from 'react';
 import useThrottle from '@/hooks/useThrottle';
 import { useUser } from '@/hooks/useUser';
 import api from '@/service/service';
-import { PatchRequest } from '@/types/deliveryAddress';
+import { AddAddressPayload } from '@/types/deliveryAddress';
 import { formatPhoneNumber } from '@/utils/format';
 import { validateName, validatePhoneNumber } from '@/utils/validate';
 
 import { toast } from '@/components/ui/use-toast';
 import useDaumPostcode from '@/hooks/deliveryAddress/daumPostCode/usePopup';
 import clsx from 'clsx';
-import { v4 as uuidv4 } from 'uuid';
 
 const AddAddressForm = () => {
   const router = useRouter();
-
+  //formattedPhoneNumber: 휴대폰 번호 포맷팅을 위한 useState
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('');
   //baseAddressWithZoneCode: 주소검색 api로 받아온 주소, 우편번호
   const [baseAddressWithZoneCode, setBaseAddressWithZoneCode] = useState('');
@@ -96,41 +95,24 @@ const AddAddressForm = () => {
     }
 
     //formData 유효성 검사 + 값 반환
-    const deliveryFormData = new FormData(e.currentTarget);
+    const formData = new FormData(e.currentTarget);
+    const addressName = formData.get('addressName')!.toString();
+    const receiverName = formData.get('receiverName')!.toString();
+    const detailAddress = formData.get('detailAddress')?.toString() ?? '';
+    const phoneNumber = formattedPhoneNumber.replace(/[^\d]/g, '');
 
-    const formDataFieldsArr = ['addressName', 'receiverName'];
-    const formDataValues: Record<string, string> = {};
-
-    for (const field of formDataFieldsArr) {
-      const value = deliveryFormData.get(field);
-      if (value === null) {
-        return toast({
-          description: `모든 정보를 바르게 입력해주세요`
-        });
-      }
-      formDataValues[field] = value.toString();
-    }
-    const detailAddress = deliveryFormData.get('detailAddress');
-    const detailAddressForRequest =
-      detailAddress === null ? '' : detailAddress.toString();
-
-    const { addressName, receiverName } = formDataValues;
-
-    //-(하이픈)을 제외한 숫자만 남긴 문자열로 포맷팅
-    const phoneNumberForSubmit = formattedPhoneNumber.replace(/[^\d]/g, '');
-
-    const addressForRequest: PatchRequest = {
-      id: uuidv4(),
+    const payload: AddAddressPayload = {
+      userId,
       addressName,
       receiverName,
-      phoneNumber: phoneNumberForSubmit,
+      phoneNumber,
       baseAddress: baseAddressWithZoneCode,
-      detailAddress: detailAddressForRequest,
-      isDefaultAddress
+      detailAddress,
+      isDefault: isDefaultAddress
     };
 
     try {
-      api.address.addNewAddress(addressForRequest, userId);
+      api.address.addNewAddress(payload);
     } catch (error) {
       console.error('배송지 업데이트 중 에러:', error);
       return toast({
