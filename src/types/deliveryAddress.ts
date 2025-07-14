@@ -4,17 +4,17 @@ export interface Address {
   receiverName: string; // 수령인 이름
   phoneNumber: string; // 휴대폰 번호
   baseAddress: string; // 기본 주소
+  isDefault: boolean; // 기본 배송지 설정 여부
   detailAddress?: string; // 상세 주소
 }
-export interface PatchRequest {
-  addressName: string; 
-  receiverName: string; 
-  phoneNumber: string; 
-  baseAddress: string; 
-  detailAddress: string; 
-  isDefaultAddress: boolean; // 기본 배송지 설정 여부
-  userId?: string; //유저 id
-  id: string;
+export interface AddAddressPayload {
+  userId: string;
+  addressName: string;
+  receiverName: string;
+  phoneNumber: string;
+  baseAddress: string;
+  detailAddress?: string;
+  isDefault: boolean;
 }
 export interface PatchResponse {
   addressName: string; 
