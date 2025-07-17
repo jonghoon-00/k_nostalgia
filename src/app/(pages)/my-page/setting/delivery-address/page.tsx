@@ -1,20 +1,12 @@
-import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/getAddresses';
-
-import { AllAddresses } from '@/types/deliveryAddress';
-
 import NoList from '@/components/common/NoList';
+import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/useAddressesServer';
 import AddNewAddressButton from './_components/AddNewAddressButton';
 import AddressesList from './_components/AddressesList';
 
 const DeliveryAddressManagement = async () => {
-  const allAddresses: AllAddresses = await getAddressesInServerComponent();
-  const { defaultAddress, addresses } = allAddresses;
+  const { addresses } = await getAddressesInServerComponent();
+  const hasNoAddresses: boolean = addresses === null || addresses.length === 0;
 
-  const hasNoDefaultAddress: boolean = defaultAddress === null;
-  const hasNoAddresses: boolean = hasNoDefaultAddress && addresses === null;
-
-  //TODO defaultAddress, addresses를 하나의 배열로 prop 넘기기
-  console.log(allAddresses);
   return (
     <>
       {hasNoAddresses ? (
@@ -23,7 +15,7 @@ const DeliveryAddressManagement = async () => {
         />
       ) : (
         <div className="max-w-md mx-auto flex flex-col p-4 bg-normal">
-          <AddressesList initialData={allAddresses} />
+          <AddressesList initialData={addresses} />
         </div>
       )}
       <AddNewAddressButton />
