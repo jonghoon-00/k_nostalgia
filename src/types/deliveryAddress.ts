@@ -26,8 +26,3 @@ export interface PatchResponse {
   userId: string; 
   id: string;
 }
-
-export interface AllAddresses {
-  defaultAddress: Address;
-  addresses: Address[];
-}
