@@ -149,14 +149,20 @@ const AddAddressForm = () => {
   }, [isDelay]);
 
   const ERROR_MESSAGE_STYLE = 'text-red-500 text-sm mt-1 ml-1';
+
+  const inputBaseClass =
+    'w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400';
+  const labelClass = 'text-base font-medium text-[#1F1E1E]';
+  const requiredMark = <span className="text-red-500">*</span>;
+
   return (
     <form onSubmit={submitWithThrottling}>
-      <div className="flex flex-col gap-6">
+      <div className={clsx('flex flex-col gap-6')}>
         {/* 배송지명 */}
         <div>
-          <div className="flex flex-col gap-2">
-            <label className="block text-[16px] font-medium text-[#1F1E1E]">
-              배송지명 <span className="text-red-500">*</span>
+          <div className={clsx('flex flex-col gap-2')}>
+            <label className={clsx('block', labelClass)}>
+              배송지명 {requiredMark}
             </label>
             <input
               type="text"
@@ -164,11 +170,12 @@ const AddAddressForm = () => {
               maxLength={10}
               minLength={1}
               placeholder="최대 10자 이내로 작성해 주세요"
-              className={`w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400 ${
+              className={clsx(
+                inputBaseClass,
                 validationErrors.addressName
                   ? 'border border-red-700'
                   : 'border'
-              }`}
+              )}
               onInput={handleInput}
             />
           </div>
@@ -181,9 +188,9 @@ const AddAddressForm = () => {
 
         {/* 수령인 */}
         <div>
-          <div className="flex flex-col gap-2">
-            <label className="block text-[16px] font-medium text-[#1F1E1E]">
-              수령인 <span className="text-red-500">*</span>
+          <div className={clsx('flex flex-col gap-2')}>
+            <label className={clsx('block', labelClass)}>
+              수령인 {requiredMark}
             </label>
             <input
               type="text"
@@ -191,11 +198,12 @@ const AddAddressForm = () => {
               maxLength={10}
               minLength={2}
               placeholder="최대 10자 이내로 작성해 주세요"
-              className={`w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400 ${
+              className={clsx(
+                inputBaseClass,
                 validationErrors.receiverName
                   ? 'border border-red-700'
                   : 'border'
-              }`}
+              )}
               onInput={handleInput}
             />
           </div>
@@ -208,9 +216,9 @@ const AddAddressForm = () => {
 
         {/* 휴대폰 번호 */}
         <div>
-          <div className="flex flex-col gap-2">
-            <label className="block text-[16px]  font-medium text-[#1F1E1E]">
-              휴대폰 번호 <span className="text-red-500">*</span>
+          <div className={clsx('flex flex-col gap-2')}>
+            <label className={clsx('block', labelClass)}>
+              휴대폰 번호 {requiredMark}
             </label>
             <input
               value={formattedPhoneNumber}
@@ -219,11 +227,12 @@ const AddAddressForm = () => {
               name="phoneNumber"
               type="text"
               placeholder="010-0000-0000"
-              className={`w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400 ${
+              className={clsx(
+                inputBaseClass,
                 validationErrors.phoneNumber
                   ? 'border border-red-700'
                   : 'border'
-              }`}
+              )}
             />
           </div>
           {validationErrors.phoneNumber && (
@@ -234,24 +243,27 @@ const AddAddressForm = () => {
         </div>
 
         {/* 주소 */}
-        <div className="flex flex-col gap-2">
-          <label className="block text-[16px]  font-medium text-[#1F1E1E]">
-            주소 <span className="text-red-500">*</span>
+        <div className={clsx('flex flex-col gap-2')}>
+          <label className={clsx('block', labelClass)}>
+            주소 {requiredMark}
           </label>
-          <div className="flex space-x-2">
+          <div className={clsx('flex space-x-2')}>
             <input
               disabled
               readOnly
               name="baseAddress"
               type="text"
               placeholder="주소 찾기로 입력해 주세요"
-              className="w-full p-3 border rounded-[8px] select-none"
+              className={clsx('w-full p-3 border rounded-[8px] select-none')}
               value={baseAddressWithZoneCode}
             />
             <button
               type="button"
-              className="bg-primary-20 text-white px-4 rounded flex justify-center items-center whitespace-nowrap"
               onClick={daumPostcodeClickHandler}
+              className={clsx(
+                'bg-primary-20 text-white px-4 rounded',
+                'flex justify-center items-center whitespace-nowrap'
+              )}
             >
               주소 찾기
             </button>
@@ -260,23 +272,28 @@ const AddAddressForm = () => {
             name="detailAddress"
             type="text"
             placeholder="상세 주소를 입력해 주세요"
-            className="w-full p-3 border rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+            className={clsx(inputBaseClass, 'border')}
           />
         </div>
       </div>
 
       {/* 기본 배송지 설정 */}
-      <div className="flex items-center my-2">
+      <div className={clsx('flex items-center my-2')}>
         <input
           type="checkbox"
           id="defaultAddress"
           checked={isDefaultAddress}
           onChange={() => setIsDefaultAddress(!isDefaultAddress)}
-          className="w-4 h-4 rounded border-gray-300 text-[#A1734C] focus:ring-[#A1734C]"
+          className={clsx(
+            'w-4 h-4 rounded border-gray-300',
+            'text-[#A1734C] focus:ring-[#A1734C]'
+          )}
         />
         <label
           htmlFor="defaultAddress"
-          className="ml-2 text-label-strong text-[14px] font-medium leading-5"
+          className={clsx(
+            'ml-2 text-label-strong text-[14px] font-medium leading-5'
+          )}
         >
           기본 배송지로 설정
         </label>
@@ -285,22 +302,15 @@ const AddAddressForm = () => {
       {/* 등록 버튼 */}
       <div
         className={clsx(
-          // 레이아웃 및 패딩
-          'fixed inset-x-0 bottom-0 pt-3 pb-6 w-full',
-          // 모바일 그림자
+          'fixed inset-x-0 bottom-0 w-full pt-6 pb-6',
           'shadow-[0_-4px_10px_rgba(0,0,0,0.1)]',
-          // 데스크탑에서 배경·그림자 해제
           'md:static md:bg-normal md:shadow-none'
         )}
       >
         <button
           className={clsx(
-            // 공통 버튼 스타일
             'w-full py-3 rounded-[8px] text-center',
-            // 모바일 배경·텍스트 색상
             'bg-primary-20 text-white'
-            // (필요 시) 데스크탑에서 다른 색상 적용
-            // 'md:bg-normal md:text-inherit'
           )}
         >
           등록하기
