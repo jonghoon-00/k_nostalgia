@@ -51,7 +51,7 @@ export const showCustomAlert = ({
     confirmButtonText: confirmButtonText,
     customClass: {
       title: 'text-xl mt-10 md:mb-[8px]',
-      popup: 'rounded-[16px]',
+      popup: 'w-[400px] rounded-[16px]',
       actions: 'flex gap-3 mb-6 mt-9 md:mt-[40px] md:mb-[28px]',
       confirmButton:
         'text-status-negative py-3 px-4 rounded-[12px] w-[138px] m-0',
