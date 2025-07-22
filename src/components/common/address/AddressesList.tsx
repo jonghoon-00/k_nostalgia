@@ -1,23 +1,27 @@
 'use client';
 
-import { showCustomAlert } from '@/components/ui/SweetAlertComponent';
 import { toast } from '@/components/ui/use-toast';
+import clsx from 'clsx';
+import React, { useState } from 'react';
+
+import { useUser } from '@/hooks/useUser';
+import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
+
+import { Address } from '@/types/deliveryAddress';
+
+import { showCustomAlert } from '@/components/ui/SweetAlertComponent';
 import {
   useDeleteAddress,
   useUpdateAddress
 } from '@/hooks/deliveryAddress/useAddressesClient';
-import { useUser } from '@/hooks/useUser';
-import { Address } from '@/types/deliveryAddress';
-import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
-import clsx from 'clsx';
-import { useState } from 'react';
+import AddressEditItem from './AddressEditItem';
 import AddressItem from './AddressItem';
 
-interface Props {
+interface AddressListProps {
   initialData: Address[];
 }
 
-const AddressesList = ({ initialData = [] }: Props) => {
+const AddressesList: React.FC<AddressListProps> = ({ initialData = [] }) => {
   const user = useUser();
   const userId = user.data?.id;
 
@@ -25,6 +29,7 @@ const AddressesList = ({ initialData = [] }: Props) => {
   const deleteAddress = useDeleteAddress();
 
   const [addressesState, setAddressesState] = useState<Address[]>(initialData);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const { selectedAddressId } = useDeliveryStore((state) => ({
     selectedAddressId: state.selectedAddressId
@@ -34,7 +39,7 @@ const AddressesList = ({ initialData = [] }: Props) => {
   const defaultAddress = addressesState.find((a) => a.isDefault);
   const otherAddresses = addressesState.filter((a) => !a.isDefault);
 
-  //TODO 배송지 수정
+  // 수정
   const handleUpdate = async (
     addressId: string,
     changes: Partial<Omit<Address, 'id'>>
@@ -60,7 +65,18 @@ const AddressesList = ({ initialData = [] }: Props) => {
       });
     }
   };
+  // 수정 상태 관리
+  const startEdit = (id: string) => setEditingId(id);
+  const cancelEdit = () => setEditingId(null);
+  const saveEdit = async (
+    id: string,
+    changes: Partial<Omit<Address, 'id'>>
+  ) => {
+    await handleUpdate(id, changes);
+    setEditingId(null);
+  };
 
+  // 삭제
   const handleDelete = async (addressId: string) => {
     showCustomAlert({
       title: '배송지 삭제',
@@ -88,52 +104,69 @@ const AddressesList = ({ initialData = [] }: Props) => {
   };
 
   return (
-    <>
-      <main
-        className={clsx('mt-14 mb-16', 'overflow-auto', 'flex flex-col gap-4')}
-      >
+    <main
+      className={clsx('mt-14 mb-16', 'overflow-auto', 'flex flex-col gap-4')}
+    >
+      {/* 기본 배송지 */}
+      {defaultAddress && (
         <div className="flex cursor-pointer gap-2">
-          <label htmlFor={`address-${defaultAddress?.id}`} className="flex-1">
-            <AddressItem
-              key={defaultAddress?.id}
-              address={defaultAddress as Address}
-              isDefaultAddress={true}
-              updateDeliveryAddress={(e) => {
-                e.stopPropagation();
-                handleUpdate(defaultAddress?.id as string, { isDefault: true });
-              }}
-              deleteDeliveryAddress={(e) => {
-                e.stopPropagation();
-                handleDelete(defaultAddress?.id as string);
-              }}
-              selectedAddressId={selectedAddressId}
-            />
+          <label htmlFor={`address-${defaultAddress.id}`} className="flex-1">
+            {editingId === defaultAddress.id ? (
+              <AddressEditItem
+                address={defaultAddress}
+                onCancel={cancelEdit}
+                onSave={saveEdit}
+              />
+            ) : (
+              <AddressItem
+                key={defaultAddress.id}
+                address={defaultAddress}
+                isDefaultAddress={true}
+                updateDeliveryAddress={(e) => {
+                  e.stopPropagation();
+                  startEdit(defaultAddress.id);
+                }}
+                deleteDeliveryAddress={(e) => {
+                  e.stopPropagation();
+                  handleDelete(defaultAddress.id);
+                }}
+                selectedAddressId={selectedAddressId}
+              />
+            )}
           </label>
         </div>
+      )}
 
-        {otherAddresses.map((address) => (
-          <div key={address.id} className="flex cursor-pointer gap-2">
-            <label htmlFor={`address-${address.id}`} className="flex-1">
+      {/* 기타 배송지 */}
+      {otherAddresses.map((address) => (
+        <div key={address.id} className="flex cursor-pointer gap-2">
+          <label htmlFor={`address-${address.id}`} className="flex-1">
+            {editingId === address.id ? (
+              <AddressEditItem
+                address={address}
+                onCancel={cancelEdit}
+                onSave={saveEdit}
+              />
+            ) : (
               <AddressItem
+                key={address.id}
                 address={address}
                 isDefaultAddress={false}
                 updateDeliveryAddress={(e) => {
                   e.stopPropagation();
-                  handleUpdate(address?.id as string, {
-                    isDefault: true
-                  });
+                  startEdit(address.id);
                 }}
                 deleteDeliveryAddress={(e) => {
                   e.stopPropagation();
-                  handleDelete(address?.id as string);
+                  handleDelete(address.id);
                 }}
                 selectedAddressId={selectedAddressId}
               />
-            </label>
-          </div>
-        ))}
-      </main>
-    </>
+            )}
+          </label>
+        </div>
+      ))}
+    </main>
   );
 };
 
