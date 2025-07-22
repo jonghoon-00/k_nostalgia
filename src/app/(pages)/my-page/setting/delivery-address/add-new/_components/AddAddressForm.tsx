@@ -131,7 +131,7 @@ const AddAddressForm = () => {
     e.currentTarget.reset();
     setValidationErrors({});
 
-    router.back();
+    router.push('/my-page/setting/delivery-address');
   };
 
   //throttling 적용
