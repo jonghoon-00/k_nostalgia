@@ -12,7 +12,7 @@ const AddNewAddress = () => {
         </p>
       </div>
 
-      <main className="max-w-md mx-auto bg-normal p-4">
+      <main className="w-full mx-auto bg-normal p-4">
         {/* 배송지 입력 폼 */}
         <AddAddressForm />
       </main>
