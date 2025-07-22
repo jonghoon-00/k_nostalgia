@@ -13,21 +13,41 @@
   border-radius: 4px;
 }
 
-/* 스크롤바 막대 꾸미기 */
+/* 스크롤바 막대 */
 *::-webkit-scrollbar-thumb {
   background-color: #ab834e;
   border-radius: 4px;
 }
-
-/* 스크롤바 트랙 꾸미기 */
+/* 스크롤바 트랙 */
 *::-webkit-scrollbar-track {
   background-color: #f4e9db;
   border-radius: 4px;
 }
-
 *::-webkit-scrollbar-button {
   height: 0.3rem;
   background-color: #f4e9db;
+}
+
+/* 모바일 스크롤 바  */
+@media screen and (max-width: 768px) {
+  /* 스크롤바 전체: 매우 얇게 */
+  *::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: #ab834e;
+    border-radius: 2px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  /* 버튼(위/아래 화살표) 아예 감추기 */
+  *::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
+  }
 }
 
 /* 시장, 특산물 페이지 필터 버튼 css */
