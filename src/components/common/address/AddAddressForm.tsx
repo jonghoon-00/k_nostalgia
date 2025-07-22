@@ -8,7 +8,7 @@ import { useUser } from '@/hooks/useUser';
 import api from '@/service/service';
 import { AddAddressPayload } from '@/types/deliveryAddress';
 import { formatPhoneNumber } from '@/utils/format';
-import { validateName, validatePhoneNumber } from '@/utils/validate';
+import { hasValidationError, validateAddressFields } from '@/utils/validate';
 
 import { toast } from '@/components/ui/use-toast';
 import useDaumPostcode from '@/hooks/deliveryAddress/daumPostCode/usePopup';
@@ -16,12 +16,19 @@ import clsx from 'clsx';
 
 const AddAddressForm = () => {
   const router = useRouter();
-  //formattedPhoneNumber: 휴대폰 번호 포맷팅을 위한 useState
+
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('');
-  //baseAddressWithZoneCode: 주소검색 api로 받아온 주소, 우편번호
   const [baseAddressWithZoneCode, setBaseAddressWithZoneCode] = useState('');
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
 
+  // form 필드 상태
+  const [form, setForm] = useState({
+    addressName: '',
+    receiverName: '',
+    phoneNumber: '',
+    detailAddress: ''
+  });
+  // 유효성 검사 상태
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: boolean;
   }>({});
@@ -29,28 +36,37 @@ const AddAddressForm = () => {
   const { data } = useUser();
   const userId = data?.id;
 
-  //input 실시간 유효성 검사
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  //주소 검색 - react-daum-postcode
+  const { daumPostcodeClickHandler } = useDaumPostcode(
+    setBaseAddressWithZoneCode
+  );
 
-    if (name === 'addressName' || name === 'receiverName') {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: !validateName(value)
-      }));
-    }
-    if (name === 'phoneNumber') {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: !validatePhoneNumber(value)
-      }));
-    }
-    if (name === 'baseAddress') {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: baseAddressWithZoneCode !== ''
-      }));
-    }
+  // input 실시간 유효성 검사 및 상태 업데이트
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    const val = type === 'checkbox' ? checked : value;
+
+    // form state 업데이트
+    setForm((prev) => ({ ...prev, [name]: val }));
+
+    // 검증할 필드 모아서 호출
+    const fields = {
+      addressName:
+        name === 'addressName' ? (val as string) : prevField('addressName'),
+      receiverName:
+        name === 'receiverName' ? (val as string) : prevField('receiverName'),
+      phoneNumber:
+        name === 'phoneNumber' ? (val as string) : formattedPhoneNumber,
+      baseAddress: baseAddressWithZoneCode
+    };
+
+    const errors = validateAddressFields(fields);
+    setValidationErrors(errors);
+  };
+
+  const prevField = (key: keyof typeof form) => {
+    // form 업데이트 비동기 문제 대비 getter
+    return form[key as keyof typeof form];
   };
 
   //휴대폰 번호 포맷팅 -> useState에 set
@@ -65,11 +81,6 @@ const AddAddressForm = () => {
     );
   };
 
-  //주소지 검색 - react-daum-postcode
-  const { daumPostcodeClickHandler } = useDaumPostcode(
-    setBaseAddressWithZoneCode
-  );
-
   //배송지 등록
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,36 +89,29 @@ const AddAddressForm = () => {
       return console.error('유저 정보 찾을 수 없음');
     }
 
-    //유효성검사 - validation error 확인
-    const requiredFields = {
-      addressName: '배송지명',
-      receiverName: '수령인',
-      phoneNumber: '휴대폰 번호',
-      baseAddress: '주소'
-    };
-    const missingFields = Object.keys(requiredFields).filter(
-      (key) => !e.currentTarget[key]?.value || validationErrors[key]
-    );
-    if (missingFields.length > 0) {
-      return toast({
-        description: `모든 정보를 바르게 입력해주세요`
-      });
-    }
+    const form = new FormData(e.currentTarget);
 
-    //formData 유효성 검사 + 값 반환
-    const formData = new FormData(e.currentTarget);
-    const addressName = formData.get('addressName')!.toString();
-    const receiverName = formData.get('receiverName')!.toString();
-    const detailAddress = formData.get('detailAddress')?.toString() ?? '';
-    const phoneNumber = formattedPhoneNumber.replace(/[^\d]/g, '');
+    const fields = {
+      addressName: form.get('addressName')?.toString() ?? '',
+      receiverName: form.get('receiverName')?.toString() ?? '',
+      phoneNumber: formattedPhoneNumber.replace(/[^\d]/g, ''),
+      baseAddress: baseAddressWithZoneCode
+    };
+
+    // 공통 유효성 검사 호출
+    const errors = validateAddressFields(fields);
+    setValidationErrors(errors);
+    if (hasValidationError(errors)) {
+      return toast({ description: '모든 정보를 바르게 입력해주세요' });
+    }
 
     const payload: AddAddressPayload = {
       userId,
-      addressName,
-      receiverName,
-      phoneNumber,
-      baseAddress: baseAddressWithZoneCode,
-      detailAddress,
+      addressName: fields.addressName,
+      receiverName: fields.receiverName,
+      phoneNumber: fields.phoneNumber.replace(/[^0-9]/g, ''),
+      baseAddress: fields.baseAddress,
+      detailAddress: form.get('detailAddress')?.toString() ?? '',
       isDefault: isDefaultAddress
     };
 
@@ -176,7 +180,7 @@ const AddAddressForm = () => {
                   ? 'border border-red-700'
                   : 'border'
               )}
-              onInput={handleInput}
+              onChange={handleInput}
             />
           </div>
           {validationErrors.addressName && (
@@ -204,7 +208,7 @@ const AddAddressForm = () => {
                   ? 'border border-red-700'
                   : 'border'
               )}
-              onInput={handleInput}
+              onChange={handleInput}
             />
           </div>
           {validationErrors.receiverName && (
