@@ -9,6 +9,7 @@ import {
 import { useUser } from '@/hooks/useUser';
 import { Address } from '@/types/deliveryAddress';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
+import clsx from 'clsx';
 import { useState } from 'react';
 import AddressItem from './AddressItem';
 
@@ -60,7 +61,6 @@ const AddressesList = ({ initialData = [] }: Props) => {
     }
   };
 
-  //TODO 배송지 삭제
   const handleDelete = async (addressId: string) => {
     showCustomAlert({
       title: '배송지 삭제',
@@ -89,7 +89,9 @@ const AddressesList = ({ initialData = [] }: Props) => {
 
   return (
     <>
-      <main className="mt-14 mb-16 overflow-auto flex flex-col gap-4">
+      <main
+        className={clsx('mt-14 mb-16', 'overflow-auto', 'flex flex-col gap-4')}
+      >
         <div className="flex cursor-pointer gap-2">
           <label htmlFor={`address-${defaultAddress?.id}`} className="flex-1">
             <AddressItem

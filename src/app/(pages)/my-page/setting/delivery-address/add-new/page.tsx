@@ -1,5 +1,5 @@
+import AddAddressForm from '@/components/common/address/AddAddressForm';
 import InfoIcon from '@/components/icons/InfoIcon';
-import AddAddressForm from './_components/AddAddressForm';
 
 const AddNewAddress = () => {
   return (
