@@ -1,6 +1,6 @@
 // stores/modalStore.ts
 import { ModalId } from '@/components/ui/Modal';
-import create from 'zustand';
+import { create } from 'zustand';
 
 interface ModalState {
   openModalId: ModalId | null;
