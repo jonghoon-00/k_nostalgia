@@ -102,6 +102,7 @@ export const Modal: React.FC<ModalProps> = ({
           {/* 모바일: 뒤로가기, 데스크탑: 자리 확보 */}
           <button
             onClick={close}
+            type="button"
             className={clsx(
               'w-7 h-7 flex items-center justify-center',
               'md:hidden'
@@ -118,6 +119,7 @@ export const Modal: React.FC<ModalProps> = ({
           {/* 모바일: 빈 공간, 데스크탑: 닫기 버튼 */}
           <div className="hidden md:block w-7 h-7" />
           <button
+            type="button"
             onClick={close}
             className={clsx(
               'w-7 h-7 flex items-center justify-center text-xl font-bold',
