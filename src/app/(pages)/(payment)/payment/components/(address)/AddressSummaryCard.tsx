@@ -7,6 +7,7 @@ interface Props {
 }
 
 const AddressSummaryCard: React.FC<Props> = ({ selectedAddress }) => {
+  //TODO Address prop의 유효성 검사 추가 (undefined나 null일 경우)
   const {
     id,
     addressName,
@@ -33,7 +34,7 @@ const AddressSummaryCard: React.FC<Props> = ({ selectedAddress }) => {
       <div className="text-label-strong">
         <div className="flex">
           {baseAddressWithoutZipCode}
-          {detailAddress !== '' && <p>, {detailAddress}</p>}
+          {detailAddress && detailAddress.trim() && <p>, {detailAddress}</p>}
         </div>
         <p>({zipCode})</p>
       </div>
