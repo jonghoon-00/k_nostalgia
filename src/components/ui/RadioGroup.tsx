@@ -65,9 +65,9 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
               className={clsx(
                 selectedValue === option.value
                   ? 'text-primary-20'
-                  : 'text-label-normal',
-                `text-[${labelTextSize}] `
+                  : 'text-label-normal'
               )}
+              style={{ fontSize: labelTextSize }}
             >
               {option.label}
             </span>
