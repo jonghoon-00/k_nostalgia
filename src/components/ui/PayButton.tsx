@@ -27,7 +27,6 @@ type Props = {
   orderNameArr: string[];
   product: ProductProps;
   text: string; //버튼 텍스트 - 버튼 비활성화 및 스타일링에 사용
-  //isCouponApplied: boolean
 };
 
 type setGlobalStateParams = {
@@ -77,31 +76,9 @@ const PayButton = ({ orderNameArr, product, text }: Props) => {
     router.push('/payment');
   };
 
-  // const [isPaymentOpen, setIsPaymentOpen] = useState<boolean>(false);
-
-  // useEffect(() => {
-  //   //결제 창 활성화 시 PopStateEvent 제한
-  //   const handlePopstate = (e: PopStateEvent) => {
-  //     if (isPaymentOpen) {
-  //       e.preventDefault();
-  //       window.history.pushState(null, '', window.location.href);
-  //       toast({
-  //         description: '결제창을 먼저 종료해주세요'
-  //       });
-  //     }
-  //   };
-  //   if (isPaymentOpen) {
-  //     window.history.pushState(null, '', window.location.href);
-  //     window.addEventListener('popstate', handlePopstate);
-  //   }
-  //   return () => {
-  //     window.removeEventListener('popstate', handlePopstate);
-  //   };
-  // }, [isPaymentOpen]);
-
   const ButtonStylesObj: ButtonStylesObj = {
     '바로 구매하기':
-      'min-w-[165px] flex bg-primary-strong py-3 px-4 rounded-xl text-white max-w-[234px] w-screen justify-center items-center leading-7',
+      'min-w-[165px] flex bg-primary-strong py-3 px-4 rounded-xl text-white max-w-[234px] w-full justify-center items-center leading-7',
     '선택 상품 주문하기':
       'flex flex-1 w-[336px] h-[48px] py-[12px] px-[16px] justify-center items-center rounded-xl text-[#9C6D2E] font-semibold leading-7 border-[1px] border-[#9C6D2E]',
     '전체 상품 주문하기':
@@ -115,7 +92,7 @@ const PayButton = ({ orderNameArr, product, text }: Props) => {
     switch (text) {
       case '바로 구매하기':
         PayButtonStyle =
-          'min-w-[165px] max-w-[234px] w-screen flex justify-center items-center bg-stone-200 py-3 px-4 rounded-xl text-white leading-7';
+          'min-w-[165px] max-w-[234px] w-full flex justify-center items-center bg-stone-200 py-3 px-4 rounded-xl text-white leading-7';
         break;
       case '선택 상품 주문하기':
         PayButtonStyle =

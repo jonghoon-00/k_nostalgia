@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-
-//결제 요청 정보에 필요한 값 전역 저장
-//update: 24.11.20
-
 export type Products = {
   id: string;
   name: string;
@@ -25,6 +21,8 @@ type State = {
   products: Products;
   customer: Customer;
   payMethod: string;
+  isCouponApplied: boolean;
+  totalQuantity: number;
 }
 type Actions = {
   setOrderName: (orderName: string) => void;
@@ -32,12 +30,16 @@ type Actions = {
   setProducts: (products: Products) => void;
   setCustomer: (customer: Customer) => void;
   setPayMethod: (method: string) => void;
+  setIsCouponApplied: (isApplied: boolean) => void;
+  setTotalQuantity: (quantity: number) => void;
   resetState: () => void;
 }
 
 const initialState : State = {
   orderName: '',
   totalAmount: 0,
+  //TODO totalQuantity 값 제거하고, products에서 계산하도록 변경
+  totalQuantity : 0,
   products:[{
     id: '',
     name: '',
@@ -51,7 +53,8 @@ const initialState : State = {
     email: '',
     address:{}
   },
-  payMethod: ''
+  payMethod: 'toss',
+  isCouponApplied: false,
 }
 
 export const usePaymentRequestStore = create<State & Actions>()(
@@ -63,6 +66,8 @@ export const usePaymentRequestStore = create<State & Actions>()(
       setProducts: (products) => set((state) => ({ ...state, products })),
       setCustomer: (customer) => set((state) => ({...state, customer})),
       setPayMethod: (method) => set((state)=> ({...state, payMethod: method})),
+      setIsCouponApplied: (isApplied) => set((state) => ({...state, isCouponApplied: isApplied})),
+      setTotalQuantity: (quantity) => set((state) => ({...state, totalQuantity: quantity})),
       resetState: () => set(initialState),
     }),
     {

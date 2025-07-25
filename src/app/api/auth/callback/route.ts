@@ -11,7 +11,6 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     const user = data.user; 
-    const { data: couponimage} = supabase.storage.from('images').getPublicUrl('Coupon.png');
     if (!error) {
       if(user){
         const {error} = await supabase.from('users').upsert({
@@ -20,9 +19,12 @@ export async function GET(request: Request) {
           name: user.user_metadata.full_name,
           nickname: user.user_metadata.user_name || user.user_metadata.name, 
           avatar: user.user_metadata.avatar_url, 
-          coupon: couponimage.publicUrl
+          coupons: ['WELCOME01']
         })
-       
+        if (error) {
+          console.error(error.message, '유저 정보 저장 실패');
+          return NextResponse.json({ error: error.message }, { status: 400 });
+        }
       }
       return NextResponse.redirect(`${origin}${next}`)
     }

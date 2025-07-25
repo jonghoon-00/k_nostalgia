@@ -143,7 +143,7 @@ export const AddCartButton = ({
   return (
     <button
       onClick={onAddCart}
-      className="min-w-[165px] text-primary-strong font-semibold border-2 border-primary-strong py-3 px-4 rounded-xl flex-1"
+      className="min-w-[165px] w-full text-primary-strong font-semibold border-2 border-primary-strong py-3 px-4 rounded-xl"
     >
       장바구니에 담기
     </button>

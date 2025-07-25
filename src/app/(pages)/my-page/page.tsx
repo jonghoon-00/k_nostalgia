@@ -1,10 +1,13 @@
 'use client';
+import { getCouponList } from '@/app/api/coupon/getCouponForClient';
 import Loading from '@/components/common/Loading';
 import useDeviceSize from '@/hooks/useDeviceSize';
 import { useUser } from '@/hooks/useUser';
+import { Tables } from '@/types/supabase';
+import clsx from 'clsx';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BsChevronRight } from 'react-icons/bs';
 import PayHistoryList from '../pay-history/_components/PayHistoryList';
 import CancelUser from './_components/CancelUser';
@@ -14,11 +17,28 @@ import LikeMarket from './_components/LikeMarket';
 import Logout from './_components/Logout';
 import OrderList_mypage from './_components/OrderList_mypage';
 import Profile from './_components/Profile';
+import CouponItem from './coupon-page/components/CouponItem';
 
 const Mypage = () => {
   const { data: user, isLoading, error } = useUser();
+
   const router = useRouter();
   const { isDesktop } = useDeviceSize();
+
+  const [couponList, setCouponList] = useState<Tables<'coupons'>[]>([]);
+  // 쿠폰 리스트 가져오기
+  useEffect(() => {
+    (async () => {
+      const result = await getCouponList();
+
+      if (!result || result.length === 0) {
+        console.warn('No coupons available');
+        setCouponList([]);
+        return;
+      }
+      setCouponList(result);
+    })();
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -81,14 +101,15 @@ const Mypage = () => {
               </div>
             </div>
 
-            <Image
-              src={user?.coupon || '/image/StateSad'}
-              alt="profile"
-              width={343}
-              height={161}
-              priority
-              className="w-[343px] h-[161px] mt-[24px]"
-            />
+            {/* 쿠폰 */}
+            <div className={clsx('p-4')}>
+              {couponList.map((coupon) => (
+                <CouponItem
+                  imageUrl={coupon.image_url as string}
+                  key={coupon.image_url}
+                />
+              ))}
+            </div>
 
             <div className="border-4  border-[#F2F2F2] mt-10" />
           </div>

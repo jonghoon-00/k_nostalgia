@@ -1,8 +1,3 @@
-// 배송지 입력 폼(input + button)
-
-// react-daum-postcode 사용
-// code update: 24.12.27
-
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -11,22 +6,29 @@ import { useEffect, useState } from 'react';
 import useThrottle from '@/hooks/useThrottle';
 import { useUser } from '@/hooks/useUser';
 import api from '@/service/service';
-import { PatchRequest } from '@/types/deliveryAddress';
+import { AddAddressPayload } from '@/types/deliveryAddress';
 import { formatPhoneNumber } from '@/utils/format';
-import { validateName, validatePhoneNumber } from '@/utils/validate';
+import { hasValidationError, validateAddressFields } from '@/utils/validate';
 
 import { toast } from '@/components/ui/use-toast';
 import useDaumPostcode from '@/hooks/deliveryAddress/daumPostCode/usePopup';
-import { v4 as uuidv4 } from 'uuid';
+import clsx from 'clsx';
 
 const AddAddressForm = () => {
   const router = useRouter();
 
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('');
-  //baseAddressWithZoneCode: 주소검색 api로 받아온 주소, 우편번호
   const [baseAddressWithZoneCode, setBaseAddressWithZoneCode] = useState('');
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
 
+  // form 필드 상태
+  const [form, setForm] = useState({
+    addressName: '',
+    receiverName: '',
+    phoneNumber: '',
+    detailAddress: ''
+  });
+  // 유효성 검사 상태
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: boolean;
   }>({});
@@ -34,28 +36,37 @@ const AddAddressForm = () => {
   const { data } = useUser();
   const userId = data?.id;
 
-  //input 실시간 유효성 검사
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  //주소 검색 - react-daum-postcode
+  const { daumPostcodeClickHandler } = useDaumPostcode(
+    setBaseAddressWithZoneCode
+  );
 
-    if (name === 'addressName' || name === 'receiverName') {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: !validateName(value)
-      }));
-    }
-    if (name === 'phoneNumber') {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: !validatePhoneNumber(value)
-      }));
-    }
-    if (name === 'baseAddress') {
-      setValidationErrors((prev) => ({
-        ...prev,
-        [name]: baseAddressWithZoneCode !== ''
-      }));
-    }
+  // input 실시간 유효성 검사 및 상태 업데이트
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    const val = type === 'checkbox' ? checked : value;
+
+    // form state 업데이트
+    setForm((prev) => ({ ...prev, [name]: val }));
+
+    // 검증할 필드 모아서 호출
+    const fields = {
+      addressName:
+        name === 'addressName' ? (val as string) : prevField('addressName'),
+      receiverName:
+        name === 'receiverName' ? (val as string) : prevField('receiverName'),
+      phoneNumber:
+        name === 'phoneNumber' ? (val as string) : formattedPhoneNumber,
+      baseAddress: baseAddressWithZoneCode
+    };
+
+    const errors = validateAddressFields(fields);
+    setValidationErrors(errors);
+  };
+
+  const prevField = (key: keyof typeof form) => {
+    // form 업데이트 비동기 문제 대비 getter
+    return form[key as keyof typeof form];
   };
 
   //휴대폰 번호 포맷팅 -> useState에 set
@@ -70,11 +81,6 @@ const AddAddressForm = () => {
     );
   };
 
-  //주소지 검색 - react-daum-postcode
-  const { daumPostcodeClickHandler } = useDaumPostcode(
-    setBaseAddressWithZoneCode
-  );
-
   //배송지 등록
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,58 +89,34 @@ const AddAddressForm = () => {
       return console.error('유저 정보 찾을 수 없음');
     }
 
-    //유효성검사 - validation error 확인
-    const requiredFields = {
-      addressName: '배송지명',
-      receiverName: '수령인',
-      phoneNumber: '휴대폰 번호',
-      baseAddress: '주소'
+    const form = new FormData(e.currentTarget);
+
+    const fields = {
+      addressName: form.get('addressName')?.toString() ?? '',
+      receiverName: form.get('receiverName')?.toString() ?? '',
+      phoneNumber: formattedPhoneNumber.replace(/[^\d]/g, ''),
+      baseAddress: baseAddressWithZoneCode
     };
-    const missingFields = Object.keys(requiredFields).filter(
-      (key) => !e.currentTarget[key]?.value || validationErrors[key]
-    );
-    if (missingFields.length > 0) {
-      return toast({
-        description: `모든 정보를 바르게 입력해주세요`
-      });
+
+    // 공통 유효성 검사 호출
+    const errors = validateAddressFields(fields);
+    setValidationErrors(errors);
+    if (hasValidationError(errors)) {
+      return toast({ description: '모든 정보를 바르게 입력해주세요' });
     }
 
-    //formData 유효성 검사 + 값 반환
-    const deliveryFormData = new FormData(e.currentTarget);
-
-    const formDataFieldsArr = ['addressName', 'receiverName'];
-    const formDataValues: Record<string, string> = {};
-
-    for (const field of formDataFieldsArr) {
-      const value = deliveryFormData.get(field);
-      if (value === null) {
-        return toast({
-          description: `모든 정보를 바르게 입력해주세요`
-        });
-      }
-      formDataValues[field] = value.toString();
-    }
-    const detailAddress = deliveryFormData.get('detailAddress');
-    const detailAddressForRequest =
-      detailAddress === null ? '' : detailAddress.toString();
-
-    const { addressName, receiverName } = formDataValues;
-
-    //-(하이픈)을 제외한 숫자만 남긴 문자열로 포맷팅
-    const phoneNumberForSubmit = formattedPhoneNumber.replace(/[^\d]/g, '');
-
-    const addressForRequest: PatchRequest = {
-      id: uuidv4(),
-      addressName,
-      receiverName,
-      phoneNumber: phoneNumberForSubmit,
-      baseAddress: baseAddressWithZoneCode,
-      detailAddress: detailAddressForRequest,
-      isDefaultAddress
+    const payload: AddAddressPayload = {
+      userId,
+      addressName: fields.addressName,
+      receiverName: fields.receiverName,
+      phoneNumber: fields.phoneNumber.replace(/[^0-9]/g, ''),
+      baseAddress: fields.baseAddress,
+      detailAddress: form.get('detailAddress')?.toString() ?? '',
+      isDefault: isDefaultAddress
     };
 
     try {
-      api.address.addNewAddress(addressForRequest, userId);
+      api.address.addNewAddress(payload);
     } catch (error) {
       console.error('배송지 업데이트 중 에러:', error);
       return toast({
@@ -153,7 +135,7 @@ const AddAddressForm = () => {
     e.currentTarget.reset();
     setValidationErrors({});
 
-    router.back();
+    router.push('/my-page/setting/delivery-address');
   };
 
   //throttling 적용
@@ -171,14 +153,20 @@ const AddAddressForm = () => {
   }, [isDelay]);
 
   const ERROR_MESSAGE_STYLE = 'text-red-500 text-sm mt-1 ml-1';
+
+  const inputBaseClass =
+    'w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400';
+  const labelClass = 'text-base font-medium text-[#1F1E1E]';
+  const requiredMark = <span className="text-red-500">*</span>;
+
   return (
     <form onSubmit={submitWithThrottling}>
-      <div className="flex flex-col gap-6">
+      <div className={clsx('flex flex-col gap-6')}>
         {/* 배송지명 */}
         <div>
-          <div className="flex flex-col gap-2">
-            <label className="block text-[16px] font-medium text-[#1F1E1E]">
-              배송지명 <span className="text-red-500">*</span>
+          <div className={clsx('flex flex-col gap-2')}>
+            <label className={clsx('block', labelClass)}>
+              배송지명 {requiredMark}
             </label>
             <input
               type="text"
@@ -186,12 +174,13 @@ const AddAddressForm = () => {
               maxLength={10}
               minLength={1}
               placeholder="최대 10자 이내로 작성해 주세요"
-              className={`w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400 ${
+              className={clsx(
+                inputBaseClass,
                 validationErrors.addressName
                   ? 'border border-red-700'
                   : 'border'
-              }`}
-              onInput={handleInput}
+              )}
+              onChange={handleInput}
             />
           </div>
           {validationErrors.addressName && (
@@ -203,9 +192,9 @@ const AddAddressForm = () => {
 
         {/* 수령인 */}
         <div>
-          <div className="flex flex-col gap-2">
-            <label className="block text-[16px] font-medium text-[#1F1E1E]">
-              수령인 <span className="text-red-500">*</span>
+          <div className={clsx('flex flex-col gap-2')}>
+            <label className={clsx('block', labelClass)}>
+              수령인 {requiredMark}
             </label>
             <input
               type="text"
@@ -213,12 +202,13 @@ const AddAddressForm = () => {
               maxLength={10}
               minLength={2}
               placeholder="최대 10자 이내로 작성해 주세요"
-              className={`w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400 ${
+              className={clsx(
+                inputBaseClass,
                 validationErrors.receiverName
                   ? 'border border-red-700'
                   : 'border'
-              }`}
-              onInput={handleInput}
+              )}
+              onChange={handleInput}
             />
           </div>
           {validationErrors.receiverName && (
@@ -230,9 +220,9 @@ const AddAddressForm = () => {
 
         {/* 휴대폰 번호 */}
         <div>
-          <div className="flex flex-col gap-2">
-            <label className="block text-[16px]  font-medium text-[#1F1E1E]">
-              휴대폰 번호 <span className="text-red-500">*</span>
+          <div className={clsx('flex flex-col gap-2')}>
+            <label className={clsx('block', labelClass)}>
+              휴대폰 번호 {requiredMark}
             </label>
             <input
               value={formattedPhoneNumber}
@@ -241,11 +231,12 @@ const AddAddressForm = () => {
               name="phoneNumber"
               type="text"
               placeholder="010-0000-0000"
-              className={`w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400 ${
+              className={clsx(
+                inputBaseClass,
                 validationErrors.phoneNumber
                   ? 'border border-red-700'
                   : 'border'
-              }`}
+              )}
             />
           </div>
           {validationErrors.phoneNumber && (
@@ -256,24 +247,27 @@ const AddAddressForm = () => {
         </div>
 
         {/* 주소 */}
-        <div className="flex flex-col gap-2">
-          <label className="block text-[16px]  font-medium text-[#1F1E1E]">
-            주소 <span className="text-red-500">*</span>
+        <div className={clsx('flex flex-col gap-2')}>
+          <label className={clsx('block', labelClass)}>
+            주소 {requiredMark}
           </label>
-          <div className="flex space-x-2">
+          <div className={clsx('flex space-x-2')}>
             <input
               disabled
               readOnly
               name="baseAddress"
               type="text"
               placeholder="주소 찾기로 입력해 주세요"
-              className="w-full p-3 border rounded-[8px] select-none"
+              className={clsx('w-full p-3 border rounded-[8px] select-none')}
               value={baseAddressWithZoneCode}
             />
             <button
               type="button"
-              className="bg-primary-20 text-white px-4 rounded flex justify-center items-center whitespace-nowrap"
               onClick={daumPostcodeClickHandler}
+              className={clsx(
+                'bg-primary-20 text-white px-4 rounded',
+                'flex justify-center items-center whitespace-nowrap'
+              )}
             >
               주소 찾기
             </button>
@@ -282,31 +276,48 @@ const AddAddressForm = () => {
             name="detailAddress"
             type="text"
             placeholder="상세 주소를 입력해 주세요"
-            className="w-full p-3 border rounded focus:outline-none focus:ring-1 focus:ring-gray-400"
+            className={clsx(inputBaseClass, 'border')}
           />
         </div>
       </div>
 
       {/* 기본 배송지 설정 */}
-      <div className="flex items-center my-2">
+      <div className={clsx('flex items-center my-2')}>
         <input
           type="checkbox"
           id="defaultAddress"
           checked={isDefaultAddress}
           onChange={() => setIsDefaultAddress(!isDefaultAddress)}
-          className="w-4 h-4 rounded border-gray-300 text-[#A1734C] focus:ring-[#A1734C]"
+          className={clsx(
+            'w-4 h-4 rounded border-gray-300',
+            'text-[#A1734C] focus:ring-[#A1734C]'
+          )}
         />
         <label
           htmlFor="defaultAddress"
-          className="ml-2 text-label-strong text-[14px] font-medium leading-5"
+          className={clsx(
+            'ml-2 text-label-strong text-[14px] font-medium leading-5'
+          )}
         >
           기본 배송지로 설정
         </label>
       </div>
 
       {/* 등록 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 shadow-[0_-4px_10px_rgba(0,0,0,0.1)] px-4 pt-3 pb-6">
-        <button className="w-full bg-primary-20 text-white text-center py-3 rounded-[8px]">
+      <div
+        className={clsx(
+          'fixed inset-x-0 bottom-0 w-full pt-6 pb-6',
+          'shadow-[0_-4px_10px_rgba(0,0,0,0.1)]',
+          'md:static md:bg-normal md:shadow-none'
+        )}
+      >
+        <button
+          type="submit"
+          className={clsx(
+            'w-full py-3 rounded-[8px] text-center',
+            'bg-primary-20 text-white'
+          )}
+        >
           등록하기
         </button>
       </div>

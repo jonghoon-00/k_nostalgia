@@ -1,27 +1,29 @@
-// 배송지 관리 페이지
-
-import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/getAddresses';
-
-import { AllAddresses } from '@/types/deliveryAddress';
-
+import { AddressesList } from '@/components/common/address';
+import NoList from '@/components/common/NoList';
+import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/useAddressesServer';
+import clsx from 'clsx';
 import AddNewAddressButton from './_components/AddNewAddressButton';
-import AddressesList from './_components/AddressesList';
-import NoDeliveryAddress from './_components/NoDeliveryAddress';
 
 const DeliveryAddressManagement = async () => {
-  const allAddresses: AllAddresses = await getAddressesInServerComponent();
-  const { defaultAddress, addresses } = allAddresses;
-
-  const hasNoDefaultAddress: boolean = defaultAddress === null;
-  const hasNoAddresses: boolean = hasNoDefaultAddress && addresses === null;
+  const { addresses } = await getAddressesInServerComponent();
+  const hasNoAddresses: boolean = addresses === null || addresses.length === 0;
 
   return (
     <>
       {hasNoAddresses ? (
-        <NoDeliveryAddress />
+        <NoList
+          message={['등록된 배송지가 없어요', '새 배송지를 추가해 주세요.']}
+        />
       ) : (
-        <div className="max-w-md mx-auto flex flex-col p-4 bg-normal">
-          <AddressesList initialData={allAddresses} />
+        <div
+          className={clsx(
+            ' w-full',
+            'mx-auto p-4',
+            'flex flex-col',
+            'bg-normal'
+          )}
+        >
+          <AddressesList initialData={addresses} />
         </div>
       )}
       <AddNewAddressButton />

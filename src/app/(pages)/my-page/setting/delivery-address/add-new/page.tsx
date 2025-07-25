@@ -1,10 +1,5 @@
-//배송지 추가 페이지
-
-//결제 진행 중에서 추가할 경우, 해당 페이지로 바로 이동되어야해서
-//별도 페이지로 제작했습니다
-
+import AddAddressForm from '@/components/common/address/AddAddressForm';
 import InfoIcon from '@/components/icons/InfoIcon';
-import AddAddressForm from './_components/AddAddressForm';
 
 const AddNewAddress = () => {
   return (
@@ -17,7 +12,7 @@ const AddNewAddress = () => {
         </p>
       </div>
 
-      <main className="max-w-md mx-auto bg-normal p-4">
+      <main className="w-full mx-auto bg-normal p-4">
         {/* 배송지 입력 폼 */}
         <AddAddressForm />
       </main>

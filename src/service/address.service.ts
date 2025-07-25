@@ -1,4 +1,4 @@
-import { Address } from "@/types/deliveryAddress";
+import { AddAddressPayload } from "@/types/deliveryAddress";
 
 const ADDRESS_API_URL = `${process.env.NEXT_PUBLIC_BASE_URL}/api/delivery-address`;
 
@@ -14,13 +14,13 @@ class AddressAPI {
     return response.json();
   }
 
-  async addNewAddress(newAddress : Address, userId: string){
+  async addNewAddress(newAddress : AddAddressPayload){
     const response = await fetch(`${ADDRESS_API_URL}`, {
-      method: 'PATCH',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ ...newAddress, userId})
+      body: JSON.stringify({ ...newAddress})
     });
 
     if (!response.ok) {

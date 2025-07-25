@@ -1,8 +1,8 @@
 import { PropsWithChildren } from 'react';
-import Navigation from './Navigation';
 import { Chat } from '../chat/Chat';
 import TopButton from '../icons/TopButton';
 import AppHeader from './header/AppHeader';
+import Navigation from './Navigation';
 
 interface DefaultAppLayoutProps {
   showNavigation: boolean;
@@ -33,7 +33,7 @@ const DefaultAppLayout = ({
   onCompleteClick
 }: PropsWithChildren<DefaultAppLayoutProps>) => {
   return (
-    <div className="flex flex-col">
+    <div className="md:hidden flex flex-col min-h-screen">
       {showHeader && (
         <AppHeader
           headerTitle={headerTitle}

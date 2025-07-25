@@ -12,12 +12,14 @@ import { BeatLoader } from 'react-spinners';
 import { v4 as uuidv4 } from 'uuid';
 
 const CheckPaymentContent = () => {
+  //TODO 사용한 쿠폰 코드 받아서 ORDER LIST에 저장
   const router = useRouter();
 
   const searchParams = useSearchParams();
   const paymentId = searchParams.get('paymentId');
   const code = searchParams.get('code');
   const totalQuantity = searchParams.get('totalQuantity');
+  //TODO TOTAL QUANTITY zustand에서 가져오기
   const isCouponApplied = searchParams.get('isCouponApplied');
 
   const [isPaymentHistoryLoaded, setIsPaymentHistoryLoaded] =
@@ -116,7 +118,7 @@ const CheckPaymentContent = () => {
             return router.replace(`/local-food`);
           }
 
-          //쿠폰 사용 시 users 테이블 coupon 항목 비움
+          //TODO 사용 쿠폰 ID OR CODDE 확인 후 일치 방목 제거
           if (isCouponApplied === 'true') {
             await supabase
               .from('users')
