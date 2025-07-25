@@ -312,6 +312,7 @@ const AddAddressForm = () => {
         )}
       >
         <button
+          type="submit"
           className={clsx(
             'w-full py-3 rounded-[8px] text-center',
             'bg-primary-20 text-white'
