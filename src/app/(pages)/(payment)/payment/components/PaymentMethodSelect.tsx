@@ -23,6 +23,7 @@ const PaymentMethodSelect = () => {
             label: (
               <div className="flex items-center gap-2">
                 {option.icon && (
+                  // TODO 이미지 로딩 실패 처리 추가
                   <img
                     src={option.icon}
                     alt={option.label}

@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-
-//결제 요청 정보에 필요한 값 전역 저장
-//update: 24.11.20
-
 export type Products = {
   id: string;
   name: string;
@@ -42,6 +38,7 @@ type Actions = {
 const initialState : State = {
   orderName: '',
   totalAmount: 0,
+  //TODO totalQuantity 값 제거하고, products에서 계산하도록 변경
   totalQuantity : 0,
   products:[{
     id: '',

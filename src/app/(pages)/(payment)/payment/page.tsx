@@ -1,8 +1,8 @@
 import HeaderWithInfoIcon from '@/components/common/header/_component/HeaderWithInfoIcon';
-import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/getAddresses';
-import { AllAddresses } from '@/types/deliveryAddress';
+import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/useAddressesServer';
+import { Address } from '@/types/deliveryAddress';
 import { createClient } from '@/utils/supabase/server';
-import DeliveryAddress from './components/(address)/DeliveryAddress ';
+import DeliveryAddress from './components/(address)/DeliveryAddress';
 import CouponInPaymentPage from './components/CouponInPaymentPage';
 import DesktopOrderHeader from './components/DesktopOrderHeader';
 import PaymentMethodSelect from './components/PaymentMethodSelect';
@@ -19,7 +19,7 @@ const Payment = async () => {
   ];
 
   // 초기 주소 및 요청 사항 가져오기
-  const allAddresses: AllAddresses = await getAddressesInServerComponent();
+  const allAddresses: Address[] = await getAddressesInServerComponent();
   const supabase = createClient();
   const { data } = await supabase.auth.getUser();
 
