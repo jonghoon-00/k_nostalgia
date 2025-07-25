@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { useRef, useState } from 'react';
 import DownButton from '../icons/DownButton';
 import UpButton from '../icons/UpButton';
@@ -63,14 +64,18 @@ const Accordion: React.FC<AccordionProps> = ({
 
   return (
     <div
-      className={
-        containerClassName ?? `border rounded-lg overflow-hidden shadow-sm`
-      }
+      className={clsx(
+        containerClassName,
+        'border rounded-lg overflow-hidden shadow-sm'
+      )}
     >
       {/* 아코디언 헤더 */}
       <button
+        type="button"
         onClick={toggleAccordion}
-        className="w-full flex justify-between items-center"
+        className={clsx(
+          'w-full flex justify-between items-center px-4 py-3' // 패딩 추가
+        )}
         ref={buttonRef}
       >
         {/* title이 string일경우 span태그로, ReactNode일경우 그대로 출력 */}
@@ -79,15 +84,20 @@ const Accordion: React.FC<AccordionProps> = ({
         ) : (
           title
         )}
-
         {open ? <UpButton /> : <DownButton />}
       </button>
 
       {/* 아코디언 내용 */}
       <div
-        className={`transition-all duration-300 ${
-          open ? 'max-h-[1000px]' : 'max-h-0'
-        } overflow-hidden bg-white`}
+        className={clsx(
+          'transition-all duration-300',
+          'px-4 py-2',
+          'overflow-hidden',
+          'bg-white'
+        )}
+        style={{
+          maxHeight: open ? `${contentRef.current?.scrollHeight}px` : '0px'
+        }}
         ref={contentRef}
       >
         {children}
