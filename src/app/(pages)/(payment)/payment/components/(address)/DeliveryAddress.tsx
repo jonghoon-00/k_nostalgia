@@ -76,6 +76,7 @@ export default function DeliveryAddressClient({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
+            type="button"
             className={clsx(
               'w-full flex justify-between items-center',
               'px-4 py-3 border rounded-lg text-sm text-gray-500 bg-white'
