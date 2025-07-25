@@ -7,15 +7,11 @@ export interface Address {
   isDefault: boolean; // 기본 배송지 설정 여부
   detailAddress?: string; // 상세 주소
 }
-export interface AddAddressPayload {
+
+export interface AddAddressPayload extends Omit<Address, 'id'> {
   userId: string;
-  addressName: string;
-  receiverName: string;
-  phoneNumber: string;
-  baseAddress: string;
-  detailAddress?: string;
-  isDefault: boolean;
 }
+
 export interface PatchResponse {
   addressName: string; 
   receiverName: string; 
