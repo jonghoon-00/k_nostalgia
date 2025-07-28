@@ -1,7 +1,7 @@
 import InfoIcon from '@/components/icons/InfoIcon';
 import Image from 'next/image';
 
-const DesktopOrderHeader = () => {
+const OrderPageIntro = () => {
   return (
     <div className="flex flex-col items-center gap-2">
       <Image
@@ -24,4 +24,4 @@ const DesktopOrderHeader = () => {
   );
 };
 
-export default DesktopOrderHeader;
+export default OrderPageIntro;
