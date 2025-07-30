@@ -1,30 +1,36 @@
 'use client';
 
-import DownButton from '@/components/icons/DownButton';
-import UpButton from '@/components/icons/UpButton';
-import { AllAddresses } from '@/types/deliveryAddress';
+import { useEffect, useState } from 'react';
+
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
+import clsx from 'clsx';
+
+import { Address } from '@/types/deliveryAddress';
+
 import {
   DropdownMenu,
   DropdownMenuTrigger
 } from '@radix-ui/react-dropdown-menu';
-import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+
+import DownButton from '@/components/icons/DownButton';
+import UpButton from '@/components/icons/UpButton';
+
 import AddAddressButton from './AddAddressButton';
 import AddressSummaryCard from './AddressSummaryCard';
 
 interface Props {
-  initialAddress: AllAddresses;
+  initialAddress: Address[];
   initialShippingRequest: string;
 }
 
-export default function DeliveryAddressClient({
+export default function DeliveryAddress({
   initialAddress,
   initialShippingRequest
 }: Props) {
-  const { defaultAddress, addresses } = initialAddress;
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Zustand store
+  // Zustand
+  const addresses = useDeliveryStore((s) => s.address);
   const shippingRequest = useDeliveryStore((s) => s.shippingRequest);
   const selectedAddressId = useDeliveryStore((s) => s.selectedAddressId);
   const shouldStoreDeliveryRequest = useDeliveryStore(
@@ -37,22 +43,29 @@ export default function DeliveryAddressClient({
       setShouldStoreDeliveryRequest: s.setShouldStoreDeliveryRequest
     }));
 
-  // Local state for dropdown and custom input
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const addressList =
+    addresses && addresses.length > 0 ? addresses : initialAddress;
+  const hasNoAddress = !addressList || addressList.length === 0;
 
-  // Determine selected address
-  const selectedAddress = selectedAddressId
-    ? [defaultAddress, ...addresses].find((a) => a.id === selectedAddressId) ||
-      defaultAddress
+  const defaultAddress = addressList?.find((a) => a.isDefault) ?? null;
+
+  // 선택된 배송지 우선 → 없으면 default → 없으면 null
+  const selectedAddress = hasNoAddress
+    ? null
+    : selectedAddressId
+    ? addressList.find((a) => a.id === selectedAddressId) || defaultAddress
     : defaultAddress;
 
   // Initialize store from props
   useEffect(() => {
-    setAddress(selectedAddress);
-  }, [selectedAddress, setAddress]);
+    setAddress(initialAddress);
+  }, [initialAddress]);
   useEffect(() => {
     setShippingRequest(initialShippingRequest);
   }, [initialShippingRequest, setShippingRequest]);
+
+  //TODO 컴포넌트 언마운트 시,  ZUSTAND 초기화
+  //TODO ZUSTAND 정리 (필요 요소, 불필요 요소 확인)
 
   return (
     <div

@@ -5,14 +5,13 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 type State = {
   selectedAddressId: string | null;
   shippingRequest: string | null;
-  address: Address | null;
+  address: Address[] | null;
   shouldStoreDeliveryRequest: boolean;
 }
 type Actions = {
-  //TODO setSelectedAddressId 필요할지 고려
   setSelectedAddressId: (id: string) => void;
   setShippingRequest: (req: string) => void;
-  setAddress: (state: Address) => void;
+  setAddress: (state: Address[]) => void;
   setShouldStoreDeliveryRequest: (shouldStore: boolean) => void;
 }
 
@@ -26,9 +25,9 @@ const useDeliveryStore = create<State&Actions>()(
   
   setSelectedAddressId:(id)=>set({selectedAddressId: id}),
   setShippingRequest: (req) => set({shippingRequest: req}),
-  setAddress: (address) =>
+  setAddress: (addresses) =>
     set((state) =>
-      state.address !== address ? { address } : state
+      state.address !== addresses ? { address: addresses } : state
 ),
 setShouldStoreDeliveryRequest: (shouldStore) => set({shouldStoreDeliveryRequest: shouldStore}),
   
