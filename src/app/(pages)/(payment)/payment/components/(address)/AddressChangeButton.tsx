@@ -7,7 +7,12 @@
 
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { AddressesList } from '@/components/common/address';
+import { Modal } from '@/components/ui/Modal';
+import { MODAL_IDS } from '@/constants';
+import { Address } from '@/types/deliveryAddress';
+import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
+import { useModalStore } from '@/zustand/useModalStore';
 import React from 'react';
 
 interface Props {
@@ -15,30 +20,24 @@ interface Props {
 }
 
 const AddressChangeButton: React.FC<Props> = ({ selectedAddressId }) => {
-  //TODO selectAddressId 가 빈 문자열일 때 처리 추가
-  const router = useRouter();
-  const ADDRESS_LIST_PAGE = '/my-page/setting/delivery-address';
-
-  const handleClick = () => {
-    // // if (isMobile) {
-    // router.push(
-    //   `${ADDRESS_LIST_PAGE}?from=payment&addressId=${selectedAddressId}`
-    // );
-    // // }
-    // // if (isDesktop) {
-    // //   setIsModalOpen(true);
-    // // }
-  };
+  const openModal = useModalStore((state) => state.open);
+  const address = useDeliveryStore((s) => s.address);
 
   return (
     <>
       <button
         className="text-xs font-normal text-[#79746D] border-[1px] border-[#959595] rounded-[6px] py-1 px-2"
-        onClick={handleClick}
+        onClick={() => openModal(MODAL_IDS.ADDRESS)}
       >
         변경
       </button>
-      {/* TODO 모달 들어갈 자리 */}
+      <Modal
+        modalId={MODAL_IDS.ADDRESS}
+        headerTitle="배송지 변경"
+        isFullOnMobile
+      >
+        <AddressesList initialData={address as Address[]} isSelecting />
+      </Modal>
     </>
   );
 };

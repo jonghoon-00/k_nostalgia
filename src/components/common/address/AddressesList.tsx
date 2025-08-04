@@ -2,7 +2,7 @@
 
 import { toast } from '@/components/ui/use-toast';
 import clsx from 'clsx';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useUser } from '@/hooks/useUser';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
@@ -14,14 +14,25 @@ import {
   useDeleteAddress,
   useUpdateAddress
 } from '@/hooks/deliveryAddress/useAddressesClient';
+import { useModalStore } from '@/zustand/useModalStore';
 import AddressEditItem from './AddressEditItem';
 import AddressItem from './AddressItem';
 
 interface AddressListProps {
   initialData: Address[];
+  isSelecting?: boolean; // 배송지 선택 모드 여부 (default: false)
 }
 
-const AddressesList: React.FC<AddressListProps> = ({ initialData = [] }) => {
+/**
+ * 배송지 목록 컴포넌트
+ * @param {Address[]} initialData - 초기 배송지 목록 데이터
+ * @param {boolean} [isSelecting=false] - 배송지 선택 모드 여부
+ * @returns {JSX.Element}
+ */
+const AddressesList: React.FC<AddressListProps> = ({
+  initialData = [],
+  isSelecting = false
+}) => {
   const user = useUser();
   const userId = user.data?.id;
 
@@ -31,13 +42,19 @@ const AddressesList: React.FC<AddressListProps> = ({ initialData = [] }) => {
   const [addressesState, setAddressesState] = useState<Address[]>(initialData);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const { selectedAddressId } = useDeliveryStore((state) => ({
-    selectedAddressId: state.selectedAddressId
-  }));
+  // Zustand - 배송지
+  const selectedAddressId = useDeliveryStore(
+    (state) => state.selectedAddressId
+  );
+  const setSelectedAddressId = useDeliveryStore(
+    (state) => state.setSelectedAddressId
+  );
+  // Zustand - 모달 닫기 함수
+  const onClose = useModalStore((state) => state.close);
 
-  // 기본 배송지 / 일반 배송지 분리
-  const defaultAddress = addressesState.find((a) => a.isDefault);
-  const otherAddresses = addressesState.filter((a) => !a.isDefault);
+  useEffect(() => {
+    setAddressesState(initialData);
+  }, [initialData]);
 
   // 수정
   const handleUpdate = async (
@@ -93,6 +110,7 @@ const AddressesList: React.FC<AddressListProps> = ({ initialData = [] }) => {
             }
             return filtered;
           });
+          toast({ description: '배송지가 삭제되었습니다.' });
         } catch (err) {
           console.error(err);
           toast({
@@ -103,15 +121,26 @@ const AddressesList: React.FC<AddressListProps> = ({ initialData = [] }) => {
     });
   };
 
+  // 기본 배송지 / 일반 배송지 분리
+  const defaultAddress = addressesState.find((a) => a.isDefault);
+  const otherAddresses = addressesState.filter((a) => !a.isDefault);
+
+  // 라디오 선택 핸들러 (선택 모드에서만 사용)
+  const handleSelect = (id: string) => {
+    setSelectedAddressId(id);
+    if (onClose) onClose(); // 선택 후 모달 닫기
+  };
+
   return (
     <main
       className={clsx('mt-14 mb-16', 'overflow-auto', 'flex flex-col gap-4')}
     >
       {/* 기본 배송지 */}
       {defaultAddress && (
+        //TODO 수정 버튼 제대로 작동하게 수정
         <div className="flex cursor-pointer gap-2">
           <label htmlFor={`address-${defaultAddress.id}`} className="flex-1">
-            {editingId === defaultAddress.id ? (
+            {editingId === defaultAddress.id && !isSelecting ? (
               <AddressEditItem
                 address={defaultAddress}
                 onCancel={cancelEdit}
@@ -131,6 +160,8 @@ const AddressesList: React.FC<AddressListProps> = ({ initialData = [] }) => {
                   handleDelete(defaultAddress.id);
                 }}
                 selectedAddressId={selectedAddressId}
+                isSelecting={isSelecting}
+                radioOnChange={() => handleSelect(defaultAddress.id)}
               />
             )}
           </label>
@@ -141,7 +172,7 @@ const AddressesList: React.FC<AddressListProps> = ({ initialData = [] }) => {
       {otherAddresses.map((address) => (
         <div key={address.id} className="flex cursor-pointer gap-2">
           <label htmlFor={`address-${address.id}`} className="flex-1">
-            {editingId === address.id ? (
+            {editingId === address.id && !isSelecting ? (
               <AddressEditItem
                 address={address}
                 onCancel={cancelEdit}
@@ -161,6 +192,8 @@ const AddressesList: React.FC<AddressListProps> = ({ initialData = [] }) => {
                   handleDelete(address.id);
                 }}
                 selectedAddressId={selectedAddressId}
+                isSelecting={isSelecting}
+                radioOnChange={() => handleSelect(address.id)}
               />
             )}
           </label>

@@ -16,6 +16,7 @@ import DownButton from '@/components/icons/DownButton';
 import UpButton from '@/components/icons/UpButton';
 
 import AddAddressButton from './AddAddressButton';
+import AddressChangeButton from './AddressChangeButton';
 import AddressSummaryCard from './AddressSummaryCard';
 
 interface Props {
@@ -31,8 +32,8 @@ export default function DeliveryAddress({
 
   // Zustand
   const addresses = useDeliveryStore((s) => s.address);
-  const shippingRequest = useDeliveryStore((s) => s.shippingRequest);
   const selectedAddressId = useDeliveryStore((s) => s.selectedAddressId);
+  const shippingRequest = useDeliveryStore((s) => s.shippingRequest);
   const shouldStoreDeliveryRequest = useDeliveryStore(
     (s) => s.shouldStoreDeliveryRequest
   );
@@ -59,7 +60,7 @@ export default function DeliveryAddress({
   // Initialize store from props
   useEffect(() => {
     setAddress(initialAddress);
-  }, [initialAddress]);
+  }, [initialAddress, setAddress]);
   useEffect(() => {
     setShippingRequest(initialShippingRequest);
   }, [initialShippingRequest, setShippingRequest]);
@@ -81,7 +82,12 @@ export default function DeliveryAddress({
       {!selectedAddress ? (
         <AddAddressButton />
       ) : (
-        <AddressSummaryCard selectedAddress={selectedAddress} />
+        <div className={clsx('flex justify-between items-start')}>
+          <AddressSummaryCard selectedAddress={selectedAddress} />
+          <AddressChangeButton
+            selectedAddressId={selectedAddress?.id as string}
+          />
+        </div>
       )}
 
       <div className="w-full h-px bg-gray-200 my-2" />
