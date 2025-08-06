@@ -51,7 +51,6 @@ const AddressesList: React.FC<AddressListProps> = ({
     (state) => state.setSelectedAddressId
   );
   // Zustand - 모달
-  const openModal = useModalStore((state) => state.open);
   const closeModal = useModalStore((state) => state.close);
 
   useEffect(() => {
