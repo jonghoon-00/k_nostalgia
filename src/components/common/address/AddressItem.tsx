@@ -9,7 +9,6 @@ interface Props {
   deleteDeliveryAddress: (e: React.MouseEvent<HTMLButtonElement>) => void;
   selectedAddressId: string | null;
   isSelecting?: boolean; // 배송지 선택 모드 여부
-  radioOnChange?: () => void;
 }
 
 const AddressItem = ({
@@ -18,8 +17,7 @@ const AddressItem = ({
   updateDeliveryAddress,
   deleteDeliveryAddress,
   selectedAddressId,
-  isSelecting = false,
-  radioOnChange
+  isSelecting = false
 }: Props) => {
   const {
     id,

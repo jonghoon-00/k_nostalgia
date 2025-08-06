@@ -1,27 +1,33 @@
-// 배송지 변경 버튼
-
-// 모바일 사이즈 : 배송지 변경 페이지로 이동
-// 데스크탑 사이즈 : 배송지 변경 모달
-
-//TODO : 데스크탑 사이즈에서 모달 띄우기(컴포넌트들 가져오기)
-
 'use client';
 
 import { AddressesList } from '@/components/common/address';
+import AddAddressForm from '@/components/common/address/AddAddressForm';
 import { Modal } from '@/components/ui/Modal';
 import { MODAL_IDS } from '@/constants';
 import { Address } from '@/types/deliveryAddress';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { useModalStore } from '@/zustand/useModalStore';
-import React from 'react';
+import clsx from 'clsx';
+import { useEffect, useState } from 'react';
 
-interface Props {
-  selectedAddressId: string;
-}
-
-const AddressChangeButton: React.FC<Props> = ({ selectedAddressId }) => {
+const AddressChangeButton: React.FC = () => {
   const openModal = useModalStore((state) => state.open);
+  const closeModal = useModalStore((state) => state.close);
+  const openModalId = useModalStore((state) => state.openModalId);
+
   const address = useDeliveryStore((s) => s.address);
+
+  const [mode, setMode] = useState<'list' | 'add'>('list');
+
+  const handleModalClose = () => {
+    setMode('list');
+    closeModal();
+  };
+  useEffect(() => {
+    if (openModalId !== MODAL_IDS.ADDRESS) {
+      setMode('list');
+    }
+  }, [openModalId]);
 
   return (
     <>
@@ -33,10 +39,31 @@ const AddressChangeButton: React.FC<Props> = ({ selectedAddressId }) => {
       </button>
       <Modal
         modalId={MODAL_IDS.ADDRESS}
-        headerTitle="배송지 변경"
+        headerTitle={mode === 'add' ? '배송지 추가' : '배송지 변경'}
         isFullOnMobile
       >
-        <AddressesList initialData={address as Address[]} isSelecting />
+        {mode === 'add' ? (
+          <AddAddressForm
+            // 등록 완료 시 동작
+            onSuccess={() => {
+              handleModalClose();
+            }}
+            onCancel={() => setMode('list')}
+          />
+        ) : (
+          <>
+            <AddressesList initialData={address as Address[]} isSelecting />
+            <button
+              className={clsx(
+                'w-full py-3 rounded-[8px] cursor-pointer mt-4',
+                'bg-primary-20 text-white'
+              )}
+              onClick={() => setMode('add')}
+            >
+              새 배송지 추가
+            </button>
+          </>
+        )}
       </Modal>
     </>
   );

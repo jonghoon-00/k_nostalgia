@@ -9,6 +9,7 @@ import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 
 import { Address } from '@/types/deliveryAddress';
 
+import RadioGroup from '@/components/ui/RadioGroup';
 import { showCustomAlert } from '@/components/ui/SweetAlertComponent';
 import {
   useDeleteAddress,
@@ -49,8 +50,9 @@ const AddressesList: React.FC<AddressListProps> = ({
   const setSelectedAddressId = useDeliveryStore(
     (state) => state.setSelectedAddressId
   );
-  // Zustand - 모달 닫기 함수
-  const onClose = useModalStore((state) => state.close);
+  // Zustand - 모달
+  const openModal = useModalStore((state) => state.open);
+  const closeModal = useModalStore((state) => state.close);
 
   useEffect(() => {
     setAddressesState(initialData);
@@ -121,26 +123,59 @@ const AddressesList: React.FC<AddressListProps> = ({
     });
   };
 
-  // 기본 배송지 / 일반 배송지 분리
+  //---------------for ui rendering----------------
+
   const defaultAddress = addressesState.find((a) => a.isDefault);
   const otherAddresses = addressesState.filter((a) => !a.isDefault);
 
-  // 라디오 선택 핸들러 (선택 모드에서만 사용)
-  const handleSelect = (id: string) => {
+  const handleRadioChange = (id: string) => {
     setSelectedAddressId(id);
-    if (onClose) onClose(); // 선택 후 모달 닫기
+    closeModal();
   };
 
+  const radioOptions = addressesState.map((a) => ({
+    value: a.id,
+    label: (
+      <div className="flex flex-col">
+        <span className="font-semibold">{a.addressName}</span>
+        <span className="text-xs">
+          {a.receiverName} / {a.phoneNumber}
+        </span>
+        <span className="text-xs">
+          {a.baseAddress}
+          {a.detailAddress && `, ${a.detailAddress}`}
+        </span>
+        {a.isDefault && (
+          <span className="inline-block mt-1 px-2 py-0.5 text-[10px] bg-gray-100 rounded">
+            기본 배송지
+          </span>
+        )}
+      </div>
+    )
+  }));
+
+  if (isSelecting) {
+    return (
+      <main className={clsx('flex flex-col gap-4')}>
+        <RadioGroup
+          name="deliveryAddress"
+          options={radioOptions}
+          selectedValue={selectedAddressId}
+          onChange={handleRadioChange}
+          labelTextSize="15px"
+        />
+      </main>
+    );
+  }
   return (
     <main
       className={clsx('mt-14 mb-16', 'overflow-auto', 'flex flex-col gap-4')}
     >
       {/* 기본 배송지 */}
       {defaultAddress && (
-        //TODO 수정 버튼 제대로 작동하게 수정
         <div className="flex cursor-pointer gap-2">
           <label htmlFor={`address-${defaultAddress.id}`} className="flex-1">
-            {editingId === defaultAddress.id && !isSelecting ? (
+            {editingId === defaultAddress.id ? (
               <AddressEditItem
                 address={defaultAddress}
                 onCancel={cancelEdit}
@@ -161,7 +196,6 @@ const AddressesList: React.FC<AddressListProps> = ({
                 }}
                 selectedAddressId={selectedAddressId}
                 isSelecting={isSelecting}
-                radioOnChange={() => handleSelect(defaultAddress.id)}
               />
             )}
           </label>
@@ -170,9 +204,9 @@ const AddressesList: React.FC<AddressListProps> = ({
 
       {/* 기타 배송지 */}
       {otherAddresses.map((address) => (
-        <div key={address.id} className="flex cursor-pointer gap-2">
+        <div key={address.id} className={'flex gap-2'}>
           <label htmlFor={`address-${address.id}`} className="flex-1">
-            {editingId === address.id && !isSelecting ? (
+            {editingId === address.id ? (
               <AddressEditItem
                 address={address}
                 onCancel={cancelEdit}
@@ -193,7 +227,6 @@ const AddressesList: React.FC<AddressListProps> = ({
                 }}
                 selectedAddressId={selectedAddressId}
                 isSelecting={isSelecting}
-                radioOnChange={() => handleSelect(address.id)}
               />
             )}
           </label>

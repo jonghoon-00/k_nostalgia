@@ -66,7 +66,6 @@ export default function DeliveryAddress({
   }, [initialShippingRequest, setShippingRequest]);
 
   //TODO 컴포넌트 언마운트 시,  ZUSTAND 초기화
-  //TODO ZUSTAND 정리 (필요 요소, 불필요 요소 확인)
 
   return (
     <div
@@ -84,9 +83,7 @@ export default function DeliveryAddress({
       ) : (
         <div className={clsx('flex justify-between items-start')}>
           <AddressSummaryCard selectedAddress={selectedAddress} />
-          <AddressChangeButton
-            selectedAddressId={selectedAddress?.id as string}
-          />
+          <AddressChangeButton />
         </div>
       )}
 

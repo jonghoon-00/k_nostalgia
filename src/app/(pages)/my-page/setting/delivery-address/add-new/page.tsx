@@ -1,7 +1,14 @@
+'use client';
+
 import AddAddressForm from '@/components/common/address/AddAddressForm';
 import InfoIcon from '@/components/icons/InfoIcon';
+import { useRouter } from 'next/navigation';
 
 const AddNewAddress = () => {
+  const router = useRouter();
+  const onSuccess = () => {
+    router.push('/my-page/setting/delivery-address');
+  };
   return (
     <>
       {/* 안내 메시지 */}
@@ -14,7 +21,7 @@ const AddNewAddress = () => {
 
       <main className="w-full mx-auto bg-normal p-4">
         {/* 배송지 입력 폼 */}
-        <AddAddressForm />
+        <AddAddressForm onSuccess={onSuccess} />
       </main>
     </>
   );

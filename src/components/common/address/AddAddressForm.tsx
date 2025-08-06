@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import useThrottle from '@/hooks/useThrottle';
 import { useUser } from '@/hooks/useUser';
@@ -14,7 +14,15 @@ import { toast } from '@/components/ui/use-toast';
 import useDaumPostcode from '@/hooks/deliveryAddress/daumPostCode/usePopup';
 import clsx from 'clsx';
 
-const AddAddressForm = () => {
+interface AddAddressFormProps {
+  onSuccess?: () => void; // 등록 성공 시
+  onCancel?: () => void; // 취소/뒤로
+}
+
+const AddAddressForm: React.FC<AddAddressFormProps> = ({
+  onSuccess,
+  onCancel
+}) => {
   const router = useRouter();
 
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('');
@@ -135,7 +143,7 @@ const AddAddressForm = () => {
     e.currentTarget.reset();
     setValidationErrors({});
 
-    router.push('/my-page/setting/delivery-address');
+    if (onSuccess) onSuccess(); // 콜백 호출
   };
 
   //throttling 적용
