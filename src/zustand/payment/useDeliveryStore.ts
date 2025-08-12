@@ -15,9 +15,6 @@ type Actions = {
   setShouldStoreDeliveryRequest: (shouldStore: boolean) => void;
 }
 
-//TODO "다음에도 사용할래요" 체크가 true면, 
-//shippingRequest를 로컬 스토리지에 저장해두고 다음 진입 시 복원하는 
-// 구조도 고려
 const useDeliveryStore = create<State&Actions>()(
   persist(
   (set)=>({

@@ -65,7 +65,12 @@ export default function DeliveryAddress({
     setShippingRequest(initialShippingRequest);
   }, [initialShippingRequest, setShippingRequest]);
 
-  //TODO 컴포넌트 언마운트 시,  ZUSTAND 초기화
+  // 언마운트 시 초기화
+  useEffect(() => {
+    return () => {
+      useDeliveryStore.persist.clearStorage();
+    };
+  }, []);
 
   return (
     <div
