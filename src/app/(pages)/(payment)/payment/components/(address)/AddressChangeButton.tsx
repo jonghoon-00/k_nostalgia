@@ -1,19 +1,21 @@
+// AddressChangeButton.tsx
 'use client';
 
 import { AddressesList } from '@/components/common/address';
 import AddAddressForm from '@/components/common/address/AddAddressForm';
+import { BackButton } from '@/components/icons/BackButton';
+import { XClose } from '@/components/icons/XClose';
 import { Modal } from '@/components/ui/Modal';
 import { MODAL_IDS } from '@/constants';
 import { Address } from '@/types/deliveryAddress';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { useModalStore } from '@/zustand/useModalStore';
-import clsx from 'clsx';
 import { useEffect, useState } from 'react';
 
 const AddressChangeButton: React.FC = () => {
-  const openModal = useModalStore((state) => state.open);
-  const closeModal = useModalStore((state) => state.close);
-  const openModalId = useModalStore((state) => state.openModalId);
+  const openModal = useModalStore((s) => s.open);
+  const closeModal = useModalStore((s) => s.close);
+  const openModalId = useModalStore((s) => s.openModalId);
 
   const address = useDeliveryStore((s) => s.address);
 
@@ -23,11 +25,53 @@ const AddressChangeButton: React.FC = () => {
     setMode('list');
     closeModal();
   };
+
   useEffect(() => {
-    if (openModalId !== MODAL_IDS.ADDRESS) {
-      setMode('list');
-    }
+    if (openModalId !== MODAL_IDS.ADDRESS) setMode('list');
   }, [openModalId]);
+
+  const listModeHeader = (
+    <div className="flex justify-between items-center w-full">
+      <button
+        type="button"
+        onClick={handleModalClose}
+        className="flex items-center justify-center"
+        aria-label="닫기"
+      >
+        <BackButton />
+      </button>
+      <h3 className="text-lg font-medium">배송지 변경</h3>
+      <button
+        type="button"
+        onClick={() => setMode('add')}
+        className="text-base font-medium text-primary-20"
+      >
+        추가
+      </button>
+    </div>
+  );
+
+  const addModeHeader = (
+    <div className="flex justify-between items-center w-full">
+      <button
+        type="button"
+        onClick={() => setMode('list')}
+        className="w-7 h-7 flex items-center justify-center"
+        aria-label="뒤로가기"
+      >
+        <BackButton />
+      </button>
+      <h3 className="text-lg font-medium">배송지 추가</h3>
+      <button
+        type="button"
+        onClick={handleModalClose}
+        className="w-7 h-7 flex items-center justify-center"
+        aria-label="닫기"
+      >
+        <XClose />
+      </button>
+    </div>
+  );
 
   return (
     <>
@@ -37,32 +81,21 @@ const AddressChangeButton: React.FC = () => {
       >
         변경
       </button>
+
       <Modal
         modalId={MODAL_IDS.ADDRESS}
-        headerTitle={mode === 'add' ? '배송지 추가' : '배송지 변경'}
+        header={mode === 'add' ? addModeHeader : listModeHeader}
+        width={471}
+        height={710}
         isFullOnMobile
       >
         {mode === 'add' ? (
           <AddAddressForm
-            // 등록 완료 시 동작
-            onSuccess={() => {
-              handleModalClose();
-            }}
+            onSuccess={handleModalClose}
             onCancel={() => setMode('list')}
           />
         ) : (
-          <>
-            <AddressesList initialData={address as Address[]} isSelecting />
-            <button
-              className={clsx(
-                'w-full py-3 rounded-[8px] cursor-pointer mt-4',
-                'bg-primary-20 text-white'
-              )}
-              onClick={() => setMode('add')}
-            >
-              새 배송지 추가
-            </button>
-          </>
+          <AddressesList initialData={address as Address[]} isSelecting />
         )}
       </Modal>
     </>

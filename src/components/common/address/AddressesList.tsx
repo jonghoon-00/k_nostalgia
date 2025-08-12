@@ -1,3 +1,4 @@
+// AddressesList.tsx
 'use client';
 
 import { toast } from '@/components/ui/use-toast';
@@ -21,15 +22,9 @@ import AddressItem from './AddressItem';
 
 interface AddressListProps {
   initialData: Address[];
-  isSelecting?: boolean; // 배송지 선택 모드 여부 (default: false)
+  isSelecting?: boolean;
 }
 
-/**
- * 배송지 목록 컴포넌트
- * @param {Address[]} initialData - 초기 배송지 목록 데이터
- * @param {boolean} [isSelecting=false] - 배송지 선택 모드 여부
- * @returns {JSX.Element}
- */
 const AddressesList: React.FC<AddressListProps> = ({
   initialData = [],
   isSelecting = false
@@ -43,21 +38,15 @@ const AddressesList: React.FC<AddressListProps> = ({
   const [addressesState, setAddressesState] = useState<Address[]>(initialData);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  // Zustand - 배송지
-  const selectedAddressId = useDeliveryStore(
-    (state) => state.selectedAddressId
-  );
-  const setSelectedAddressId = useDeliveryStore(
-    (state) => state.setSelectedAddressId
-  );
-  // Zustand - 모달
-  const closeModal = useModalStore((state) => state.close);
+  const selectedAddressId = useDeliveryStore((s) => s.selectedAddressId);
+  const setSelectedAddressId = useDeliveryStore((s) => s.setSelectedAddressId);
+
+  const closeModal = useModalStore((s) => s.close);
 
   useEffect(() => {
     setAddressesState(initialData);
   }, [initialData]);
 
-  // 수정
   const handleUpdate = async (
     addressId: string,
     changes: Partial<Omit<Address, 'id'>>
@@ -78,12 +67,10 @@ const AddressesList: React.FC<AddressListProps> = ({
       });
     } catch (err) {
       console.error(err);
-      toast({
-        description: '배송지 수정에 실패했습니다.'
-      });
+      toast({ description: '배송지 수정에 실패했습니다.' });
     }
   };
-  // 수정 상태 관리
+
   const startEdit = (id: string) => setEditingId(id);
   const cancelEdit = () => setEditingId(null);
   const saveEdit = async (
@@ -94,7 +81,6 @@ const AddressesList: React.FC<AddressListProps> = ({
     setEditingId(null);
   };
 
-  // 삭제
   const handleDelete = async (addressId: string) => {
     showCustomAlert({
       title: '배송지 삭제',
@@ -114,121 +100,106 @@ const AddressesList: React.FC<AddressListProps> = ({
           toast({ description: '배송지가 삭제되었습니다.' });
         } catch (err) {
           console.error(err);
-          toast({
-            description: '배송지 삭제에 실패했습니다.'
-          });
+          toast({ description: '배송지 삭제에 실패했습니다.' });
         }
       }
     });
   };
 
-  //---------------for ui rendering----------------
-
   const defaultAddress = addressesState.find((a) => a.isDefault);
   const otherAddresses = addressesState.filter((a) => !a.isDefault);
 
-  const handleRadioChange = (id: string) => {
-    setSelectedAddressId(id);
-    closeModal();
-  };
-
-  const radioOptions = addressesState.map((a) => ({
-    value: a.id,
-    label: (
-      <div className="flex flex-col">
-        <span className="font-semibold">{a.addressName}</span>
-        <span className="text-xs">
-          {a.receiverName} / {a.phoneNumber}
-        </span>
-        <span className="text-xs">
-          {a.baseAddress}
-          {a.detailAddress && `, ${a.detailAddress}`}
-        </span>
-        {a.isDefault && (
-          <span className="inline-block mt-1 px-2 py-0.5 text-[10px] bg-gray-100 rounded">
-            기본 배송지
-          </span>
-        )}
-      </div>
-    )
-  }));
-
+  // 선택 모드
   if (isSelecting) {
+    const options = addressesState.map((a) => ({
+      value: a.id,
+      label: (
+        <AddressItem
+          address={a}
+          isDefaultAddress={a.isDefault}
+          updateDeliveryAddress={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          deleteDeliveryAddress={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          selectedAddressId={selectedAddressId}
+          isSelecting
+        />
+      )
+    }));
+
     return (
-      <main className={clsx('flex flex-col gap-4')}>
+      <main className={clsx('flex flex-col gap-4', 'w-full')}>
         <RadioGroup
           name="deliveryAddress"
-          options={radioOptions}
+          options={options}
           selectedValue={selectedAddressId}
-          onChange={handleRadioChange}
-          labelTextSize="15px"
+          onChange={(id) => {
+            setSelectedAddressId(id);
+            closeModal();
+          }}
         />
       </main>
     );
   }
+
+  // 일반 모드
   return (
-    <main
-      className={clsx('mt-14 mb-16', 'overflow-auto', 'flex flex-col gap-4')}
-    >
-      {/* 기본 배송지 */}
+    <main className={clsx('flex flex-col gap-4', 'w-full', 'mt-14')}>
       {defaultAddress && (
-        <div className="flex cursor-pointer gap-2">
-          <label htmlFor={`address-${defaultAddress.id}`} className="flex-1">
-            {editingId === defaultAddress.id ? (
-              <AddressEditItem
-                address={defaultAddress}
-                onCancel={cancelEdit}
-                onSave={saveEdit}
-              />
-            ) : (
-              <AddressItem
-                key={defaultAddress.id}
-                address={defaultAddress}
-                isDefaultAddress={true}
-                updateDeliveryAddress={(e) => {
-                  e.stopPropagation();
-                  startEdit(defaultAddress.id);
-                }}
-                deleteDeliveryAddress={(e) => {
-                  e.stopPropagation();
-                  handleDelete(defaultAddress.id);
-                }}
-                selectedAddressId={selectedAddressId}
-                isSelecting={isSelecting}
-              />
-            )}
-          </label>
+        <div className="w-full">
+          {editingId === defaultAddress.id ? (
+            <AddressEditItem
+              address={defaultAddress}
+              onCancel={cancelEdit}
+              onSave={saveEdit}
+            />
+          ) : (
+            <AddressItem
+              key={defaultAddress.id}
+              address={defaultAddress}
+              isDefaultAddress
+              updateDeliveryAddress={(e) => {
+                e.stopPropagation();
+                startEdit(defaultAddress.id);
+              }}
+              deleteDeliveryAddress={(e) => {
+                e.stopPropagation();
+                handleDelete(defaultAddress.id);
+              }}
+              selectedAddressId={selectedAddressId}
+            />
+          )}
         </div>
       )}
 
-      {/* 기타 배송지 */}
-      {otherAddresses.map((address) => (
-        <div key={address.id} className={'flex gap-2'}>
-          <label htmlFor={`address-${address.id}`} className="flex-1">
-            {editingId === address.id ? (
-              <AddressEditItem
-                address={address}
-                onCancel={cancelEdit}
-                onSave={saveEdit}
-              />
-            ) : (
-              <AddressItem
-                key={address.id}
-                address={address}
-                isDefaultAddress={false}
-                updateDeliveryAddress={(e) => {
-                  e.stopPropagation();
-                  startEdit(address.id);
-                }}
-                deleteDeliveryAddress={(e) => {
-                  e.stopPropagation();
-                  handleDelete(address.id);
-                }}
-                selectedAddressId={selectedAddressId}
-                isSelecting={isSelecting}
-              />
-            )}
-          </label>
+      {otherAddresses.map((addr) => (
+        <div key={addr.id} className="w-full">
+          {editingId === addr.id ? (
+            <AddressEditItem
+              address={addr}
+              onCancel={cancelEdit}
+              onSave={saveEdit}
+            />
+          ) : (
+            <AddressItem
+              key={addr.id}
+              address={addr}
+              isDefaultAddress={false}
+              updateDeliveryAddress={(e) => {
+                e.stopPropagation();
+                startEdit(addr.id);
+              }}
+              deleteDeliveryAddress={(e) => {
+                e.stopPropagation();
+                handleDelete(addr.id);
+              }}
+              selectedAddressId={selectedAddressId}
+            />
+          )}
         </div>
       ))}
     </main>
