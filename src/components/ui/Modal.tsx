@@ -1,6 +1,7 @@
 'use client';
 
 import { MODAL_IDS } from '@/constants';
+import useDeviceSize from '@/hooks/useDeviceSize';
 import { useModalStore } from '@/zustand/useModalStore';
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
@@ -16,8 +17,8 @@ interface ModalProps {
   headerTitle?: string; // 기본 헤더 제목
   header?: React.ReactNode; // 커스텀 헤더 노드
   isFullOnMobile?: boolean; // 모바일 풀스크린 여부
-  width?: React.CSSProperties['width']; // 데스크탑 기준 너비
-  height?: React.CSSProperties['height']; // 데스크탑 기준 높이
+  width?: number;
+  height?: number;
   className?: string; // 추가 클래스
   children: React.ReactNode;
 }
@@ -29,8 +30,8 @@ interface ModalProps {
  * @param {string} [headerTitle] - 기본 헤더에서 표시할 타이틀 (header 미사용 시 적용)
  * @param {React.ReactNode} [header] - 커스텀 헤더 노드 (지정 시 기본 헤더 대신 사용)
  * @param {boolean} [isFullOnMobile] - 모바일 화면에서 전체 화면 표시 여부
- * @param {string|number} [width] - 데스크탑 기준 모달 너비 (px, %, auto 등)
- * @param {string|number} [height] - 데스크탑 기준 모달 높이 (px, %, auto 등)
+ * @param {number} [width] - 데스크탑 기준 모달 너비 (px, %, auto 등)
+ * @param {number} [height] - 데스크탑 기준 모달 높이 (px, %, auto 등)
  * @param {string} [className] - 모달 컨테이너에 추가할 클래스
  * @param {React.ReactNode} children - 모달 본문 콘텐츠
  */
@@ -48,6 +49,8 @@ export const Modal: React.FC<ModalProps> = ({
   const openModalId = useModalStore((state) => state.openModalId);
   const close = useModalStore((state) => state.close);
   const isOpen = openModalId === modalId;
+
+  const { isMobile } = useDeviceSize();
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -98,6 +101,7 @@ export const Modal: React.FC<ModalProps> = ({
   if (!mounted || !isOpen) return null;
 
   const titleId = `${String(modalId)}-title`;
+  const hasCustomHeader = Boolean(header);
 
   const content = (
     <div
@@ -111,7 +115,7 @@ export const Modal: React.FC<ModalProps> = ({
       )}
       role="dialog"
       aria-modal="true"
-      aria-labelledby={header ? undefined : titleId} // 최소 라벨: 기본 헤더만 연결
+      aria-labelledby={hasCustomHeader ? undefined : titleId}
     >
       <div
         ref={modalRef}
@@ -119,22 +123,49 @@ export const Modal: React.FC<ModalProps> = ({
         className={clsx(
           'bg-normal outline-none',
           isFullOnMobile
-            ? 'w-full h-full rounded-none max-h-none'
-            : 'w-auto h-auto rounded-2xl max-h-[calc(100vh-40px)]',
-          'md:w-auto md:h-auto md:rounded-2xl md:max-h-[calc(100vh-40px)]',
+            ? [
+                // 모바일: 풀스크린
+                'fixed inset-0 w-screen h-dvh rounded-none max-h-none',
+                // 데스크탑: prop 크기 적용
+                'md:static md:w-[var(--modal-w)] md:h-[var(--modal-h)]',
+                'md:rounded-2xl md:max-h-[calc(100vh-40px)]'
+              ].join(' ')
+            : [
+                // 기존 데스크탑 모달 스타일 유지
+                'w-auto rounded-2xl max-h-[calc(100vh-40px)]',
+                'md:w-auto md:h-[var(--modal-h)] md:rounded-2xl md:max-h-[calc(100vh-40px)]'
+              ].join(' '),
           className
         )}
-        style={{
-          width: typeof width === 'number' ? `${width}px` : width,
-          height: typeof height === 'number' ? `${height}px` : height
-        }}
+        style={
+          {
+            // 데스크탑에서만 참조됨
+            '--modal-w':
+              typeof width === 'number' ? `${width}px` : String(width),
+            '--modal-h':
+              typeof height === 'number' ? `${height}px` : String(height)
+          } as React.CSSProperties
+        }
       >
-        <ModalHeader
-          titleId={titleId}
-          title={headerTitle}
-          custom={header}
-          onClose={close}
-        />
+        {hasCustomHeader ? (
+          // 커스텀 헤더: 독립적인 렌더링
+          <div
+            className={clsx(
+              'border-b-2 border-gray-90',
+              'py-3 pb-2 px-4',
+              'flex justify-between items-center'
+            )}
+          >
+            {header}
+          </div>
+        ) : (
+          // 기본 헤더
+          <DefaultModalHeader
+            titleId={titleId}
+            title={headerTitle}
+            onClose={close}
+          />
+        )}
         <div className="overflow-auto p-4">{children}</div>
       </div>
     </div>
@@ -145,50 +176,19 @@ export const Modal: React.FC<ModalProps> = ({
   return createPortal(content, document.body);
 };
 
-const ModalHeader: React.FC<{
+// 기본 헤더 컴포넌트 (커스텀 헤더 미사용 시에만 렌더링)
+const DefaultModalHeader: React.FC<{
   titleId: string;
   title?: string;
-  custom?: React.ReactNode;
   onClose: () => void;
-}> = ({ titleId, title, custom, onClose }) => {
-  if (custom) {
-    return (
-      <div
-        className={clsx(
-          'flex justify-between items-center',
-          'py-3 pb-2 px-4',
-          'border-b-2 border-gray-90'
-        )}
-      >
-        <button
-          type="button"
-          onClick={onClose}
-          className="w-7 h-7 flex items-center justify-center md:hidden"
-          aria-label="닫기"
-        >
-          <BackButton />
-        </button>
-        <div className="hidden md:block w-7 h-7" aria-hidden />
-        <div className="flex-1">{custom}</div>
-        <div className="hidden md:block w-7 h-7" aria-hidden />
-        <button
-          type="button"
-          onClick={onClose}
-          className="w-7 h-7 hidden md:flex items-center justify-center"
-          aria-label="닫기"
-        >
-          <XClose />
-        </button>
-      </div>
-    );
-  }
-
+}> = ({ titleId, title, onClose }) => {
   return (
     <div
       className={clsx(
         'flex justify-between items-center',
         'py-3 pb-2 px-4',
-        'border-b-2 border-gray-90'
+        'border-b-2 border-gray-90',
+        'h-screen md:h-auto'
       )}
     >
       <button
