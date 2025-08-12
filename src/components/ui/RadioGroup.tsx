@@ -1,3 +1,4 @@
+// RadioGroup.tsx
 import clsx from 'clsx';
 import React from 'react';
 
@@ -17,18 +18,8 @@ interface RadioGroupProps {
 
 /**
  * 커스텀 라디오 그룹 컴포넌트
- *
- * @param {string} name - `<input>` 요소 name 속성 (그룹 구분자)
- * @param {RadioOption[]} options - {
-  value: any;
-  label: string | React.ReactNode;
-}[]
- * @param {any} selectedValue - 현재 선택된 값. state
- * @param {(value: any) => void} onChange - 라디오 버튼 선택이 변경되었을 때 호출되는 콜백
- * @param {boolean} [withDivider=false] - 각 옵션 사이에 구분선을 표시할지 여부
- * @param {string} - 라벨 사이즈 텍스트 !! px !!
  */
-export const RadioGroup: React.FC<RadioGroupProps> = ({
+const RadioGroup: React.FC<RadioGroupProps> = ({
   name,
   options,
   selectedValue,
@@ -40,7 +31,9 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
     <div className="flex flex-col gap-2">
       {options.map((option, index) => (
         <div key={option.value}>
-          <label className={clsx('flex items-center gap-2 cursor-pointer')}>
+          <label
+            className={clsx('flex items-center gap-2', 'cursor-pointer w-full')}
+          >
             <input
               type="radio"
               name={name}
@@ -51,7 +44,7 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
             />
             <div
               className={clsx(
-                'w-[20px] h-[20px] rounded-full flex items-center justify-center',
+                'mt-1 w-[20px] h-[20px] rounded-full flex items-center justify-center flex-none',
                 selectedValue === option.value
                   ? 'bg-primary-20 border-[1px] border-primary-20'
                   : 'border-gray-70 border-[1px]'
@@ -61,17 +54,24 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
                 <div className="w-[10px] h-[10px] bg-white rounded-full" />
               )}
             </div>
-            <span
-              className={clsx(
-                selectedValue === option.value
-                  ? 'text-primary-20'
-                  : 'text-label-normal'
-              )}
-              style={{ fontSize: labelTextSize }}
-            >
-              {option.label}
-            </span>
+
+            {/* label: 문자열은 인라인, ReactNode는 블록 카드 */}
+            {typeof option.label === 'string' ? (
+              <span
+                className={clsx(
+                  selectedValue === option.value
+                    ? 'text-primary-20'
+                    : 'text-label-normal'
+                )}
+                style={{ fontSize: labelTextSize }}
+              >
+                {option.label}
+              </span>
+            ) : (
+              <div className="flex-1">{option.label}</div>
+            )}
           </label>
+
           {withDivider && index < options.length - 1 && (
             <hr className="border-gray-90 h-[1px] mt-2" />
           )}
