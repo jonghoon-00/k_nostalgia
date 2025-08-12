@@ -1,9 +1,6 @@
-//수정, 삭제 로직은 리스트에서 prop으로 넘겨받고
-//해당 컴포넌트는 최대한 ui 렌더링만 역할 남겼습니다 - 종훈
-
 'use client';
-
 import { Address } from '@/types/deliveryAddress';
+import clsx from 'clsx';
 
 interface Props {
   address: Address | Address[];
@@ -11,6 +8,7 @@ interface Props {
   updateDeliveryAddress: (e: React.MouseEvent<HTMLButtonElement>) => void;
   deleteDeliveryAddress: (e: React.MouseEvent<HTMLButtonElement>) => void;
   selectedAddressId: string | null;
+  isSelecting?: boolean; // 배송지 선택 모드 여부
 }
 
 const AddressItem = ({
@@ -18,7 +16,8 @@ const AddressItem = ({
   isDefaultAddress,
   updateDeliveryAddress,
   deleteDeliveryAddress,
-  selectedAddressId
+  selectedAddressId,
+  isSelecting = false
 }: Props) => {
   const {
     id,
@@ -34,11 +33,19 @@ const AddressItem = ({
 
   return (
     <div
-      className={`p-4 bg-white w-full flex flex-col gap-2 border rounded-xl ${
+      className={clsx(
+        'bg-white w-full',
+        'flex flex-col',
+        isSelecting ? 'gap-0' : 'gap-3',
+        'p-4',
+        'border rounded-xl',
+        'shadow-sm',
         selectedAddressId === id ? 'border-primary-20' : 'border-[#E0E0E0]'
-      }`}
+      )}
     >
-      <div className="flex items-center gap-2">
+      <div
+        className={clsx('flex items-center gap-2', isSelecting && 'text-xs')}
+      >
         <p
           className={`font-semibold text-[16px] ${
             selectedAddressId === id ? 'text-primary-20' : 'text-label-strong'
@@ -47,7 +54,7 @@ const AddressItem = ({
           {addressName}
         </p>
         {isDefaultAddress && (
-          <span className="px-2 py-1 text-xs border bg-[#F2F2F2] text-label-strong rounded-[6px]">
+          <span className="px-2 py-1 text-xs bg-[#F2F2F2] text-label-strong rounded-[6px]">
             기본 배송지
           </span>
         )}
@@ -71,10 +78,28 @@ const AddressItem = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-2 font-normal text-label-normal text-[14px]">
-        <button onClick={updateDeliveryAddress}>수정</button>
-        <span>|</span>
-        <button onClick={deleteDeliveryAddress}>삭제</button>
+      <div
+        className={clsx(
+          'flex items-center gap-2',
+          'font-normal text-label-normal text-[14px]',
+          'pt-2 border-t border-gray-100'
+        )}
+      >
+        <button
+          type="button"
+          onClick={updateDeliveryAddress}
+          className="hover:text-primary-20 transition-colors"
+        >
+          수정
+        </button>
+        <span className="text-gray-300">|</span>
+        <button
+          type="button"
+          onClick={deleteDeliveryAddress}
+          className="hover:text-red-500 transition-colors"
+        >
+          삭제
+        </button>
       </div>
     </div>
   );

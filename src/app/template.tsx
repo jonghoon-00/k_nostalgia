@@ -131,7 +131,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }
   // 결제 페이지
   else if (pathName === '/payment') {
-    showHeader = false;
+    showHeader = true;
     showSearch = false;
     showCart = false;
     showNavigation = false;

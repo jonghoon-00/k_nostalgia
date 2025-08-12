@@ -1,14 +1,14 @@
-import HeaderWithInfoIcon from '@/components/common/header/_component/HeaderWithInfoIcon';
-import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/useAddressesServer';
-import { Address } from '@/types/deliveryAddress';
 import { createClient } from '@/utils/supabase/server';
+
+import { getAddressesInServerComponent } from '@/hooks/deliveryAddress/useAddressesServer';
+
+import HeaderWithInfoIcon from '@/components/common/header/_component/HeaderWithInfoIcon';
+import clsx from 'clsx';
 import DeliveryAddress from './components/(address)/DeliveryAddress';
 import CouponInPaymentPage from './components/CouponInPaymentPage';
-import DesktopOrderHeader from './components/DesktopOrderHeader';
+import OrderPageIntro from './components/OrderPageIntro';
 import PaymentMethodSelect from './components/PaymentMethodSelect';
 
-// TODO 1. 전체 리팩토링 이후
-// TODO 2. 배송지 변경 - 반응형 대응. (풀화면 <-> 모달)
 const Payment = async () => {
   //툴팁 내용
   const toolTipContentArray = [
@@ -18,11 +18,15 @@ const Payment = async () => {
     '주문 내역에서 주문 취소 버튼을 통해 환불 가능합니다.'
   ];
 
-  // 초기 주소 및 요청 사항 가져오기
-  const allAddresses: Address[] = await getAddressesInServerComponent();
-  const supabase = createClient();
+  // 주소
+  const addressData = await getAddressesInServerComponent();
+  const addresses = addressData?.addresses ?? [];
+
+  // 유저 정보
+  const supabase = createClient(); //server
   const { data } = await supabase.auth.getUser();
 
+  // 배송 요청 사항
   let shippingRequest = '';
   if (data.user) {
     const user = data.user;
@@ -44,15 +48,22 @@ const Payment = async () => {
         isIncludeIconHighlighting={true}
       />
       {/* 데스크탑 헤더 */}
-      <div className="hidden md:block md:mt-16">
-        <DesktopOrderHeader />
+      <div className={clsx('hidden md:block', 'md:mt-16')}>
+        <OrderPageIntro />
       </div>
-      {/* 결제 페이지 주요 컴포넌트 */}
-      <main className="mx-auto md:max-w-[1080px] p-4 md:p-0 bg-normal mb-14 mt-16 md:mt-0 md:flex md:gap-6">
+      {/* content */}
+      <main
+        className={clsx(
+          'mx-auto p-4 md:p-0 mb-14 mt-16 md:mt-0',
+          'md:max-w-[1080px]',
+          'bg-normal',
+          'md:flex md:gap-6'
+        )}
+      >
         {/* 좌측: 배송지, 주문상품, 쿠폰, 결제수단 */}
-        <section className="md:flex-1 md:max-w-[681px] space-y-6">
+        <section className={clsx('space-y-6', 'md:flex-1 md:max-w-[681px]')}>
           <DeliveryAddress
-            initialAddress={allAddresses}
+            initialAddresses={addresses}
             initialShippingRequest={shippingRequest}
           />
           {/* <OrderProducts /> */}
