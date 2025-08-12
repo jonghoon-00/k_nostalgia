@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 import useThrottle from '@/hooks/useThrottle';
@@ -16,15 +15,9 @@ import clsx from 'clsx';
 
 interface AddAddressFormProps {
   onSuccess?: () => void; // 등록 성공 시
-  onCancel?: () => void; // 취소/뒤로
 }
 
-const AddAddressForm: React.FC<AddAddressFormProps> = ({
-  onSuccess,
-  onCancel
-}) => {
-  const router = useRouter();
-
+const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('');
   const [baseAddressWithZoneCode, setBaseAddressWithZoneCode] = useState('');
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);

@@ -86,6 +86,7 @@ const AddressItem = ({
         )}
       >
         <button
+          type="button"
           onClick={updateDeliveryAddress}
           className="hover:text-primary-20 transition-colors"
         >
@@ -93,6 +94,7 @@ const AddressItem = ({
         </button>
         <span className="text-gray-300">|</span>
         <button
+          type="button"
           onClick={deleteDeliveryAddress}
           className="hover:text-red-500 transition-colors"
         >

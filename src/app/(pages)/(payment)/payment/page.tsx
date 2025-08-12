@@ -19,7 +19,8 @@ const Payment = async () => {
   ];
 
   // 주소
-  const { addresses } = await getAddressesInServerComponent();
+  const addressData = await getAddressesInServerComponent();
+  const addresses = addressData?.addresses ?? [];
 
   // 유저 정보
   const supabase = createClient(); //server
@@ -62,7 +63,7 @@ const Payment = async () => {
         {/* 좌측: 배송지, 주문상품, 쿠폰, 결제수단 */}
         <section className={clsx('space-y-6', 'md:flex-1 md:max-w-[681px]')}>
           <DeliveryAddress
-            initialAddress={addresses}
+            initialAddresses={addresses}
             initialShippingRequest={shippingRequest}
           />
           {/* <OrderProducts /> */}

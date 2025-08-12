@@ -20,12 +20,12 @@ import AddressChangeButton from './AddressChangeButton';
 import AddressSummaryCard from './AddressSummaryCard';
 
 interface Props {
-  initialAddress: Address[];
+  initialAddresses: Address[];
   initialShippingRequest: string;
 }
 
 export default function DeliveryAddress({
-  initialAddress,
+  initialAddresses,
   initialShippingRequest
 }: Props) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -45,32 +45,28 @@ export default function DeliveryAddress({
     }));
 
   const addressList =
-    addresses && addresses.length > 0 ? addresses : initialAddress;
-  const hasNoAddress = !addressList || addressList.length === 0;
+    addresses && addresses.length > 0 ? addresses : initialAddresses;
+  const hasNoAddress = !addressList.length;
 
-  const defaultAddress = addressList?.find((a) => a.isDefault) ?? null;
+  // 선택된 배송지 우선 > 없으면 default
+  const getSelectedAddress = () => {
+    if (hasNoAddress) return null;
 
-  // 선택된 배송지 우선 → 없으면 default → 없으면 null
-  const selectedAddress = hasNoAddress
-    ? null
-    : selectedAddressId
-    ? addressList.find((a) => a.id === selectedAddressId) || defaultAddress
-    : defaultAddress;
+    if (!selectedAddressId) {
+      const selected = addressList.find((a) => a.id === selectedAddressId);
+      if (selected) return selected;
+    }
+    return addressList.find((a) => a.isDefault) ?? null;
+  };
+  const selectedAddress = getSelectedAddress();
 
   // Initialize store from props
   useEffect(() => {
-    setAddress(initialAddress);
-  }, [initialAddress, setAddress]);
+    setAddress(initialAddresses);
+  }, [initialAddresses, setAddress]);
   useEffect(() => {
     setShippingRequest(initialShippingRequest);
   }, [initialShippingRequest, setShippingRequest]);
-
-  // 언마운트 시 초기화
-  useEffect(() => {
-    return () => {
-      useDeliveryStore.persist.clearStorage();
-    };
-  }, []);
 
   return (
     <div

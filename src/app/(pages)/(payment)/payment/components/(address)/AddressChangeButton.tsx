@@ -7,7 +7,6 @@ import { BackButton } from '@/components/icons/BackButton';
 import { XClose } from '@/components/icons/XClose';
 import { Modal } from '@/components/ui/Modal';
 import { MODAL_IDS } from '@/constants';
-import { Address } from '@/types/deliveryAddress';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { useModalStore } from '@/zustand/useModalStore';
 import { useEffect, useState } from 'react';
@@ -76,6 +75,7 @@ const AddressChangeButton: React.FC = () => {
   return (
     <>
       <button
+        type="button"
         className="text-xs font-normal text-[#79746D] border-[1px] border-[#959595] rounded-[6px] py-1 px-2"
         onClick={() => openModal(MODAL_IDS.ADDRESS)}
       >
@@ -92,10 +92,10 @@ const AddressChangeButton: React.FC = () => {
         {mode === 'add' ? (
           <AddAddressForm
             onSuccess={handleModalClose}
-            onCancel={() => setMode('list')}
+            // onCancel={() => setMode('list')}
           />
         ) : (
-          <AddressesList initialData={address as Address[]} isSelecting />
+          <AddressesList initialData={address || []} isSelecting />
         )}
       </Modal>
     </>

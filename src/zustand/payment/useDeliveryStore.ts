@@ -1,6 +1,5 @@
 import { Address } from '@/types/deliveryAddress';
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
 
 type State = {
   selectedAddressId: string | null;
@@ -13,10 +12,13 @@ type Actions = {
   setShippingRequest: (req: string) => void;
   setAddress: (state: Address[]) => void;
   setShouldStoreDeliveryRequest: (shouldStore: boolean) => void;
+  resetAddressStore: () => void;
 }
 
+const eqById = (a: Address[] | null, b: Address[]) =>
+  !!a && a.length === b.length && a.every((x, i) => x.id === b[i].id);
+
 const useDeliveryStore = create<State&Actions>()(
-  persist(
   (set)=>({
   selectedAddressId: null,
   shippingRequest: null,
@@ -26,15 +28,10 @@ const useDeliveryStore = create<State&Actions>()(
   setSelectedAddressId:(id)=>set({selectedAddressId: id}),
   setShippingRequest: (req) => set({shippingRequest: req}),
   setAddress: (addresses) =>
-    set((state) =>
-      state.address !== addresses ? { address: addresses } : state
-),
-setShouldStoreDeliveryRequest: (shouldStore) => set({shouldStoreDeliveryRequest: shouldStore}),
+    set((s) => (eqById(s.address, addresses) ? s : { address: addresses })),
   
-}),{
-  name: 'delivery-address-storage',
-  storage: createJSONStorage(()=>sessionStorage),
-  //스토리지 비우기 : useDeliveryStore.persist.clearStorage()
-}))
+  setShouldStoreDeliveryRequest: (shouldStore) => set({shouldStoreDeliveryRequest: shouldStore}),
+  resetAddressStore: () => set({ selectedAddressId: null, address: null }),
+}),)
 
 export default useDeliveryStore;

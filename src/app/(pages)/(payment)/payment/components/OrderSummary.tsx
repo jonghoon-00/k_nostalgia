@@ -66,6 +66,7 @@ const OrderSummary = ({
     }
 
     //TODO 결제 POPSTATE 제한 로직 추가(paybutton.tsx 주석 참고)
+    //TODO 결제 완료시 ZUSTAND RESET
 
     // const [isPaymentOpen, setIsPaymentOpen] = useState<boolean>(false);
 

@@ -141,9 +141,9 @@ export const Modal: React.FC<ModalProps> = ({
           {
             // 데스크탑에서만 참조됨
             '--modal-w':
-              typeof width === 'number' ? `${width}px` : String(width),
+              typeof width === 'number' ? `${width}px` : width ?? 'auto',
             '--modal-h':
-              typeof height === 'number' ? `${height}px` : String(height)
+              typeof height === 'number' ? `${height}px` : height ?? 'auto'
           } as React.CSSProperties
         }
       >
@@ -188,7 +188,7 @@ const DefaultModalHeader: React.FC<{
         'flex justify-between items-center',
         'py-3 pb-2 px-4',
         'border-b-2 border-gray-90',
-        'h-screen md:h-auto'
+        'md:h-auto'
       )}
     >
       <button

@@ -6,14 +6,8 @@ interface Props {
 }
 
 const AddressSummaryCard: React.FC<Props> = ({ selectedAddress }) => {
-  const {
-    // id,
-    addressName,
-    receiverName,
-    phoneNumber,
-    baseAddress,
-    detailAddress
-  } = selectedAddress;
+  const { addressName, receiverName, phoneNumber, baseAddress, detailAddress } =
+    selectedAddress;
 
   const zipCode = baseAddress.match(/\((\d+)\)/)?.[1];
   const baseAddressWithoutZipCode = baseAddress.split('(')[0];
