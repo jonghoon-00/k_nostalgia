@@ -4,6 +4,7 @@
 
 import { BackButton } from '@/components/icons/BackButton';
 import InfoIcon from '@/components/icons/InfoIcon';
+import clsx from 'clsx';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -79,15 +80,20 @@ const HeaderWithInfoIcon = ({
         };
       }
     }
-  }, [isIncludeIconHighlighting]);
+  }, [pathName, isIncludeIconHighlighting]);
 
   return (
     // 앱헤더
-    <header className="flex fixed bg-normal w-full justify-between items-center pt-5 pb-2 px-4 mb-4 m-1 md:hidden">
+    <header
+      className={clsx(
+        'flex fixed w-full justify-between items-center',
+        'bg-normal pt-5 pb-2 px-4 mb-4 mx-1 md:hidden'
+      )}
+    >
       {/* 뒤로가기 버튼 */}
       <button
         onClick={() => router.back()}
-        className="flex items-center justify-center"
+        className={clsx('flex items-center justify-center')}
       >
         <BackButton />
       </button>
@@ -95,11 +101,14 @@ const HeaderWithInfoIcon = ({
       <h1 className="text-lg font-semibold">주문/결제</h1>
 
       {/* Info 아이콘 */}
-      <div className="flex items-center justify-center">
+      <div className={clsx('flex items-center justify-center')}>
         <div className="relative">
           <div
-            className="text-white rounded-lg focus:outline-none cursor-pointer p-1"
-            onClick={handleTooltipToggle} // 클릭 시 툴팁 상태 토글
+            className={clsx(
+              'rounded-lg p-1 cursor-pointer text-white',
+              'focus:outline-none'
+            )}
+            onClick={handleTooltipToggle}
           >
             <InfoIcon
               color={iconHighLight ? '#9C6D2E' : '#959595'}
@@ -110,16 +119,29 @@ const HeaderWithInfoIcon = ({
 
           {/* 툴팁 */}
           {isTooltipVisible && (
-            <div className="absolute top-full transform -translate-x-1/2 mt-3 right-[-9rem]">
-              <div className="relative bg-[#9C6D2E] p-4 w-[274px] text-white text-sm rounded-[8px] shadow-lg select-none ">
+            <div
+              className={clsx(
+                'absolute top-full transform -translate-x-1/2 mt-3',
+                'right-[-9rem]'
+              )}
+            >
+              <div
+                className={clsx(
+                  'relative p-4 w-[274px] text-white text-sm rounded-[8px]',
+                  'bg-[#9C6D2E] shadow-lg select-none'
+                )}
+              >
                 {toolTipContentArray.map((line, index) => (
                   <div key={index}>
                     {line} <br />
                   </div>
                 ))}
+
                 {/* 화살표 */}
                 <div
-                  className="absolute top-[-0.4rem] right-[2%] transform -translate-x-1/2 w-0 h-0"
+                  className={clsx(
+                    'absolute top-[-0.4rem] right-[2%] transform -translate-x-1/2 w-0 h-0'
+                  )}
                   style={{
                     borderLeft: '8px solid transparent',
                     borderRight: '8px solid transparent',
