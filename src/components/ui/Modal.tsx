@@ -1,12 +1,13 @@
 'use client';
-
-import { MODAL_IDS } from '@/constants';
-import useDeviceSize from '@/hooks/useDeviceSize';
-import { useModalStore } from '@/zustand/useModalStore';
-import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+
+import { useModalStore } from '@/zustand/useModalStore';
+import clsx from 'clsx';
+
+import { MODAL_IDS } from '@/constants';
+
 import { BackButton } from '../icons/BackButton';
 import { XClose } from '../icons/XClose';
 
@@ -49,8 +50,6 @@ export const Modal: React.FC<ModalProps> = ({
   const openModalId = useModalStore((state) => state.openModalId);
   const close = useModalStore((state) => state.close);
   const isOpen = openModalId === modalId;
-
-  const { isMobile } = useDeviceSize();
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);

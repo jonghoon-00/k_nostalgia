@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import DeliveryAddress from './components/(address)/DeliveryAddress';
 import CouponInPaymentPage from './components/CouponInPaymentPage';
 import OrderPageIntro from './components/OrderPageIntro';
+import OrderProducts from './components/OrderProducts';
 import PaymentMethodSelect from './components/PaymentMethodSelect';
 
 const Payment = async () => {
@@ -66,7 +67,7 @@ const Payment = async () => {
             initialAddresses={addresses}
             initialShippingRequest={shippingRequest}
           />
-          {/* <OrderProducts /> */}
+          <OrderProducts />
           <CouponInPaymentPage />
           <PaymentMethodSelect />
         </section>

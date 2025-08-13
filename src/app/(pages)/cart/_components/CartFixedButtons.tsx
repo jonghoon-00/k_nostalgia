@@ -101,7 +101,7 @@ export const CartFixedButtons = ({ data, selectedItems }: CartButtonProps) => {
             <PayButton
               product={product}
               orderNameArr={orderNameArr}
-              text={'바로 구매하기'}
+              variant={'buyNow'}
             />
           </div>
         </div>
