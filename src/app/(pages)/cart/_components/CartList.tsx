@@ -111,13 +111,13 @@ export const CartList = () => {
         <PayButton
           product={selectedProduct}
           orderNameArr={selectedOrderNameArr}
-          text={'선택 상품 주문하기'}
+          variant={'orderSelected'}
         />
         {/* 전체 상품 주문하기 */}
         <PayButton
           product={product}
           orderNameArr={orderNameArr}
-          text={'전체 상품 주문하기'}
+          variant={'orderAll'}
         />
       </div>
     </div>
