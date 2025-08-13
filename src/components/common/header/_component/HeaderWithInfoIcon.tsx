@@ -26,7 +26,7 @@ const HeaderWithInfoIcon = ({
   const [iconHighLight, setIconHighLight] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleTooltipToggle = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleTooltipToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (isIncludeIconHighlighting) {
       localStorage.setItem(`isVisit-${pathName}`, 'true');
     }
@@ -92,6 +92,7 @@ const HeaderWithInfoIcon = ({
     >
       {/* 뒤로가기 버튼 */}
       <button
+        type="button"
         onClick={() => router.back()}
         className={clsx('flex items-center justify-center')}
       >
@@ -103,7 +104,11 @@ const HeaderWithInfoIcon = ({
       {/* Info 아이콘 */}
       <div className={clsx('flex items-center justify-center')}>
         <div className="relative">
-          <div
+          <button
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={isTooltipVisible}
+            aria-controls="payment-tooltip"
             className={clsx(
               'rounded-lg p-1 cursor-pointer text-white',
               'focus:outline-none'
@@ -115,7 +120,7 @@ const HeaderWithInfoIcon = ({
               width="28"
               height="28"
             />
-          </div>
+          </button>
 
           {/* 툴팁 */}
           {isTooltipVisible && (

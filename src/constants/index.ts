@@ -8,4 +8,4 @@ export const MODAL_IDS = {
 } as const;
 
 // 결제 관련 상수
-export const DELIVERY_FEE = 2500; // 배송비
+export const DELIVERY_FEE = 2500 as const; // 배송비(KRW)

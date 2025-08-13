@@ -70,14 +70,14 @@ export default function PayButton({ orderNameArr, product, variant }: Props) {
       return;
     }
     if (product.length === 0) {
-      toast({ description: '구매할 상품을 선택 해 주세요' });
+      toast({ description: '구매할 상품을 선택해 주세요' });
       return;
     }
 
     const total = calcTotalAmount(product) + DELIVERY_FEE;
     setTotalAmount(total);
     setOrderName(formatOrderName(orderNameArr));
-    setProducts(product as any); // 스토어 타입과 Product 타입을 맞춰 any 제거
+    setProducts(product as any);
 
     router.push('/payment');
   };

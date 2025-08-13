@@ -96,7 +96,7 @@ const OrderProducts = () => {
 
       <ul className={clsx('flex flex-col gap-2', 'mt-1')}>
         {products.map(({ id, name, amount, quantity }) => {
-          const imgSrc = productImgObject[name];
+          const imgSrc = productImgObject[name] || '/images/tigernew.png';
           return (
             <li key={id} className={clsx('flex')}>
               <Image
