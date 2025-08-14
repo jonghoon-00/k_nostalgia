@@ -1,4 +1,3 @@
-// File: hooks/coupon/useCouponDiscount.ts
 import { calculateDiscount } from '@/utils/coupons';
 import { useCouponStore } from '@/zustand/coupon/useCouponStore';
 import { useMemo } from 'react';

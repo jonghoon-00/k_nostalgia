@@ -10,7 +10,7 @@ import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
 import { useGetAllCoupons } from '@/hooks/coupon/useGetAllCoupons';
 import { useCouponStore } from '@/zustand/coupon/useCouponStore';
 import { useModalStore } from '@/zustand/useModalStore';
-import { CouponItem } from './CouponItem';
+import { CouponItem } from './CouponItem'; //하위 컴포넌트
 
 export const CouponSelection: React.FC = () => {
   const { isMobile } = useDeviceSize();

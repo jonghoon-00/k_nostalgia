@@ -8,6 +8,7 @@ import DeliveryAddress from './components/(address)/DeliveryAddress';
 import CouponInPaymentPage from './components/CouponInPaymentPage';
 import OrderPageIntro from './components/OrderPageIntro';
 import OrderProducts from './components/OrderProducts';
+import OrderSummary from './components/OrderSummary';
 import PaymentMethodSelect from './components/PaymentMethodSelect';
 
 const Payment = async () => {
@@ -74,7 +75,7 @@ const Payment = async () => {
 
         {/* 우측: 결제 요약 */}
         <aside className="md:w-[375px] md:shrink-0">
-          {/* <OrderSummary /> */}
+          <OrderSummary />
         </aside>
       </main>
       ;
