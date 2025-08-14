@@ -46,7 +46,7 @@ const OrderProducts = () => {
 
       resetState();
       usePaymentRequestStore.persist.clearStorage();
-      router.replace('/local-food');
+      router.replace('/cart');
     }
   }, [products, resetState, router]);
 
