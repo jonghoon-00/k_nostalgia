@@ -105,13 +105,12 @@ const Accordion: React.FC<AccordionProps> = ({
               top: getScrollTarget(panel, window.innerHeight / 2),
               behavior: 'smooth'
             });
-          } else {
-            // 닫힐 때 :
-
-            if (!isVisible) {
-              const y = getScrollTarget(btn, window.innerHeight / 2);
-              window.scrollTo({ top: y, behavior: 'smooth' });
-            }
+          }
+        } else {
+          // 닫힐 때 :
+          if (!isVisible) {
+            const y = getScrollTarget(btn, window.innerHeight / 2);
+            window.scrollTo({ top: y, behavior: 'smooth' });
           }
         }
       });

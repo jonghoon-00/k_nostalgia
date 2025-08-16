@@ -44,9 +44,14 @@ const OrderSummary = () => {
   // 쿠폰 할인 금액
   const discountAmount = useCouponDiscount();
 
-  const { data: user } = useUser();
+  const { data: user, isPending: isUserLoading } = useUser();
 
   const payRequest = async () => {
+    if (isUserLoading) {
+      toast({
+        description: '사용자 정보 확인중. 잠시 후 다시 시도해주세요'
+      });
+    }
     if (!user) {
       console.error('Get user failed');
       router.push('/login');
@@ -59,7 +64,7 @@ const OrderSummary = () => {
     const response = await requestPayment({
       payMethod,
       user,
-      totalAmount: totalAmount,
+      totalAmount,
       products,
       orderName
     });
@@ -94,7 +99,6 @@ const OrderSummary = () => {
       );
     }
   }, [products, setTotalQuantity]);
-
   return (
     <>
       <Accordion
@@ -132,6 +136,7 @@ const OrderSummary = () => {
         <button
           onClick={payRequest}
           className="w-[90%] md:w-full md:mt-4 max-w-[420px] bg-primary-20 text-white py-3 rounded-[12px] font-bold"
+          disabled={products.length === 0 || isUserLoading}
         >
           {totalAmount.toLocaleString('ko-KR')}원 결제하기
         </button>

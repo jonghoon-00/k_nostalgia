@@ -35,7 +35,7 @@ const Payment = async () => {
 
     const { data: userPaymentInfo } = await supabase
       .from('users')
-      .select('shippingRequest, coupons')
+      .select('shippingRequest')
       .eq('id', user.id)
       .single();
 
