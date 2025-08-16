@@ -11,7 +11,7 @@ import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
 import { useUser } from '@/hooks/useUser';
 
 import Accordion from '@/components/ui/Accordion';
-import { DELIVERY_FEE } from '@/constants';
+import { ACCORDION_IDS, DELIVERY_FEE } from '@/constants';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 
@@ -64,6 +64,7 @@ const OrderSummary = () => {
       orderName
     });
 
+    // response.code가 있는 경우 결제 실패
     if (response?.code != null) {
       console.log(response.code);
       return toast({
@@ -97,6 +98,7 @@ const OrderSummary = () => {
   return (
     <>
       <Accordion
+        id={ACCORDION_IDS.ORDER_SUMMARY}
         title={
           <div className="flex w-full justify-between text-gray-700 font-bold">
             <span>결제 금액</span>
@@ -107,7 +109,7 @@ const OrderSummary = () => {
         }
         isOpen={isAccordionOpen}
         onToggle={setIsAccordionOpen}
-        containerClassName="bg-white p-4 w-full flex flex-col gap-2 rounded-[12px] border-2 border-[#E0E0E0]"
+        containerClassName="bg-white w-full flex flex-col gap-2 border border-[#E0E0E0] p-4"
       >
         <div className="text-label-strong text-[16px] flex flex-col gap-2">
           <div className="w-full flex justify-between">

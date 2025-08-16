@@ -72,7 +72,7 @@ export default function DeliveryAddress({
     <div
       className={clsx(
         'bg-white p-4 mb-4 flex flex-col gap-2',
-        'border-2 border-[#E0E0E0] rounded-[12px]'
+        'border border-[#E0E0E0] rounded-[12px]'
       )}
     >
       <h2 className="w-full text-label-strong text-[18px] font-semibold">

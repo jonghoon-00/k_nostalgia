@@ -1,6 +1,3 @@
-// requestPayment 함수가 메인
-// 토스/카카오/이니시스 결제 요청 함수 위치
-
 // update : 25.04.08
 
 'use client';
@@ -12,7 +9,7 @@ import {
 } from '@/zustand/payment/usePaymentStore';
 import * as PortOne from '@portone/browser-sdk/v2';
 import dayjs from 'dayjs';
-import { uuid as uuidv4 } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 
 interface PayRequestParameters {
   payMethod: string; // toss | kakao | normal
