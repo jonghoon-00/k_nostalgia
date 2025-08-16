@@ -52,6 +52,7 @@ export const CouponItem: React.FC<Props> = ({ coupon }) => {
       >
         {isLoading && <Skeleton className={clsx('absolute inset-0')} />}
         <Image
+          fill
           src={coupon.image_url ? coupon.image_url : ''}
           alt="쿠폰 이미지"
           onLoad={() => setIsLoading(false)}

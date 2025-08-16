@@ -15,7 +15,7 @@ export function useGetAllCoupons(): Tables<'coupons'>[] {
     // 캐시가 있으면 재요청 x
     if (_cachedCoupons) {
       setCoupons(_cachedCoupons);
-      return () => { mounted = false; };
+      return () => { mounted = false; }; // 클린업
     }
 
     const run = async () => {
