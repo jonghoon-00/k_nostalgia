@@ -8,6 +8,7 @@ import DeliveryAddress from './components/(address)/DeliveryAddress';
 import CouponInPaymentPage from './components/CouponInPaymentPage';
 import OrderPageIntro from './components/OrderPageIntro';
 import OrderProducts from './components/OrderProducts';
+import OrderSummary from './components/OrderSummary';
 import PaymentMethodSelect from './components/PaymentMethodSelect';
 
 const Payment = async () => {
@@ -32,13 +33,13 @@ const Payment = async () => {
   if (data.user) {
     const user = data.user;
 
-    const { data: shippingRequestObj } = await supabase
+    const { data: userPaymentInfo } = await supabase
       .from('users')
       .select('shippingRequest')
       .eq('id', user.id)
       .single();
 
-    shippingRequest = shippingRequestObj?.shippingRequest || '';
+    shippingRequest = userPaymentInfo?.shippingRequest || '';
   }
 
   return (
@@ -74,7 +75,7 @@ const Payment = async () => {
 
         {/* 우측: 결제 요약 */}
         <aside className="md:w-[375px] md:shrink-0">
-          {/* <OrderSummary /> */}
+          <OrderSummary />
         </aside>
       </main>
       ;

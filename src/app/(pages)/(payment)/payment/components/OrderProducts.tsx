@@ -28,6 +28,8 @@ const OrderProducts = () => {
   useEffect(() => {
     if (handleRef.current) return;
 
+    let secondToastTimer: NodeJS.Timeout | null = null;
+
     const isInvalid =
       !Array.isArray(products) ||
       products.length === 0 ||
@@ -38,7 +40,7 @@ const OrderProducts = () => {
       toast({
         description: '상품 정보를 가져오는데에 실패했습니다'
       });
-      setTimeout(() => {
+      secondToastTimer = setTimeout(() => {
         toast({
           description: '잠시 후 다시 시도해주세요'
         });
@@ -46,8 +48,15 @@ const OrderProducts = () => {
 
       resetState();
       usePaymentRequestStore.persist.clearStorage();
-      router.replace('/local-food');
+      router.replace('/cart');
     }
+    return () => {
+      {
+        if (secondToastTimer) {
+          clearTimeout(secondToastTimer);
+        }
+      }
+    };
   }, [products, resetState, router]);
 
   const arrivalDateText = useMemo(
