@@ -12,6 +12,7 @@ import { useUser } from '@/hooks/useUser';
 
 import Accordion from '@/components/ui/Accordion';
 import { ACCORDION_IDS, DELIVERY_FEE } from '@/constants';
+import { startBackGuard } from '@/utils/popstateGuard';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 
@@ -66,35 +67,52 @@ const OrderSummary = () => {
       return toast({ description: '배송지 추가 혹은 선택 해주세요' });
     }
 
-    const response = await requestPayment({
-      payMethod,
-      user,
-      totalAmount,
-      products,
-      orderName
+    //--------popstate guard---------
+    const releaseBackGuard = startBackGuard({
+      onBack: () => {
+        toast({ description: '진행중인 결제를 먼저 종료해주세요' });
+      }
     });
-
-    // response.code가 있는 경우 결제 실패
-    if (response?.code != null) {
-      console.log(response.code);
-      return toast({
-        variant: 'destructive',
-        description: '결제에 실패했습니다 다시 시도해주세요'
+    try {
+      const response = await requestPayment({
+        payMethod,
+        user,
+        totalAmount,
+        products,
+        orderName
       });
-    }
 
-    if (shouldStoreDeliveryRequest && shippingRequest !== '') {
-      await supabase
-        .from('users')
-        .update({ shippingRequest })
-        .eq('id', user.id);
-    }
+      // response.code가 있는 경우 결제 실패
+      if (response?.code != null) {
+        console.log(response.code);
+        return toast({
+          variant: 'destructive',
+          description: '결제에 실패했습니다 다시 시도해주세요'
+        });
+      }
 
-    //TODO 결제 성공시 RESPONSE 처리 재확인
-    if (response?.code) {
-      router.push(
-        `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
-      );
+      if (shouldStoreDeliveryRequest && shippingRequest !== '') {
+        await supabase
+          .from('users')
+          .update({ shippingRequest })
+          .eq('id', user.id);
+      }
+
+      //TODO 결제 성공시 RESPONSE 처리 재확인
+      if (response?.code) {
+        router.push(
+          `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        description: '결제 처리 중 오류가 발생했습니다.'
+      });
+    } finally {
+      // === 결제 플로우 종료: 가드 해제(히스토리 더미 1개 제거) ===
+      releaseBackGuard();
     }
   };
 
