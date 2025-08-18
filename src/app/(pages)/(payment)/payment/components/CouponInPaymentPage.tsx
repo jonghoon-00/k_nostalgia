@@ -3,16 +3,28 @@ import { CouponSelection } from '@/components/common/coupon/CouponSelection';
 import { Modal } from '@/components/ui/Modal';
 import { MODAL_IDS } from '@/constants';
 import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
+import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 import { useModalStore } from '@/zustand/useModalStore';
 import clsx from 'clsx';
+import { useEffect } from 'react';
 
 export const CouponInPaymentPage = () => {
-  const discount = useCouponDiscount();
+  const discount = useCouponDiscount(); //hook
+  const setIsCouponApplied = usePaymentRequestStore(
+    (state) => state.setIsCouponApplied
+  );
 
   const { open } = useModalStore((state) => ({
     open: state.open
   }));
 
+  useEffect(() => {
+    if (discount > 0) {
+      setIsCouponApplied(true);
+    } else {
+      setIsCouponApplied(false);
+    }
+  }, [discount, setIsCouponApplied]);
   return (
     <div
       className={clsx(
