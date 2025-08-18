@@ -1,28 +1,30 @@
 'use client';
 
-import requestPayment from '@/app/api/payment/requestPayment';
-import Accordion from '@/components/ui/Accordion';
 import { toast } from '@/components/ui/use-toast';
-import { useUser } from '@/hooks/useUser';
 import supabase from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+
+import requestPayment from '@/app/api/payment/requestPayment';
+import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
+import { useUser } from '@/hooks/useUser';
+
+import Accordion from '@/components/ui/Accordion';
+import { ACCORDION_IDS, DELIVERY_FEE } from '@/constants';
+import { startBackGuard } from '@/utils/popstateGuard';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
-interface Props {
-  shippingRequest: string;
-  shouldStoreDeliveryRequest: boolean;
-  discountAmount: number;
-}
-const OrderSummary = ({
-  shippingRequest,
-  shouldStoreDeliveryRequest,
-  discountAmount
-}: Props) => {
+const OrderSummary = () => {
   const router = useRouter();
-
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
+
+  const address = useDeliveryStore((state) => state.address);
+  const shippingRequest = useDeliveryStore((state) => state.shippingRequest);
+  const shouldStoreDeliveryRequest = useDeliveryStore(
+    (s) => s.shouldStoreDeliveryRequest
+  );
 
   const {
     products,
@@ -30,90 +32,95 @@ const OrderSummary = ({
     totalAmount,
     isCouponApplied,
     payMethod,
-    totalQuantity,
-    setTotalQuantity
-  } = usePaymentRequestStore();
-  const { address } = useDeliveryStore();
+    getTotalQuantity
+  } = usePaymentRequestStore(
+    useShallow((s) => ({
+      products: s.products,
+      orderName: s.orderName,
+      totalAmount: s.totalAmount,
+      isCouponApplied: s.isCouponApplied,
+      payMethod: s.payMethod,
+      getTotalQuantity: s.getTotalQuantity
+    }))
+  );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const totalQuantity = useMemo(() => getTotalQuantity(), [products]);
 
-  const amount = products.reduce((acc, product) => acc + product.amount, 0);
+  // 쿠폰 할인 금액
+  const discountAmount = useCouponDiscount();
 
-  const { data: user } = useUser();
+  const { data: user, isPending: isUserLoading } = useUser();
+
   const payRequest = async () => {
+    if (isUserLoading) {
+      return toast({
+        description: '사용자 정보 확인중. 잠시 후 다시 시도해주세요'
+      });
+    }
     if (!user) {
-      return console.error('유저 정보 가져올 수 없음');
+      console.error('Get user failed');
+      router.push('/login');
+      return toast({
+        description: '로그인이 필요합니다. 로그인 후 다시 시도해주세요'
+      });
     }
     if (!address) {
-      return toast({
-        description: '배송지 추가 혹은 선택 해주세요'
-      });
+      return toast({ description: '배송지 추가 혹은 선택 해주세요' });
     }
 
-    const response = await requestPayment({
-      payMethod,
-      user,
-      totalAmount,
-      products,
-      orderName
+    //--------popstate guard---------
+    const releaseBackGuard = startBackGuard({
+      onBack: () => {
+        toast({ description: '진행중인 결제를 먼저 종료해주세요' });
+      }
     });
-
-    //response.code가 존재 === 결제 실패
-    if (response?.code != null) {
-      console.log(response.code);
-      return toast({
-        variant: 'destructive',
-        description: '결제에 실패했습니다 다시 시도해주세요'
+    try {
+      const response = await requestPayment({
+        payMethod,
+        user,
+        totalAmount,
+        products,
+        orderName
       });
-    }
 
-    //TODO 결제 POPSTATE 제한 로직 추가(paybutton.tsx 주석 참고)
+      // response.code가 있는 경우 결제 실패
+      if (response?.code != null) {
+        console.log(response.code);
+        return toast({
+          variant: 'destructive',
+          description: '결제에 실패했습니다 다시 시도해주세요'
+        });
+      }
 
-    // const [isPaymentOpen, setIsPaymentOpen] = useState<boolean>(false);
+      if (shouldStoreDeliveryRequest && shippingRequest !== '') {
+        await supabase
+          .from('users')
+          .update({ shippingRequest })
+          .eq('id', user.id);
+      }
 
-    // useEffect(() => {
-    //   //결제 창 활성화 시 PopStateEvent 제한
-    //   const handlePopstate = (e: PopStateEvent) => {
-    //     if (isPaymentOpen) {
-    //       e.preventDefault();
-    //       window.history.pushState(null, '', window.location.href);
-    //       toast({
-    //         description: '결제창을 먼저 종료해주세요'
-    //       });
-    //     }
-    //   };
-    //   if (isPaymentOpen) {
-    //     window.history.pushState(null, '', window.location.href);
-    //     window.addEventListener('popstate', handlePopstate);
-    //   }
-    //   return () => {
-    //     window.removeEventListener('popstate', handlePopstate);
-    //   };
-    // }, [isPaymentOpen]);
-
-    if (shouldStoreDeliveryRequest && shippingRequest !== '') {
-      await supabase
-        .from('users')
-        .update({ shippingRequest: shippingRequest })
-        .eq('id', user.id);
-    }
-
-    if (response?.code) {
-      router.push(
-        `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
-      );
+      //TODO 결제 성공시 RESPONSE 처리 재확인
+      if (response?.code) {
+        router.push(
+          `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
+        );
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        description: '결제 처리 중 오류가 발생했습니다.'
+      });
+    } finally {
+      // === 결제 플로우 종료: 가드 해제(히스토리 더미 1개 제거) ===
+      releaseBackGuard();
     }
   };
-
-  useEffect(() => {
-    if (products.length > 0) {
-      setTotalQuantity(
-        products.reduce((acc, product) => acc + product.quantity, 0)
-      );
-    }
-  }, [products]);
 
   return (
     <>
       <Accordion
+        id={ACCORDION_IDS.ORDER_SUMMARY}
         title={
           <div className="flex w-full justify-between text-gray-700 font-bold">
             <span>결제 금액</span>
@@ -124,16 +131,20 @@ const OrderSummary = ({
         }
         isOpen={isAccordionOpen}
         onToggle={setIsAccordionOpen}
-        containerClassName="bg-white p-4 w-full flex flex-col gap-2 rounded-[12px] border-2 border-[#E0E0E0]"
+        containerClassName="bg-white w-full flex flex-col gap-2 border border-[#E0E0E0] p-4"
       >
         <div className="text-label-strong text-[16px] flex flex-col gap-2">
           <div className="w-full flex justify-between">
             <span>상품 금액</span>
-            <span>{amount.toLocaleString('ko-KR')}원</span>
+            <span>{totalAmount.toLocaleString('ko-KR')}원</span>
           </div>
           <div className="flex justify-between">
             <span>배송비</span>
-            <span>{discountAmount?.toLocaleString('ko-KR')}원</span>
+            <span>{DELIVERY_FEE.toLocaleString('ko-KR')}원</span>
+          </div>
+          <div className="flex justify-between text-primary-20">
+            <span>할인</span>
+            <span>-{discountAmount.toLocaleString('ko-KR')}원</span>
           </div>
         </div>
       </Accordion>
@@ -143,8 +154,9 @@ const OrderSummary = ({
         <button
           onClick={payRequest}
           className="w-[90%] md:w-full md:mt-4 max-w-[420px] bg-primary-20 text-white py-3 rounded-[12px] font-bold"
+          disabled={products.length === 0 || isUserLoading}
         >
-          {discountAmount.toLocaleString('ko-KR')}원 결제하기
+          {totalAmount.toLocaleString('ko-KR')}원 결제하기
         </button>
       </div>
     </>

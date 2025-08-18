@@ -1,8 +1,3 @@
-// requestPayment 함수가 메인
-// 토스/카카오/이니시스 결제 요청 함수 위치
-
-// update : 25.04.08
-
 'use client';
 
 import { toast } from '@/components/ui/use-toast';
@@ -12,7 +7,7 @@ import {
 } from '@/zustand/payment/usePaymentStore';
 import * as PortOne from '@portone/browser-sdk/v2';
 import dayjs from 'dayjs';
-import { uuid as uuidv4 } from 'uuidv4';
+import { v4 as uuidv4 } from 'uuid';
 
 interface PayRequestParameters {
   payMethod: string; // toss | kakao | normal
@@ -20,11 +15,11 @@ interface PayRequestParameters {
   totalAmount: number;
   orderName: string;
   products: Products,
-
 }
 
-const PRODUCTION_URL = 'https://k-nostalgia.vercel.app/';
-const DEV_URL = 'http://localhost:3000/';
+//TODO 배포 이후 URL 변경
+const PRODUCTION_URL = 'https://k-nostalgia.vercel.app/'
+const DEV_URL = process.env.NEXT_PUBLIC_DOMAIN;
 
 //결제 요청 함수
 export default async function requestPayment({
@@ -33,7 +28,6 @@ export default async function requestPayment({
   totalAmount,
   orderName,
   products,
-
 }: PayRequestParameters) {
 
   toast({

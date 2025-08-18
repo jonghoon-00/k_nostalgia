@@ -47,7 +47,7 @@ const FixedButtons = ({
               <PayButton
                 product={product}
                 orderNameArr={[food.food_name as string]}
-                text={'바로 구매하기'}
+                variant={'buyNow'}
               />
             ) : (
               <button className="min-w-[165px] bg-primary-strong py-3 px-4 rounded-xl text-white w-full text-center text-base leading-7">

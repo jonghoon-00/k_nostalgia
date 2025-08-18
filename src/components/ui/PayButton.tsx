@@ -1,121 +1,93 @@
 'use client';
 
-//장바구니, 특산물 상세 페이지에 위치하는 결제 버튼
-
-//feat1. 결제에 필요한 정보 전역에 저장(클릭 이벤트) - zustand
-//feat2. 결제 페이지로 redirect
-//feat3. 스타일링 - text props 값에 따른 스타일링
-
-//update : 24.11.20
-
-import { useRouter } from 'next/navigation';
-
 import { useUser } from '@/hooks/useUser';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
-
-import { Tables } from '@/types/supabase';
+import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
 import { toast } from './use-toast';
 
-type ProductProps = {
+type Product = {
   id: string | null;
   name: string | null;
-  amount: number;
-  quantity: number;
-}[];
+  amount: number; // 총 가격
+  quantity: number; // 수량
+};
+type ProductProps = Product[];
 
 type Props = {
   orderNameArr: string[];
   product: ProductProps;
-  text: string; //버튼 텍스트 - 버튼 비활성화 및 스타일링에 사용
+  variant: 'buyNow' | 'orderSelected' | 'orderAll';
 };
 
-type setGlobalStateParams = {
-  orderNameArr: string[];
-  nowUser: Tables<'users'>;
-};
-type ButtonStylesObj = {
-  [key: string]: string;
+const BUTTON_LABEL: Record<Props['variant'], string> = {
+  buyNow: '바로 구매하기',
+  orderSelected: '선택 상품 주문하기',
+  orderAll: '전체 상품 주문하기'
 };
 
-const PayButton = ({ orderNameArr, product, text }: Props) => {
+const BUTTON_CLASS: Record<Props['variant'], string> = {
+  buyNow:
+    'min-w-[165px] max-w-[234px] w-full flex justify-center items-center py-3 px-4 rounded-xl leading-7 text-white bg-[#9C6D2E]',
+  orderSelected:
+    'flex flex-1 w-[336px] h-[48px] py-[12px] px-[16px] justify-center items-center rounded-xl font-semibold leading-7 text-[#9C6D2E] border border-[#9C6D2E]',
+  orderAll:
+    'flex flex-1 w-[336px] h-[48px] py-[12px] px-[16px] justify-center items-center rounded-xl font-semibold leading-7 text-white bg-[#9C6D2E]'
+};
+
+const BUTTON_CLASS_DISABLED: Record<Props['variant'], string> = {
+  buyNow: 'bg-stone-200 text-white',
+  orderSelected: 'text-stone-300 border border-stone-300',
+  orderAll: 'bg-stone-200 text-white'
+};
+
+function formatOrderName(names: string[]) {
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0] ?? '';
+  return `${names[0]} 외 ${names.length - 1}건`;
+}
+
+// product.amount는 총 가격이므로, 수량을 곱할 필요 없음
+export default function PayButton({ orderNameArr, product, variant }: Props) {
   const router = useRouter();
-  const { data: nowUser } = useUser(); //getUser-query
-
+  const { data: nowUser } = useUser();
   const { setOrderName, setTotalAmount, setProducts } =
-    usePaymentRequestStore(); //zustand
+    usePaymentRequestStore();
 
-  //총액 계산 함수
-  const calculateTotalAmount = (product: ProductProps) => {
-    return product.reduce((acc, item) => acc + item.amount, 0);
-  };
-  const DELIVERY_FEE = 2500;
+  const buttonDisabled = product.length === 0;
 
-  //payRequest값 저장(zustand)
-  const setPayRequestDataInGlobalState = ({
-    orderNameArr
-  }: setGlobalStateParams) => {
-    const totalAmount = calculateTotalAmount(product);
-    setTotalAmount(totalAmount + DELIVERY_FEE);
-    setOrderName(orderNameArr.join(' '));
-    setProducts(product as any);
-  };
-
-  //전역 관리 이후 redirect
-  const setPaymentDataAndRedirect = () => {
+  const handleClick = () => {
     if (!nowUser) {
-      return toast({
-        description: '로그인 후 이용 가능합니다'
-      });
+      toast({ description: '로그인 후 이용 가능합니다' });
+      router.push('/login');
+      return;
     }
     if (product.length === 0) {
-      return toast({
-        description: '구매할 상품을 선택 해 주세요'
-      });
+      toast({ description: '구매할 상품을 선택해 주세요' });
+      return;
     }
-    setPayRequestDataInGlobalState({ orderNameArr, nowUser });
+    const total = product.reduce((acc, p) => acc + p.amount, 0);
+    setTotalAmount(total);
+    setOrderName(formatOrderName(orderNameArr));
+    setProducts(product as any);
+
     router.push('/payment');
   };
 
-  const ButtonStylesObj: ButtonStylesObj = {
-    '바로 구매하기':
-      'min-w-[165px] flex bg-primary-strong py-3 px-4 rounded-xl text-white max-w-[234px] w-full justify-center items-center leading-7',
-    '선택 상품 주문하기':
-      'flex flex-1 w-[336px] h-[48px] py-[12px] px-[16px] justify-center items-center rounded-xl text-[#9C6D2E] font-semibold leading-7 border-[1px] border-[#9C6D2E]',
-    '전체 상품 주문하기':
-      'flex flex-1 w-[336px] h-[48px] py-[12px] px-[16px] justify-center items-center rounded-xl text-white font-semibold leading-7 bg-[#9C6D2E]'
-  };
-  const buttonDisabled = product.length === 0;
-
-  let PayButtonStyle = ButtonStylesObj[text];
-
-  if (buttonDisabled) {
-    switch (text) {
-      case '바로 구매하기':
-        PayButtonStyle =
-          'min-w-[165px] max-w-[234px] w-full flex justify-center items-center bg-stone-200 py-3 px-4 rounded-xl text-white leading-7';
-        break;
-      case '선택 상품 주문하기':
-        PayButtonStyle =
-          'flex flex-1 w-[336px] h-[48px] py-[12px] px-[16px] justify-center items-center rounded-xl text-stone-300 font-semibold leading-7 border-[1px] border-stone-300';
-        break;
-      case '전체 상품 주문하기':
-        PayButtonStyle =
-          'flex flex-1 w-[336px] h-[48px] py-[12px] px-[16px] justify-center items-center rounded-xl text-white font-semibold leading-7 bg-stone-200';
-        break;
-      default:
-        break;
-    }
-  }
+  const className = clsx(
+    BUTTON_CLASS[variant],
+    buttonDisabled && BUTTON_CLASS_DISABLED[variant]
+  );
 
   return (
     <button
-      className={PayButtonStyle}
-      onClick={setPaymentDataAndRedirect}
+      type="button"
+      className={className}
+      onClick={handleClick}
       disabled={buttonDisabled}
+      aria-disabled={buttonDisabled}
     >
-      {text}
+      {BUTTON_LABEL[variant]}
     </button>
   );
-};
-
-export default PayButton;
+}

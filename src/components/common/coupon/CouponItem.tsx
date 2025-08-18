@@ -5,6 +5,7 @@ import { Tables } from '@/types/supabase';
 import { calculateDiscount } from '@/utils/coupons';
 import { useCouponStore } from '@/zustand/coupon/useCouponStore';
 import clsx from 'clsx';
+import Image from 'next/image';
 import React, { useState } from 'react';
 
 interface Props {
@@ -50,7 +51,8 @@ export const CouponItem: React.FC<Props> = ({ coupon }) => {
         )}
       >
         {isLoading && <Skeleton className={clsx('absolute inset-0')} />}
-        <img
+        <Image
+          fill
           src={coupon.image_url ? coupon.image_url : ''}
           alt="쿠폰 이미지"
           onLoad={() => setIsLoading(false)}

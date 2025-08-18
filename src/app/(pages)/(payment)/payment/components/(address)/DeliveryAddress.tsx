@@ -1,32 +1,39 @@
 'use client';
 
-import DownButton from '@/components/icons/DownButton';
-import UpButton from '@/components/icons/UpButton';
-import { AllAddresses } from '@/types/deliveryAddress';
+import { useEffect, useState } from 'react';
+
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
+import clsx from 'clsx';
+
+import { Address } from '@/types/deliveryAddress';
+
 import {
   DropdownMenu,
   DropdownMenuTrigger
 } from '@radix-ui/react-dropdown-menu';
-import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+
+import DownButton from '@/components/icons/DownButton';
+import UpButton from '@/components/icons/UpButton';
+
 import AddAddressButton from './AddAddressButton';
+import AddressChangeButton from './AddressChangeButton';
 import AddressSummaryCard from './AddressSummaryCard';
 
 interface Props {
-  initialAddress: AllAddresses;
+  initialAddresses: Address[];
   initialShippingRequest: string;
 }
 
-export default function DeliveryAddressClient({
-  initialAddress,
+export default function DeliveryAddress({
+  initialAddresses,
   initialShippingRequest
 }: Props) {
-  const { defaultAddress, addresses } = initialAddress;
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Zustand store
-  const shippingRequest = useDeliveryStore((s) => s.shippingRequest);
+  // Zustand
+  const addresses = useDeliveryStore((s) => s.address);
   const selectedAddressId = useDeliveryStore((s) => s.selectedAddressId);
+  const shippingRequest = useDeliveryStore((s) => s.shippingRequest);
   const shouldStoreDeliveryRequest = useDeliveryStore(
     (s) => s.shouldStoreDeliveryRequest
   );
@@ -37,19 +44,26 @@ export default function DeliveryAddressClient({
       setShouldStoreDeliveryRequest: s.setShouldStoreDeliveryRequest
     }));
 
-  // Local state for dropdown and custom input
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const addressList =
+    addresses && addresses.length > 0 ? addresses : initialAddresses;
+  const hasNoAddress = !addressList.length;
 
-  // Determine selected address
-  const selectedAddress = selectedAddressId
-    ? [defaultAddress, ...addresses].find((a) => a.id === selectedAddressId) ||
-      defaultAddress
-    : defaultAddress;
+  // 선택된 배송지 우선 > 없으면 default
+  const getSelectedAddress = () => {
+    if (hasNoAddress) return null;
+
+    if (!selectedAddressId) {
+      const selected = addressList.find((a) => a.id === selectedAddressId);
+      if (selected) return selected;
+    }
+    return addressList.find((a) => a.isDefault) ?? null;
+  };
+  const selectedAddress = getSelectedAddress();
 
   // Initialize store from props
   useEffect(() => {
-    setAddress(selectedAddress);
-  }, [selectedAddress, setAddress]);
+    setAddress(initialAddresses);
+  }, [initialAddresses, setAddress]);
   useEffect(() => {
     setShippingRequest(initialShippingRequest);
   }, [initialShippingRequest, setShippingRequest]);
@@ -58,7 +72,7 @@ export default function DeliveryAddressClient({
     <div
       className={clsx(
         'bg-white p-4 mb-4 flex flex-col gap-2',
-        'border-2 border-[#E0E0E0] rounded-[12px]'
+        'border border-[#E0E0E0] rounded-[12px]'
       )}
     >
       <h2 className="w-full text-label-strong text-[18px] font-semibold">
@@ -68,7 +82,10 @@ export default function DeliveryAddressClient({
       {!selectedAddress ? (
         <AddAddressButton />
       ) : (
-        <AddressSummaryCard selectedAddress={selectedAddress} />
+        <div className={clsx('flex justify-between items-start')}>
+          <AddressSummaryCard selectedAddress={selectedAddress} />
+          <AddressChangeButton />
+        </div>
       )}
 
       <div className="w-full h-px bg-gray-200 my-2" />

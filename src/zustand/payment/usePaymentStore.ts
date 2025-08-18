@@ -1,81 +1,81 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-export type Products = {
+export type Product = {
   id: string;
   name: string;
   amount: number;
   quantity: number;
-}[]
-type Customer = {
-  customerId: string;
-  fullName: string;
-  phoneNumber: string;
-  email: string;
-  address: object;
 }
+export type Products = Product[];
+
+type payMethod = 'toss' | 'kakao' | 'normal';
 
 type State = {
   orderName: string;
   totalAmount: number;
   products: Products;
-  customer: Customer;
-  payMethod: string;
+  payMethod: payMethod;
   isCouponApplied: boolean;
-  totalQuantity: number;
 }
 type Actions = {
   setOrderName: (orderName: string) => void;
   setTotalAmount: (amount: number) => void;
   setProducts: (products: Products) => void;
-  setCustomer: (customer: Customer) => void;
-  setPayMethod: (method: string) => void;
+  setPayMethod: (method: payMethod) => void;
   setIsCouponApplied: (isApplied: boolean) => void;
-  setTotalQuantity: (quantity: number) => void;
+
+  getTotalQuantity: () => number;
+
   resetState: () => void;
 }
 
 const initialState : State = {
   orderName: '',
   totalAmount: 0,
-  //TODO totalQuantity 값 제거하고, products에서 계산하도록 변경
-  totalQuantity : 0,
-  products:[{
-    id: '',
-    name: '',
-    amount: 0,
-    quantity: 0
-  }],
-  customer:{
-    customerId: '',
-    fullName: '',
-    phoneNumber: '',
-    email: '',
-    address:{}
-  },
+  products:[],
   payMethod: 'toss',
   isCouponApplied: false,
 }
 
+const CURRENT_VERSION = 2;
 export const usePaymentRequestStore = create<State & Actions>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...initialState,
+      getTotalQuantity:() => 
+        get().products.reduce((acc, product) => acc + (product.quantity ?? 0), 0),
+
       setOrderName: (name) => set((state) => ({ ...state, orderName: name })),
       setTotalAmount: (amount) => set((state) => ({ ...state, totalAmount: amount })),
       setProducts: (products) => set((state) => ({ ...state, products })),
-      setCustomer: (customer) => set((state) => ({...state, customer})),
       setPayMethod: (method) => set((state)=> ({...state, payMethod: method})),
       setIsCouponApplied: (isApplied) => set((state) => ({...state, isCouponApplied: isApplied})),
-      setTotalQuantity: (quantity) => set((state) => ({...state, totalQuantity: quantity})),
       resetState: () => set(initialState),
     }),
     {
       name: "payment-request-storage", 
       storage: createJSONStorage(()=>sessionStorage),
       //스토리지 비우기 : usePaymentRequestStore.persist.clearStorage()
-    }
+
+      version: CURRENT_VERSION,
+      // v2 마이그레이션: customer/totalQuantity/placeholder products 제거
+      migrate: (persisted: any, version) => {
+        if (!persisted) return persisted;
+        if (version < 2) {
+          if("totalQuantity" in persisted) delete persisted.totalQuantity;
+          if ("customer" in persisted) delete persisted.customer;
+          if(
+            Array.isArray(persisted.products) &&
+            persisted.products.length === 1 &&
+            persisted.products[0] &&
+            !persisted.products[0].id
+          ) {
+            persisted.products = [];
+          }
+        }
+          return persisted;
+        }
+      },
   )
 );
-
-  // setCustomer: (customer) => set((state) => ({ ...state, customer })),
