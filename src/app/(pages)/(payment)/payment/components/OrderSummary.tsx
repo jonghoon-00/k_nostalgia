@@ -1,10 +1,10 @@
-// components/OrderSummary.tsx
 'use client';
 
 import { toast } from '@/components/ui/use-toast';
 import supabase from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 import requestPayment from '@/app/api/payment/requestPayment';
 import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
@@ -31,15 +31,18 @@ const OrderSummary = () => {
     totalAmount,
     isCouponApplied,
     payMethod,
-    totalQuantity,
-    setTotalQuantity
-  } = usePaymentRequestStore();
-
-  // 상품 금액
-  const subtotal = useMemo(
-    () => products.reduce((acc, p) => acc + p.amount * p.quantity, 0),
-    [products]
+    getTotalQuantity
+  } = usePaymentRequestStore(
+    useShallow((s) => ({
+      products: s.products,
+      orderName: s.orderName,
+      totalAmount: s.totalAmount,
+      isCouponApplied: s.isCouponApplied,
+      payMethod: s.payMethod,
+      getTotalQuantity: s.getTotalQuantity
+    }))
   );
+  const totalQuantity = useMemo(() => getTotalQuantity(), [getTotalQuantity]);
 
   // 쿠폰 할인 금액
   const discountAmount = useCouponDiscount();
@@ -48,14 +51,16 @@ const OrderSummary = () => {
 
   const payRequest = async () => {
     if (isUserLoading) {
-      toast({
+      return toast({
         description: '사용자 정보 확인중. 잠시 후 다시 시도해주세요'
       });
     }
     if (!user) {
       console.error('Get user failed');
       router.push('/login');
-      return;
+      return toast({
+        description: '로그인이 필요합니다. 로그인 후 다시 시도해주세요'
+      });
     }
     if (!address) {
       return toast({ description: '배송지 추가 혹은 선택 해주세요' });
@@ -85,6 +90,7 @@ const OrderSummary = () => {
         .eq('id', user.id);
     }
 
+    //TODO 결제 성공시 RESPONSE 처리 재확인
     if (response?.code) {
       router.push(
         `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
@@ -92,13 +98,6 @@ const OrderSummary = () => {
     }
   };
 
-  useEffect(() => {
-    if (products.length > 0) {
-      setTotalQuantity(
-        products.reduce((acc, product) => acc + product.quantity, 0)
-      );
-    }
-  }, [products, setTotalQuantity]);
   return (
     <>
       <Accordion
@@ -118,7 +117,7 @@ const OrderSummary = () => {
         <div className="text-label-strong text-[16px] flex flex-col gap-2">
           <div className="w-full flex justify-between">
             <span>상품 금액</span>
-            <span>{subtotal.toLocaleString('ko-KR')}원</span>
+            <span>{totalAmount.toLocaleString('ko-KR')}원</span>
           </div>
           <div className="flex justify-between">
             <span>배송비</span>
