@@ -18,7 +18,7 @@ type ProductProps = Product[];
 type Props = {
   orderNameArr: string[];
   product: ProductProps;
-  variant: 'buyNow' | 'orderSelected' | 'orderAll'; // <-- text 대신 variant
+  variant: 'buyNow' | 'orderSelected' | 'orderAll';
 };
 
 const BUTTON_LABEL: Record<Props['variant'], string> = {
