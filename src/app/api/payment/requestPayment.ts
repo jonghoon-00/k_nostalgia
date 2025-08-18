@@ -1,5 +1,3 @@
-// update : 25.04.08
-
 'use client';
 
 import { toast } from '@/components/ui/use-toast';
@@ -17,11 +15,11 @@ interface PayRequestParameters {
   totalAmount: number;
   orderName: string;
   products: Products,
-
 }
 
-const PRODUCTION_URL = 'https://k-nostalgia.vercel.app/';
-const DEV_URL = 'http://localhost:3000/';
+//TODO 배포 이후 URL 변경
+const PRODUCTION_URL = 'https://k-nostalgia.vercel.app/'
+const DEV_URL = process.env.NEXT_PUBLIC_DOMAIN;
 
 //결제 요청 함수
 export default async function requestPayment({
@@ -30,7 +28,6 @@ export default async function requestPayment({
   totalAmount,
   orderName,
   products,
-
 }: PayRequestParameters) {
 
   toast({

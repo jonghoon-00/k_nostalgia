@@ -56,7 +56,7 @@ const Payment = async () => {
       {/* content */}
       <main
         className={clsx(
-          'mx-auto p-4 md:p-0 mb-14 mt-16 md:mt-0',
+          'mx-auto p-4 md:py-0 md:px-4 mb-14 mt-16 md:mt-0',
           'md:max-w-[1080px]',
           'bg-normal',
           'md:flex md:gap-6'
@@ -74,7 +74,7 @@ const Payment = async () => {
         </section>
 
         {/* 우측: 결제 요약 */}
-        <aside className="md:w-[375px] md:shrink-0">
+        <aside className="py-4 md:p-0 md:w-[375px] md:shrink-0">
           <OrderSummary />
         </aside>
       </main>

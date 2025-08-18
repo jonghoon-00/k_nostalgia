@@ -1,21 +1,20 @@
 'use client';
 
-import { ColumnDef } from '@tanstack/react-table';
-import { Checkbox } from '@/components/ui/checkbox';
-import Image from 'next/image';
-import { CountButton } from './CountButton';
-import supabase from '@/utils/supabase/client';
-import Link from 'next/link';
-import { DataTable } from './DataTable';
 import Loading from '@/components/common/Loading';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useUserCartData } from '@/hooks/cart/useUserCartData';
-import { useEffect } from 'react';
 import { useDeleteProduct } from '@/hooks/localFood/useDeleteProduct';
+import useDeviceSize from '@/hooks/useDeviceSize';
+import supabase from '@/utils/supabase/client';
+import { ColumnDef } from '@tanstack/react-table';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect } from 'react';
 import { CgClose } from 'react-icons/cg';
 import Swal from 'sweetalert2';
+import { CountButton } from './CountButton';
+import { DataTable } from './DataTable';
 import { DeleteButton } from './DeleteButton';
-import useDeviceSize from '@/hooks/useDeviceSize';
-import { useGetProduct } from '@/hooks/localFood/useGetProduct';
 
 export type CartItem = {
   id: string | null;
@@ -276,11 +275,13 @@ export const TableDataColumns = ({
       header: () => <div className="hidden md:block">할인 전 금액</div>,
       cell: ({ row }) => {
         const price = row.getValue('product_price') as number;
+        const count = row.getValue('count') as number;
+        const totalPrice = price * count;
         const isSelected = selectedItems.includes(row.getValue('product_id'));
 
         return (
           <div className="invisible md:visible">
-            {isSelected ? `${price.toLocaleString()}원` : '0원'}
+            {isSelected ? `${totalPrice.toLocaleString()}원` : '0원'}
           </div>
         );
       }
