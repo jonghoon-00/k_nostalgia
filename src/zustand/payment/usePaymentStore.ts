@@ -38,6 +38,7 @@ const initialState : State = {
   isCouponApplied: false,
 }
 
+const CURRENT_VERSION = 2;
 export const usePaymentRequestStore = create<State & Actions>()(
   persist(
     (set, get) => ({
@@ -57,7 +58,7 @@ export const usePaymentRequestStore = create<State & Actions>()(
       storage: createJSONStorage(()=>sessionStorage),
       //스토리지 비우기 : usePaymentRequestStore.persist.clearStorage()
 
-      version: 2,
+      version: CURRENT_VERSION,
       // v2 마이그레이션: customer/totalQuantity/placeholder products 제거
       migrate: (persisted: any, version) => {
         if (!persisted) return persisted;
