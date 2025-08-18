@@ -10,7 +10,7 @@ import { toast } from './use-toast';
 type Product = {
   id: string | null;
   name: string | null;
-  amount: number; // 가격
+  amount: number; // 총 가격
   quantity: number; // 수량
 };
 type ProductProps = Product[];
@@ -42,19 +42,13 @@ const BUTTON_CLASS_DISABLED: Record<Props['variant'], string> = {
   orderAll: 'bg-stone-200 text-white'
 };
 
-function calcTotalAmount(items: ProductProps) {
-  return items.reduce(
-    (acc, { amount, quantity }) => acc + amount * quantity,
-    0
-  );
-}
-
 function formatOrderName(names: string[]) {
   if (names.length === 0) return '';
   if (names.length === 1) return names[0] ?? '';
   return `${names[0]} 외 ${names.length - 1}건`;
 }
 
+// product.amount는 총 가격이므로, 수량을 곱할 필요 없음
 export default function PayButton({ orderNameArr, product, variant }: Props) {
   const router = useRouter();
   const { data: nowUser } = useUser();
@@ -73,8 +67,7 @@ export default function PayButton({ orderNameArr, product, variant }: Props) {
       toast({ description: '구매할 상품을 선택해 주세요' });
       return;
     }
-
-    const total = calcTotalAmount(product) + DELIVERY_FEE;
+    const total = product.reduce((acc, p) => acc + p.amount, 0) + DELIVERY_FEE;
     setTotalAmount(total);
     setOrderName(formatOrderName(orderNameArr));
     setProducts(product as any);
