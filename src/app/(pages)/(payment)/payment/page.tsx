@@ -56,7 +56,7 @@ const Payment = async () => {
       {/* content */}
       <main
         className={clsx(
-          'mx-auto p-4 md:p-0 mb-14 mt-16 md:mt-0',
+          'mx-auto p-4 md:py-0 md:px-4 mb-14 mt-16 md:mt-0',
           'md:max-w-[1080px]',
           'bg-normal',
           'md:flex md:gap-6'
