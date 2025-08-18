@@ -74,7 +74,7 @@ const Payment = async () => {
         </section>
 
         {/* 우측: 결제 요약 */}
-        <aside className="md:w-[375px] md:shrink-0">
+        <aside className="py-4 md:p-0 md:w-[375px] md:shrink-0">
           <OrderSummary />
         </aside>
       </main>

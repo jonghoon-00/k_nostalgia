@@ -76,7 +76,7 @@ const OrderProducts = () => {
         'p-4',
         'flex flex-col gap-2',
         'rounded-[12px]',
-        'border-2 border-[#E0E0E0]',
+        'border border-[#E0E0E0]',
         'mb-4'
       )}
     >
