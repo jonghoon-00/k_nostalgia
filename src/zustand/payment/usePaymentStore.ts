@@ -15,7 +15,7 @@ type State = {
   orderName: string;
   totalAmount: number;
   products: Products;
-  payMethod: string;
+  payMethod: payMethod;
   isCouponApplied: boolean;
 }
 type Actions = {

@@ -19,11 +19,7 @@ export const CouponInPaymentPage = () => {
   }));
 
   useEffect(() => {
-    if (discount > 0) {
-      setIsCouponApplied(true);
-    } else {
-      setIsCouponApplied(false);
-    }
+    setIsCouponApplied(discount > 0);
   }, [discount, setIsCouponApplied]);
   return (
     <div

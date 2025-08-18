@@ -43,7 +43,8 @@ const OrderSummary = () => {
       getTotalQuantity: s.getTotalQuantity
     }))
   );
-  const totalQuantity = useMemo(() => getTotalQuantity(), [getTotalQuantity]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const totalQuantity = useMemo(() => getTotalQuantity(), [products]);
 
   // 쿠폰 할인 금액
   const discountAmount = useCouponDiscount();

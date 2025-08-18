@@ -1,6 +1,5 @@
 'use client';
 
-import { DELIVERY_FEE } from '@/constants';
 import { useUser } from '@/hooks/useUser';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 import clsx from 'clsx';
@@ -67,7 +66,7 @@ export default function PayButton({ orderNameArr, product, variant }: Props) {
       toast({ description: '구매할 상품을 선택해 주세요' });
       return;
     }
-    const total = product.reduce((acc, p) => acc + p.amount, 0) + DELIVERY_FEE;
+    const total = product.reduce((acc, p) => acc + p.amount, 0);
     setTotalAmount(total);
     setOrderName(formatOrderName(orderNameArr));
     setProducts(product as any);

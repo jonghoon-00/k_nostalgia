@@ -1,11 +1,17 @@
-
+// popstate-guard.ts
 type Options = {
   onBack?: () => void;
 };
 
+const MARKER = '__POP_GUARD__';
+
+let active = false;                       // 가드 활성화 여부
+let added = 0;                            // pushState로 추가한 더미 스택 수
+let onPop: ((e: PopStateEvent) => void) | null = null;
+
 /**
- * 
  * 뒤로가기를 임시 차단하는 유틸
+ *
  * @param options 브라우저 뒤로가기 클릭 시 실행할 콜백 함수
  * @returns release 함수
  */
@@ -15,35 +21,55 @@ export function startBackGuard(options?: Options) {
     return () => {};
   }
 
-  const MARKER = '__GUARD_ACTIVE__';
-  let active = true;
+  if (active) {
+    // 이미 활성화되어 있다면, 해제 함수만 반환
+    return releaseBackGuard;
+  }
 
-  // 히스토리 스택 위에 더미 상태 쌓기
+  active = true;
+
+  // 가드 시작 - 더미 스택 1개 추가
   history.pushState({ [MARKER]: true }, '', location.href);
+  added += 1;
 
-  const onPopState = (event: PopStateEvent) => {
+  // 첫 popstate 타이밍 글리치 방지
+  const noopOnce = () => {};
+  window.addEventListener('popstate', noopOnce, { once: true });
+
+  onPop = (event: PopStateEvent) => {
     if (!active) return;
 
-    event.preventDefault?.();
     options?.onBack?.();
-
-    // 다시 현재 url로 더미 상태를 올려 뒤로가기를 계속 흡수
-    history.pushState({ [MARKER]: true }, '', location.href);
+    // 새 항목을 추가하지 않고 현재 페이지로 복귀(스택 증가 없음)
+    history.go(1);
   };
 
-  window.addEventListener('popstate', onPopState);
+  window.addEventListener('popstate', onPop);
 
-  // release 함수
-  const release = () => {
-    if (!active) return;
-    active = false;
-    window.removeEventListener('popstate', onPopState);
+  return releaseBackGuard;
+}
 
-    //이벤트를 한 번 흡수하기 위한 더미 함수
-    const noopOnce = () => {/* iOS Safari 등에서의 안전장치. */};
-    window.addEventListener('popstate', noopOnce, { once: true });
-    history.back();
-  };
+/**
+ * 가드 해제: 리스너 제거 + 누적 더미 스택 일괄 제거
+ */
+export function releaseBackGuard() {
+  if (typeof window === 'undefined') return;
 
-  return release;
+  if (!active) return;
+  active = false;
+
+  if (onPop) {
+    window.removeEventListener('popstate', onPop);
+    onPop = null;
+  }
+
+  const toRemove = added;
+  added = 0;
+
+  // 현재 콜스택/라우팅과 충돌 방지 위해 다음 틱에 처리
+  if (toRemove > 0) {
+    setTimeout(() => {
+      history.go(-toRemove);
+    }, 0);
+  }
 }
