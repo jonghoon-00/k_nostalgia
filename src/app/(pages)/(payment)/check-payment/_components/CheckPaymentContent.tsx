@@ -122,7 +122,7 @@ const CheckPaymentContent = () => {
           if (isCouponApplied === 'true') {
             await supabase
               .from('users')
-              .update({ coupon: null })
+              .update({ coupons: null })
               .eq('email', customer.email);
           }
 
