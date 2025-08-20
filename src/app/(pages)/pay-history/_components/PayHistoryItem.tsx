@@ -1,7 +1,5 @@
 'use client';
-
 //feat : 주문 내역 삭제(db), 주문 취소(환불)
-//update : 24.8.13
 
 import { toast } from '@/components/ui/use-toast';
 import { usePaymentCancellation } from '@/hooks/payment/canclePayWithDbUpdate';
@@ -125,7 +123,7 @@ const PayHistoryItem = ({ orderList, date }: Props) => {
               />
             </div>
 
-            {order.products.map((product: Product, index: number) => (
+            {order.products?.map((product: Product, index: number) => (
               <div
                 className="cursor-pointer"
                 key={product.id}

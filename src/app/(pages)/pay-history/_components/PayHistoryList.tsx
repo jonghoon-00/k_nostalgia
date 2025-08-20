@@ -1,10 +1,5 @@
 'use client';
 
-//주문 내역 최상단 component
-//feat : 주문 내역 리스팅 (무한스크롤 + 날짜별 분류(reducing))
-
-//update : 24.9.30
-
 import Loading from '@/components/common/Loading';
 import { useGetPaymentHistoryWithSupabase } from '@/hooks/payment/useGetPaymentHistory';
 import { useUser } from '@/hooks/useUser';
