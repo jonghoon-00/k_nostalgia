@@ -1,8 +1,5 @@
 //결제 관련 api (포트원)
 //환불, 내역 단건 조회
-
-//update : 24.8.20
-
 import { NextRequest, NextResponse } from "next/server";
 
 //환불

@@ -1,20 +1,33 @@
 'use client';
 
-//결제 완료 페이지
-
-//update : 24.8.27
-
 import Loading from '@/components/common/Loading';
 import { productImgObject } from '@/hooks/payment/getProductImage';
 import { useGetPaymentHistory } from '@/hooks/payment/useGetPaymentHistory';
+import { useCouponStore } from '@/zustand/coupon/useCouponStore';
+import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
+import clsx from 'clsx';
 import dayjs from 'dayjs';
 import Image from 'next/image';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 const CompletePaymentContent = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
+
+  //store reset
+  const resetState = usePaymentRequestStore((state) => state.resetState);
+  const clearCouponIds = useCouponStore((state) => state.clearCouponIds);
+  useEffect(() => {
+    return () => {
+      resetState();
+      clearCouponIds();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const paymentId = searchParams.get('paymentId');
+  const products = usePaymentRequestStore((state) => state.products);
 
   const { payHistory, payHistoryIsPending } = useGetPaymentHistory({
     paymentId
@@ -23,60 +36,85 @@ const CompletePaymentContent = () => {
   if (payHistoryIsPending || !payHistory) {
     return <Loading />;
   }
-  const { paidAt, products, amount } = payHistory;
+  const { paidAt, amount } = payHistory;
 
   const price = products?.reduce(
     (acc: number, item: any) => acc + item.amount,
     0
   );
 
+  const PAYMENT_COMPLETE_IMAGE =
+    'https://kejbzqdwablccrontqrb.supabase.co/storage/v1/object/public/images/Tiger_congrats.png';
   return (
-    <main className="bg-normal pt-10 md:w-[860px] md:mx-auto">
+    <main className={clsx('bg-normal pt-10', 'md:w-[860px] md:mx-auto')}>
       <section className="m-auto mb-[104px] md:mb-6">
-        <div className="flex flex-col items-center px-[46.5px] pb-[15px] pt-[8px] md:pt-10">
+        <div
+          className={clsx(
+            'flex flex-col items-center',
+            'px-[46.5px] pt-[8px] pb-[15px]',
+            'md:pt-10'
+          )}
+        >
           <Image
-            src="https://kejbzqdwablccrontqrb.supabase.co/storage/v1/object/public/images/Tiger_congrats.png"
+            src={PAYMENT_COMPLETE_IMAGE}
             alt="결제 완료 이미지"
             width={300}
             height={300}
-            style={{
-              width: '282',
-              height: '175'
-            }}
+            style={{ width: '282', height: '175' }}
             priority
           />
-          <p className="text-[20px] text-[#9C6D2E] font-medium leading-7">
+          <p className="text-[20px] text-primary-20 font-medium leading-7">
             결제가 완료됐어요!
           </p>
         </div>
 
-        <section className="flex flex-col gap-[8px] p-[16px] leading-[160%] rounded-xl sm:bg-white sm:border-[1px] sm:border-[#E0E0E0] sm:my-9">
+        <section
+          className={clsx(
+            'flex flex-col gap-[8px] leading-[160%] rounded-xl',
+            'p-[16px] sm:my-9 sm:bg-white sm:border-[1px] sm:border-gray-80'
+          )}
+        >
           <div className="flex flex-row justify-between">
-            <p className="text-[#79746D] font-medium">주문번호</p>
+            <p className="text-label-alternative font-medium">주문번호</p>
             <p className="font-semibold text-[#1F1E1E]">{paymentId}</p>
           </div>
           <div className="flex flex-row justify-between">
-            <p className="text-[#79746D] font-medium">결제일자</p>
+            <p className="text-label-alternative font-medium">결제일자</p>
             <p className="font-semibold text-[#1F1E1E]">
               {dayjs(paidAt).locale('ko').format('YYYY. MM. DD HH:MM')}
             </p>
           </div>
         </section>
+
         <section>
           <div className="pb-3">
             <h3 className="hidden text-[20px] font-medium leading-7 sm:block">
               주문상품
             </h3>
           </div>
-          <div className="rounded-xl md: sm:bg-white sm:border-[1px] sm:border-[#E0E0E0]">
-            <div className="border-t-4 border-[#F2F2F2] pt-[20px] pb-[16px] sm:border-none">
+
+          <div
+            className={clsx(
+              'rounded-xl',
+              'sm:bg-white sm:border-[1px] sm:border-gray-80'
+            )}
+          >
+            <div
+              className={clsx(
+                'border-t-4 border-gray-90 pt-[20px] pb-[16px]',
+                'sm:border-none'
+              )}
+            >
               <div className="flex flex-col gap-[16px]">
                 {products?.map((product: any) => {
                   const { id, name, amount, quantity } = product;
                   return (
                     <div
                       key={id}
-                      className="flex gap-[12px] border-b-2 border-[#F2F2F2] pb-[16px] px-[16px]"
+                      className={clsx(
+                        'flex gap-[12px] border-b-2 border-gray-90',
+                        'pb-[16px] mx-[16px]'
+                      )}
                     >
                       <Image
                         src={productImgObject[name]}
@@ -92,7 +130,7 @@ const CompletePaymentContent = () => {
                       />
                       <div className="flex flex-col justify-center gap-[8px]">
                         <p className="text-[16px] font-medium">{name}</p>
-                        <div className="flex flex-row gap-[4px] text-[#79746D]">
+                        <div className="flex flex-row gap-[4px] text-label-alternative">
                           <p>{amount.toLocaleString('ko-KR')}원</p>
                           <p>·</p>
                           <p>{quantity}개</p>
@@ -120,26 +158,55 @@ const CompletePaymentContent = () => {
                 <p className="font-semibold">-2,000원</p>
               </div>
             </div>
-            <div className="flex justify-between px-[16px] pt-[16px] pb-[16px] mt-[16px] border-t-2 border-[#F2F2F2]">
+
+            <div
+              className={clsx(
+                'flex justify-between mx-[16px] mt-[16px]',
+                'pt-[16px] pb-[16px] border-t-2 border-gray-90'
+              )}
+            >
               <p className="font-semibold text-[18px]">총 결제 금액</p>
-              <p className="font-semibold text-[20px] md:text-[#9C6D2E]">
+              <p className="font-semibold text-[20px] md:text-primary-20">
                 {amount.total.toLocaleString('ko-KR')}원
               </p>
             </div>
           </div>
         </section>
       </section>
-      <div className="font-semibold flex mb-[16px] gap-[12px] fixed bottom-0 bg-[#FAF8F5] py-[12px] shadow-[rgba(31,30,30,0.08)_0px_-2px_8px_0px] w-screen justify-center md:shadow-none md:bg-none md:relative md:w-full md:mb-[80px]">
-        <Link href={'/pay-history'}>
-          <button className="w-[166px] h-[48px] px-[12px] py-16px border-[1px] border-[#9C6D2E] text-[#9C6D2E] rounded-[12px] md:flex md:flex-1 md:w-[336px] justify-center items-center">
-            주문 내역 보기
-          </button>
-        </Link>
-        <Link href={'/local-food'}>
-          <button className="bg-[#9C6D2E] text-white w-[166px] h-[48px] px-[12px] rounded-[12px] md:flex md:flex-1 md:w-[336px] justify-center items-center">
-            계속 쇼핑하기
-          </button>
-        </Link>
+
+      <div
+        className={clsx(
+          'bg-[#FAF8F5]',
+          'fixed bottom-0 w-screen justify-center font-semibold flex gap-2',
+          'mb-[16px] px-4 py-[12px] md:px-20',
+          'shadow-[rgba(31,30,30,0.08)_0px_-2px_8px_0px]',
+          'md:relative md:w-full md:mb-[80px] md:shadow-none md:bg-none'
+        )}
+      >
+        <button
+          onClick={() => router.replace('/pay-history')}
+          type="button"
+          className={clsx(
+            'w-full h-[48px] px-[12px] border-[1px]',
+            'border-primary-20 text-primary-20 rounded-[12px]',
+            'md:flex md:flex-1  justify-center items-center'
+          )}
+        >
+          주문 내역 보기
+        </button>
+
+        <button
+          onClick={() => router.replace('/local-food')}
+          type="button"
+          className={clsx(
+            'bg-primary-20 text-white',
+            // 166
+            'w-full h-[48px] px-[12px] rounded-[12px]',
+            'md:flex md:flex-1 justify-center items-center'
+          )}
+        >
+          계속 쇼핑하기
+        </button>
       </div>
     </main>
   );

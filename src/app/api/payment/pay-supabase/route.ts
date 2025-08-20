@@ -1,9 +1,4 @@
-//feat: supabase 'orderd_list' table 추가(post), 불러오기(get), 수정(put)
-
-//삭제는 hooks/payment/useDeletePayment.tsx 파일에 
-//optimistic update와 함께 적용되어있음(route handler 사용 안했음)
-
-//update: 24.9.19
+//supabase 'orderd_list' table 추가(post), 불러오기(get), 수정(put)
 
 import { Tables } from "@/types/supabase";
 import supabase from "@/utils/supabase/client";

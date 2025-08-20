@@ -9,7 +9,7 @@ export const GET = async (request: NextRequest) => {
     const {searchParams} = new URL(request.url);
     const page = searchParams.get('page') || '1' 
     const serviceKey = encodeURIComponent('serviceKey');
-    const apiKey = process.env.NEXT_PUBLIC_MARKET_API_KEY;
+    const apiKey = process.env.MARKET_API_KEY;
     const response = await fetch(
       `${MARKET_URL}?${serviceKey}=${apiKey}&page=${page}` //불러올 시장 갯수 -> &perPage=1388 /총 시장 갯수:1388
     );

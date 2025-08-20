@@ -1,50 +1,67 @@
 'use client';
 
-//feat : 결제 확인 -> 내역 supabase 저장
-//update : 24.10.24
-
-import { toast } from '@/components/ui/use-toast';
-import supabase from '@/utils/supabase/client';
-import dayjs from 'dayjs';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { BeatLoader } from 'react-spinners';
+
+import supabase from '@/utils/supabase/client';
+import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
+
+import clsx from 'clsx';
+import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 
+import { toast } from '@/components/ui/use-toast';
+import { useUser } from '@/hooks/useUser';
+import { BeatLoader } from 'react-spinners';
+
+async function getPayHistory({ paymentId }: { paymentId: string }) {
+  const getPayHistory = await fetch(
+    `/api/payment/transaction?paymentId=${paymentId}`
+  );
+  return await getPayHistory.json();
+}
+async function cancelPayment({ paymentId }: { paymentId: string }) {
+  return await fetch('/api/payment/transaction', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ paymentId })
+  });
+}
+
 const CheckPaymentContent = () => {
-  //TODO 사용한 쿠폰 코드 받아서 ORDER LIST에 저장
   const router = useRouter();
+  const { data: user } = useUser();
+  const [isPaymentHistoryLoaded, setIsPaymentHistoryLoaded] =
+    useState<boolean>(false);
 
   const searchParams = useSearchParams();
   const paymentId = searchParams.get('paymentId');
   const code = searchParams.get('code');
-  const totalQuantity = searchParams.get('totalQuantity');
-  //TODO TOTAL QUANTITY zustand에서 가져오기
-  const isCouponApplied = searchParams.get('isCouponApplied');
 
-  const [isPaymentHistoryLoaded, setIsPaymentHistoryLoaded] =
-    useState<boolean>(false);
+  const isCouponApplied = usePaymentRequestStore(
+    (state) => state.isCouponApplied
+  );
+  const getTotalQuantity = usePaymentRequestStore(
+    (state) => state.getTotalQuantity
+  );
+  const totalQuantity = getTotalQuantity();
 
-  //TODO 결제  후 ZUSTAND STORAGE 비우기
-  //TODO useEffect 내부 로직 별도 분리
   useEffect(() => {
-    const handlePayment = async () => {
+    const syncPaymentHistory = async () => {
       if (code === 'FAILURE_TYPE_PG') {
         toast({
           variant: 'destructive',
           description: '결제 실패했습니다 잠시 후 다시 시도해주세요'
         });
-        return router.replace(`/local-food`);
+        return router.replace(`/cart`);
       }
 
       if (paymentId) {
         const postPaymentHistory = async () => {
           //결제 내역 조회
-          const getPayHistory = await fetch(
-            `/api/payment/transaction?paymentId=${paymentId}`
-          );
-          const payHistory = await getPayHistory.json();
-
+          const payHistory = await getPayHistory({ paymentId });
           const {
             paidAt,
             status,
@@ -83,7 +100,7 @@ const CheckPaymentContent = () => {
                 order_name: orderName,
                 amount: totalQuantity,
                 price: amount.total,
-                user_id: customer.id,
+                user_id: user?.id,
                 user_name: customer.name,
                 payment_id: paymentId,
                 pay_provider: method.provider
@@ -92,20 +109,14 @@ const CheckPaymentContent = () => {
                 phone_number: customer.phoneNumber,
                 products,
                 user_email: customer.email,
-                is_CouponApplied: isCouponApplied === 'true' ? true : false
+                is_CouponApplied: isCouponApplied
               })
             });
           } catch (error) {
             console.error('failed_update pay history,', error);
 
-            await fetch('/api/payment/transaction', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ paymentId: paymentId })
-            });
-
+            //db 저장 실패시 결제 취소
+            await cancelPayment({ paymentId });
             toast({
               description: '결제 건 처리 과정에서 문제가 발생했습니다'
             });
@@ -115,28 +126,34 @@ const CheckPaymentContent = () => {
               });
             }, 1500);
 
-            return router.replace(`/local-food`);
+            return router.replace(`/cart`);
           }
 
-          //TODO 사용 쿠폰 ID OR CODDE 확인 후 일치 방목 제거
-          if (isCouponApplied === 'true') {
+          //쿠폰이 추가될 경우 수정 필요
+          if (isCouponApplied) {
             await supabase
               .from('users')
-              .update({ coupon: null })
-              .eq('email', customer.email);
+              .update({ coupons: null })
+              .eq('id', user?.id as string);
           }
-
           router.replace(`complete-payment?paymentId=${paymentId}`);
         };
         postPaymentHistory();
       }
     };
-    handlePayment();
-  }, [code, paymentId, router, totalQuantity]);
+    syncPaymentHistory();
+  }, [code, paymentId, router, totalQuantity, isCouponApplied]);
 
   return (
     <div className="bg-normal">
-      <main className="flex justify-center flex-col items-center text-label-assistive text-sm absolute translate-x-[-50%] translate-y-[-50%] top-[50%] left-[50%]">
+      <main
+        className={clsx(
+          'flex justify-center flex-col items-center',
+          'text-label-assistive text-sm',
+          'absolute top-[50%] left-[50%]',
+          'translate-x-[-50%] translate-y-[-50%] '
+        )}
+      >
         <BeatLoader color="#A87939" />
         <h1 className="my-5">
           {isPaymentHistoryLoaded ? '' : '결제를 확인중입니다'}
