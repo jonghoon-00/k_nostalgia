@@ -12,7 +12,7 @@ export const GET = async (req: NextRequest) => {
     }
 
     const clientId = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
-    const clientSecret = process.env.NEXT_PUBLIC_NAVER_CLIENT_SECRET;
+    const clientSecret = process.env.NAVER_CLIENT_SECRET;
 
     if (!clientId || !clientSecret) {
         console.error('네이버 API의 ID 또는 비밀번호가 틀림');

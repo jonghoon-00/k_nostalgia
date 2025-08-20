@@ -6,7 +6,7 @@ const MARKET_URL =
 export const GET = async (request: NextRequest) => {
   try {
     const serviceKey = encodeURIComponent('serviceKey');
-    const apiKey = process.env.NEXT_PUBLIC_MARKET_API_KEY;
+    const apiKey = process.env.MARKET_API_KEY;
     const response = await fetch(
       `${MARKET_URL}?${serviceKey}=${apiKey}&page=1&perPage=10`
     );
