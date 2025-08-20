@@ -10,7 +10,6 @@ interface Props {
 }
 
 //주문 내역 조회(단건)
-//주문 완료 페이지에서 사용 - CompletePaymentContent.tsx
 export const useGetPaymentHistory = ({ paymentId }: Props) => {
   const { data: payHistory, isPending: payHistoryIsPending } = useQuery<
     PayHistory,
@@ -31,10 +30,9 @@ export const useGetPaymentHistory = ({ paymentId }: Props) => {
   return { payHistory, payHistoryIsPending };
 };
 
-//supabase 주문내역 리스트 불러오기
-//useInfiniteQuery 사용 (무한 스크롤 구현)
 interface OrderedList extends Tables<'orderd_list'> {}
 
+//supabase 주문내역 리스트 불러오기
 const fetchPaymentHistory = async (
   userId: string,
   page: number

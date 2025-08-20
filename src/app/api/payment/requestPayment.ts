@@ -17,7 +17,6 @@ interface PayRequestParameters {
   products: Products,
 }
 
-//TODO 배포 이후 URL 변경
 const PRODUCTION_URL = 'https://k-nostalgia.vercel.app/'
 const DEV_URL = process.env.NEXT_PUBLIC_DOMAIN;
 

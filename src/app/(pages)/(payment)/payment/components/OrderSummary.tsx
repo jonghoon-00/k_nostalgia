@@ -16,6 +16,16 @@ import { startBackGuard } from '@/utils/popstateGuard';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 
+// response type
+// {
+//   transactionType: "PAYMENT",
+//   txId: string,
+//   paymentId: string,
+//   code?: string, // 결제 실패 시 코드
+//   message?: string, // 결제 실패 시 메시지
+//   pgCode?: string, //pg에서 오류 발생시 코드를 그대로 반환
+//   pgMessage?: string, //pg에서 오류 발생시 메시지를 그대로 반환
+// }  docs : https://developers.portone.io/sdk/ko/v2-sdk/payment-response?v=v2
 const OrderSummary = () => {
   const router = useRouter();
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
@@ -26,23 +36,16 @@ const OrderSummary = () => {
     (s) => s.shouldStoreDeliveryRequest
   );
 
-  const {
-    products,
-    orderName,
-    totalAmount,
-    isCouponApplied,
-    payMethod,
-    getTotalQuantity
-  } = usePaymentRequestStore(
-    useShallow((s) => ({
-      products: s.products,
-      orderName: s.orderName,
-      totalAmount: s.totalAmount,
-      isCouponApplied: s.isCouponApplied,
-      payMethod: s.payMethod,
-      getTotalQuantity: s.getTotalQuantity
-    }))
-  );
+  const { products, orderName, totalAmount, payMethod, getTotalQuantity } =
+    usePaymentRequestStore(
+      useShallow((s) => ({
+        products: s.products,
+        orderName: s.orderName,
+        totalAmount: s.totalAmount,
+        payMethod: s.payMethod,
+        getTotalQuantity: s.getTotalQuantity
+      }))
+    );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const totalQuantity = useMemo(() => getTotalQuantity(), [products]);
 
@@ -84,8 +87,8 @@ const OrderSummary = () => {
       });
 
       // response.code가 있는 경우 결제 실패
-      if (response?.code != null) {
-        console.log(response.code);
+      if (response?.code) {
+        console.error(` failed code : ${response.code}`);
         return toast({
           variant: 'destructive',
           description: '결제에 실패했습니다 다시 시도해주세요'
@@ -99,11 +102,8 @@ const OrderSummary = () => {
           .eq('id', user.id);
       }
 
-      //TODO 결제 성공시 RESPONSE 처리 재확인
-      if (response?.code) {
-        router.push(
-          `/check-payment?paymentId=${response?.paymentId}&totalQuantity=${totalQuantity}&isCouponApplied=${isCouponApplied}`
-        );
+      if (!response?.code) {
+        router.push(`/check-payment?paymentId=${response?.paymentId}`);
       }
     } catch (error) {
       console.error(error);
