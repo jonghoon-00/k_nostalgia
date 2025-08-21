@@ -3,3 +3,7 @@ export const queryKeys = {
   payHistoryList: (userId: string) => ['payHistoryList', userId] as const,
   
 };
+
+export const mutationKeys = {
+  deletePayHistory: () => ['deletePayHistory'] as const,
+}
