@@ -1,8 +1,7 @@
-// feat: 주문 내역 단건 조회, 주문 내역 리스트 불러오기(무한스크롤 적용)
-// update : 24.9.19
-
+// 내역 조최 이후 get list (무한스크롤 적용)
 import { PayHistory } from '@/types/payHistory';
 import { Tables } from '@/types/supabase';
+
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 interface Props {

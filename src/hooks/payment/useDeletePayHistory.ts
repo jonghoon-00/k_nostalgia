@@ -1,10 +1,10 @@
 //주문 내역 삭제
 //tanstack-query useMutation을 사용한 optimistic update
 
-//update : 24.8.15
-
 import { toast } from '@/components/ui/use-toast';
+
 import supabase from '@/utils/supabase/client';
+
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const useDeletePayHistory = () => {

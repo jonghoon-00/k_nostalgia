@@ -1,7 +1,5 @@
-//주문 취소(환불) 이후 db 업데이트하는 hook(optimistic update 적용)
-//tanstack-query useMutation 사용
-
-//update: 24.8.15
+// 환불 이후 db update hook
+//tanstack-query useMutation 사용, optimistic update 적용
 
 import { toast } from '@/components/ui/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
