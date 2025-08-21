@@ -1,83 +1,96 @@
-// 환불 이후 db update hook
-//tanstack-query useMutation 사용, optimistic update 적용
-
+// 환불 + db update (optimistic update)
 import { toast } from '@/components/ui/use-toast';
+
+import { queryKeys } from '@/constants/queryKeys';
+import { Tables } from '@/types/supabase';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-interface Props {
+type OrderList  = Tables<'ordered_list'>;
+interface MutationParams   {
   payment_id: string;
-  newHistory: any;
+  patch: Partial<OrderList>;
 }
 
-export const usePaymentCancellation = () => {
+// 환불 요청
+async function cancelPayment( payment_id: string): Promise<void> {
+  const res = await fetch('/api/payment/transaction', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ paymentId: payment_id })
+  });
+  if (!res.ok) {
+    let msg = '결제 취소 실패';
+    try {
+      const data = await res.json();
+      if (data?.message) msg = data.message;
+    } catch {}
+    throw new Error(msg);
+  }
+}
+//db 업데이트
+async function updateOrderListDB(patch: Partial<OrderList>): Promise<OrderList> {
+  const res = await fetch('/api/payment/pay-supabase', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch)
+  });
+  if (!res.ok) {
+    let msg = '주문 내역 업데이트 실패';
+    try {
+      const data = await res.json();
+      if (data?.message) msg = data.message;
+    } catch {}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+export const usePaymentCancellation = (userId: string) => {
   const queryClient = useQueryClient();
-
-  //환불
-  const cancelPayment = async (payment_id: string) => {
-    const cancelResponse = await fetch('/api/payment/transaction', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ paymentId: payment_id })
-    });
-
-    if (!cancelResponse.ok) {
-      throw new Error('결제 취소 실패');
-    }
-
-    return cancelResponse;
-  };
-
-  //db 업데이트
-  const updateOrderList = async (newHistory: any) => {
-    const historyUpdate = await fetch('/api/payment/pay-supabase', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ ...newHistory })
-    });
-    return historyUpdate.json();
-  };
+const listKey = queryKeys.payHistoryList(userId);
 
   //query를 사용한 optimistic update
   const mutation = useMutation({
-    mutationFn: async ({ payment_id, newHistory }: Props) => {
+    mutationFn: async ({ payment_id, patch }: MutationParams ) => {
       await cancelPayment(payment_id);
-      return updateOrderList(newHistory);
+      return updateOrderListDB(patch);
     },
-    onMutate: async (variables) => {
-      await queryClient.cancelQueries({ queryKey: ['payHistoryList'] });
 
-      const previousHistory = queryClient.getQueryData(['payHistoryList']);
+    //optimistic update
+    onMutate: async ({ payment_id, patch }) => {
+      await queryClient.cancelQueries({ queryKey: listKey });
+      const previous = queryClient.getQueryData<OrderList[]>(listKey);
 
-      queryClient.setQueryData(['payHistoryList'], (old: any[] = []) => {
-        return old.map((item) =>
-          item.payment_id === variables.payment_id
-            ? { ...item, ...variables.newHistory }
-            : item
-        );
-      });
+      queryClient.setQueryData<OrderList[]>(listKey, (old = []) =>
+        old.map((item) =>
+          item.payment_id === payment_id ? { ...item, ...patch } : item
+        )
+      );
 
-      return { previousHistory };
+      return { previous };
     },
+
     onError: (err, variables, context: any) => {
-      queryClient.setQueryData(['payHistoryList'], context.previousHistory);
-      toast({
-        variant: 'destructive',
-        description: '주문 취소 실패. 다시 시도해주세요.'
-      });
+      if (context?.previous) {
+        queryClient.setQueryData(listKey, context.previous);
+      }
+      toast({ variant: 'destructive', description: '잠시 후 다시 시도해주세요.' });
+      console.error(err);
     },
-    onSuccess: () => {
-      toast({
-        description: '주문이 성공적으로 취소되었습니다.'
-      });
+
+    onSuccess: (updated) => {
+      // 서버 결과를 리스트에 반영(불필요한 전체 invalidation 최소화)
+      queryClient.setQueryData<OrderList[]>(listKey, (old = []) =>
+        old.map((item) => (item.payment_id === updated.payment_id ? updated : item))
+      );
+      toast({ description: '주문이 취소되었습니다.' });
     },
+
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['payHistoryList'] });
+      queryClient.invalidateQueries({ queryKey: listKey });
     }
   });
-
   return mutation;
 };
