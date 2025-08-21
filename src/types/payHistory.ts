@@ -10,7 +10,7 @@ export interface Product {
   rating?: number | null | undefined;
 }
 
-export interface Order extends Omit<Tables<'orderd_list'>, 'products'> {
+export interface Order extends Omit<Tables<'ordered_list'>, 'products'> {
   products: Product[] | null;
 }
 
@@ -18,25 +18,25 @@ export type NullablePropertiesExcept<T, K extends keyof T = never> = {
   [P in keyof T]: P extends K ? T[P] : T[P] | null
 };
 
-export type BaseOrderInPayHistory = {
-  payment_id: string;
-  status: string | null;
-  order_name: string | null;
-  amount: number | null;
-  price: number | null;
-  user_id: string | null;
-  payment_date: string | null;
-  id: string;
-  pay_provider: string | null;
-  user_name: string | null;
-  phone_number: string | null;
-  products: any;
-  created_at: string | null;
-  user_email: string | null;
-}
+// export type BaseOrderInPayHistory = {
+//   payment_id: string;
+//   status: string | null;
+//   order_name: string | null;
+//   amount: number | null;
+//   price: number | null;
+//   user_id: string | null;
+//   payment_date: string | null;
+//   id: string;
+//   pay_provider: string | null;
+//   user_name: string | null;
+//   phone_number: string | null;
+//   products: any;
+//   created_at: string | null;
+//   user_email: string | null;
+// }
 
-export type OrderInPayHistory = NullablePropertiesExcept<BaseOrderInPayHistory>;
-export type OrderListInPayHistory = Record<string,BaseOrderInPayHistory[]>
+// export type OrderInPayHistory = NullablePropertiesExcept<BaseOrderInPayHistory>;
+// export type OrderListInPayHistory = Record<string,BaseOrderInPayHistory[]>
 
 export interface PayHistory  {
   status: string;

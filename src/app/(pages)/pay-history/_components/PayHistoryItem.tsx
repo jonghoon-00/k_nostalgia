@@ -5,12 +5,8 @@ import { toast } from '@/components/ui/use-toast';
 import { usePaymentCancellation } from '@/hooks/payment/canclePayWithDbUpdate';
 import { productImgObject } from '@/hooks/payment/getProductImage';
 import useDeletePayHistory from '@/hooks/payment/useDeletePayHistory';
-import {
-  BaseOrderInPayHistory,
-  Order,
-  OrderListInPayHistory,
-  Product
-} from '@/types/payHistory';
+import { Order, Product } from '@/types/payHistory';
+import { Tables } from '@/types/supabase';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { CgClose } from 'react-icons/cg';
@@ -18,7 +14,7 @@ import Swal from 'sweetalert2';
 import ReviewProductDetail from './ReviewProductDetail';
 
 interface Props {
-  orderList: OrderListInPayHistory;
+  orderList: Tables<'ordered_list'>[];
   date: string;
 }
 const PayHistoryItem = ({ orderList, date }: Props) => {

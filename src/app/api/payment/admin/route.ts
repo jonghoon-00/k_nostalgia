@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const GET = async (request: NextRequest) => {
   try {
     const response = await supabase
-      .from('orderd_list')
+      .from('ordered_list')
       .select('*')
       .order('created_at', { ascending: false })
       .eq('status','PAID')

@@ -37,7 +37,7 @@ export const useGetPayHistory = ({ paymentId }: { paymentId: string }) => {
   return { payHistory, payHistoryIsPending };
 };
 
-type OrderedList = Tables<'orderd_list'>
+type OrderedList = Tables<'ordered_list'>
 
 // 주문 내역 무한 스크롤 조회
 export const usePayHistoryInfinite = (
@@ -50,7 +50,7 @@ export const usePayHistoryInfinite = (
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useInfiniteQuery<Tables<'orderd_list'>[], Error, Tables<'orderd_list'>[]>(
+  } = useInfiniteQuery<Tables<'ordered_list'>[], Error, Tables<'ordered_list'>[]>(
     {
       queryKey: queryKeys.payHistoryList(userId!),
       enabled: !!userId,

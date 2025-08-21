@@ -13,7 +13,7 @@ const useDeletePayHistory = () => {
   const deleteMutation = useMutation({
     mutationFn: async (payment_id: string) => {
       const { error } = await supabase
-        .from('orderd_list')
+        .from('ordered_list')
         .delete()
         .eq('payment_id', payment_id);
 

@@ -10,14 +10,10 @@ import TopIconInDesktop from './TopIconInDesktop';
 import { usePayHistoryInfinite } from '@/hooks/payment/useGetPaymentHistory';
 import { useUser } from '@/hooks/useUser';
 
-import {
-  BaseOrderInPayHistory,
-  OrderListInPayHistory
-} from '@/types/payHistory';
-
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
 
+import { Tables } from '@/types/supabase';
 import NoPayHistory from './NoPayHistory';
 import PayHistoryItem from './PayHistoryItem';
 
@@ -51,8 +47,8 @@ const PayHistoryList = () => {
 
   //list 기존 형식 : array
   //[{date : []}] 형식으로 변환 - 날짜별로 묶기
-  const orderList = payHistoryList.reduce<OrderListInPayHistory>(
-    (acc, order: BaseOrderInPayHistory) => {
+  const orderList = payHistoryList.reduce(
+    (acc, order: Tables<'ordered_list'>) => {
       const date = dayjs(order.payment_date).format('YYYY. MM. DD');
       if (!acc[date]) {
         acc[date] = [];
