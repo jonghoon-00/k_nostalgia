@@ -1,20 +1,25 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
+import { useEffect } from 'react';
+import { useInView } from 'react-intersection-observer';
+
 import Loading from '@/components/common/Loading';
-import { useGetPaymentHistoryWithSupabase } from '@/hooks/payment/useGetPaymentHistory';
+import TopIconInDesktop from './TopIconInDesktop';
+
+import { usePayHistoryInfinite } from '@/hooks/payment/useGetPaymentHistory';
 import { useUser } from '@/hooks/useUser';
+
 import {
   BaseOrderInPayHistory,
   OrderListInPayHistory
 } from '@/types/payHistory';
+
 import dayjs from 'dayjs';
 import 'dayjs/locale/ko';
-import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
-import { useInView } from 'react-intersection-observer';
+
 import NoPayHistory from './NoPayHistory';
 import PayHistoryItem from './PayHistoryItem';
-import TopIconInDesktop from './TopIconInDesktop';
 
 const PayHistoryList = () => {
   const pathName = usePathname();
@@ -28,7 +33,7 @@ const PayHistoryList = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage
-  } = useGetPaymentHistoryWithSupabase(userId); //get list (query)
+  } = usePayHistoryInfinite(userId); //get list (query)
 
   const { ref, inView } = useInView({
     threshold: 0.1

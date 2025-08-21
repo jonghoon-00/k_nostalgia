@@ -1,51 +1,46 @@
-// 내역 조최 이후 get list (무한스크롤 적용)
+import { queryKeys } from '@/constants/queryKeys';
+
 import { PayHistory } from '@/types/payHistory';
 import { Tables } from '@/types/supabase';
 
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
-interface Props {
-  paymentId: string | null;
-}
 
-//주문 내역 조회(단건)
-export const useGetPaymentHistory = ({ paymentId }: Props) => {
+async function fetchPayHistoryItem(paymentId: string, signal?: AbortSignal): Promise<PayHistory> {
+  const res = await fetch(`/api/payment/transaction?paymentId=${paymentId}`, { signal });
+  if (!res.ok) throw new Error('Failed to fetch payment history');
+  return res.json();
+};
+async function fetchPayHistoryPage(
+  userId: string,
+  page: number,
+  signal?: AbortSignal
+): Promise<OrderedList[]>{
+  const url = `/api/payment/pay-supabase?${new URLSearchParams({ user_id: userId, page: String(page) })}`;
+  const res = await fetch(url, { signal });
+  if (!res.ok) throw new Error('Failed to fetch payment history list');
+  return res.json();
+};
+
+// 주문 내역 단건 조회
+export const useGetPayHistory = ({ paymentId }: { paymentId: string }) => {
   const { data: payHistory, isPending: payHistoryIsPending } = useQuery<
     PayHistory,
     Error,
     PayHistory
   >({
-    queryKey: ['payHistory', paymentId],
-    queryFn: async () => {
-      if (!paymentId) {
-        throw new Error('Payment ID is required');
-      }
-      const response = await fetch(
-        `/api/payment/transaction?paymentId=${paymentId}`
-      );
-      return response.json();
-    }
+    queryKey: queryKeys.payHistory(paymentId),
+    enabled: !!paymentId,
+    queryFn: ({signal}) => fetchPayHistoryItem(paymentId,signal),
+    staleTime: 1000 * 60 * 1000, // 10분 
   });
   return { payHistory, payHistoryIsPending };
 };
 
-interface OrderedList extends Tables<'orderd_list'> {}
+type OrderedList = Tables<'orderd_list'>
 
-//supabase 주문내역 리스트 불러오기
-const fetchPaymentHistory = async (
-  userId: string,
-  page: number
-): Promise<OrderedList[]> => {
-  const response = await fetch(
-    `/api/payment/pay-supabase?user_id=${userId}&page=${page}`
-  );
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return response.json();
-};
-
-export const useGetPaymentHistoryWithSupabase = (
+// 주문 내역 무한 스크롤 조회
+export const usePayHistoryInfinite = (
   userId: string | undefined
 ) => {
   const {
@@ -57,14 +52,16 @@ export const useGetPaymentHistoryWithSupabase = (
     isFetchingNextPage
   } = useInfiniteQuery<Tables<'orderd_list'>[], Error, Tables<'orderd_list'>[]>(
     {
-      queryKey: ['payHistoryList', userId],
+      queryKey: queryKeys.payHistoryList(userId!),
+      enabled: !!userId,
       initialPageParam: 1,
-      queryFn: ({ pageParam = 1 }) =>
-        fetchPaymentHistory(userId!, pageParam as number),
+      queryFn: ({ pageParam = 1, signal }) =>
+        fetchPayHistoryPage(userId!, pageParam as number, signal),
       getNextPageParam: (lastPage, allPages) => {
         return lastPage.length ? allPages.length + 1 : undefined;
       },
-      select: ({ pages }) => pages.flat()
+      select: ({ pages }) => pages.flat(),
+      gcTime: 1000 * 60 * 10, // 10분
     }
   );
 
