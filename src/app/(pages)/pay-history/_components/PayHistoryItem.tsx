@@ -37,7 +37,7 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
   const { data: nowUser } = useUser();
   const userId = nowUser?.id;
 
-  const deletePayHistory = useDeletePayHistory();
+  const deletePayHistory = useDeletePayHistory(userId!);
   const cancelPaymentMutation = usePaymentCancellation(userId);
 
   const currency = useMemo(
