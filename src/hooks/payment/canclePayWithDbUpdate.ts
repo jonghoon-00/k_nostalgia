@@ -1,7 +1,7 @@
 // 환불 + db update (optimistic update)
 import { toast } from '@/components/ui/use-toast';
 
-import { queryKeys } from '@/constants/queryKeys';
+import { queryKeys } from '@/constants/keys';
 import { Tables } from '@/types/supabase';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 

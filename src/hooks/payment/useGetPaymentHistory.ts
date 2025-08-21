@@ -1,4 +1,4 @@
-import { queryKeys } from '@/constants/queryKeys';
+import { queryKeys } from '@/constants/keys';
 
 import { PayHistory } from '@/types/payHistory';
 import { Tables } from '@/types/supabase';
