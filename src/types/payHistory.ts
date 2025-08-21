@@ -9,13 +9,21 @@ export interface Product {
   hasReview?: boolean;
   rating?: number | null | undefined;
 }
+export type ProductList = Product[];
 
-export type PayHistory = Tables<'ordered_list'>;
+// Supabase 원시 행 타입 (products: Json | null 일 가능성 높음)
+export type PayHistoryRaw = Tables<'ordered_list'>;
+
+// 앱에서 사용하는 정상화된 타입 (products: Product[] | null)
+export type PayHistory = Omit<PayHistoryRaw, 'products'> & {
+  products: Product[] | null;
+};
+
 export type PayHistoryList = PayHistory[];
 export type RenderPayHistoryList = Record<string, PayHistoryList>;
 
+// 부분 업데이트에 쓰는 타입 (정상화 기준을 따름)
 export type PartialOrder = Partial<Tables<'ordered_list'>>;
 
-export interface Order extends Omit<Tables<'ordered_list'>, 'products'> {
-  products: Product[] | null;
-}
+// 명시적 Order 별칭 (가독성용) 
+export type Order = PayHistory;
