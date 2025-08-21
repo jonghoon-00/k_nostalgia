@@ -47,9 +47,11 @@ async function updateOrderListDB(patch: Partial<OrderList>): Promise<OrderList> 
   return res.json();
 }
 
-export const usePaymentCancellation = (userId: string) => {
+export const usePaymentCancellation = (userId?: string) => {
+  if (!userId) throw new Error('로그인이 필요합니다.');
+  
   const queryClient = useQueryClient();
-const listKey = queryKeys.payHistoryList(userId);
+  const listKey = queryKeys.payHistoryList(userId);
 
   //query를 사용한 optimistic update
   const mutation = useMutation({
