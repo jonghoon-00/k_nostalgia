@@ -3,7 +3,7 @@ import { Address } from '@/types/deliveryAddress';
 import clsx from 'clsx';
 
 interface Props {
-  address: Address | Address[];
+  address: Address;
   isDefaultAddress: boolean;
   updateDeliveryAddress: (e: React.MouseEvent<HTMLButtonElement>) => void;
   deleteDeliveryAddress: (e: React.MouseEvent<HTMLButtonElement>) => void;
