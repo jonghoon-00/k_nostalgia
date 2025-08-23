@@ -46,7 +46,6 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
   );
 
   const confirmDelete = async (paymentId?: string) => {
-    // ----- 타입/런타임 가드 -----
     if (!paymentId) {
       toast({
         variant: 'destructive',
@@ -75,6 +74,8 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
 
     if (result.isConfirmed) {
       // paymentId: string으로 내로잉
+      console.log(paymentId);
+      console.log(typeof paymentId);
       deletePayHistory.mutate(paymentId);
     }
   };

@@ -59,8 +59,6 @@ const PayHistoryList = () => {
   //날짜 최신순 정렬
   const sortedDates = useMemo(() => {
     const dates = Object.keys(orderList);
-    // 'YYYY. MM. DD' 형식이므로 Date.parse에 안전하게 적용
-    // 혹은 dayjs(datestr, 'YYYY. MM. DD') 비교도 가능
     return dates.sort((a, b) => Date.parse(b) - Date.parse(a));
   }, [orderList]);
 
@@ -84,7 +82,11 @@ const PayHistoryList = () => {
     return <Loading />;
   }
   if (Object.keys(orderList).length === 0) {
-    return <NoPayHistory />;
+    return (
+      <>
+        <NoPayHistory />
+      </>
+    );
   }
   return (
     <main

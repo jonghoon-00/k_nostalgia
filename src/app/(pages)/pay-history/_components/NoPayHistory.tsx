@@ -1,8 +1,5 @@
-//주문 내역이 없을 경우 렌더링되는 컴포넌트
-//update : 24.9.5
-
-import Image from 'next/image';
-import Link from 'next/link';
+import NoList from '@/components/common/NoList';
+import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 
 const NoPayHistory = () => {
@@ -18,28 +15,27 @@ const NoPayHistory = () => {
           pathName === '/my-page' && 'border-none'
         }`}
       >
-        <img src="/image/pay_history_tiger.png" alt="복숭아 든 귀여운 호랑이" />
+        <img src="/image/pay_history_tiger.png" alt="주문내역 호랑이 아이콘" />
       </div>
       <div
         className={`my-auto flex gap-4 justify-center items-center flex-col ${
           pathName === '/pay-history' ? 'md:h-[68vh]' : 'mb-[80px]'
         }`}
       >
-        <Image
-          src="/image/StateSad.png"
-          alt="우는 호랑이"
-          width={114}
-          height={97}
-          className="w-[114px] h-[97px]"
-        />
-        <p className="text-[18px] text-[#AFACA7] font-medium">
-          주문 내역이 없어요
-        </p>
-        <Link href={'local-food'}>
-          <button className="w-au h-[48px] px-[32px] py-[12px] rounded-[12px] text-white bg-[#9C6D2E] mt-[12px] font-semibold leading-[140%]">
-            특산물 보러 가기
-          </button>
-        </Link>
+        <NoList message="주문 내역이 없어요" />
+        <button
+          type="button"
+          onClick={() => (window.location.href = '/local-food')}
+          className={clsx(
+            'h-[48px]',
+            'px-[32px] py-[12px] mt-[12px]',
+            'rounded-[12px]',
+            'text-white font-semibold leading-[140%]',
+            'bg-[#9C6D2E]'
+          )}
+        >
+          특산물 보러 가기
+        </button>
       </div>
     </main>
   );
