@@ -33,30 +33,41 @@ export const CouponSelection: React.FC = () => {
     };
   }, [close]);
 
+  const hasNoCoupons = coupons.length === 0;
+  const couponList = () => {
+    if (hasNoCoupons) {
+      return (
+        <div className="text-center text-gray-500 py-10">
+          사용 가능한 쿠폰이 없어요.
+        </div>
+      );
+    }
+    return coupons.map((coupon) => (
+      <CouponItem key={coupon.id} coupon={coupon} />
+    ));
+  };
   return (
     <div className={clsx('md:pb-4', 'px-0')}>
       {/* 할인액 표시 */}
-      <div
-        className={clsx(
-          'flex flex-col items-start',
-          'text-xl text-black font-medium'
-        )}
-      >
-        현재 적용된 할인 금액은
-        <div>
-          <span className="text-primary-20">
-            {discountAmount > 0 ? discountAmount.toLocaleString() : '0'}
-          </span>
-          <span>원이에요</span>
+      {!hasNoCoupons && (
+        <div
+          className={clsx(
+            'flex flex-col items-start',
+            'text-xl text-black font-medium'
+          )}
+        >
+          현재 적용된 할인 금액은
+          <div>
+            <span className="text-primary-20">
+              {discountAmount > 0 ? discountAmount.toLocaleString() : '0'}
+            </span>
+            <span>원이에요</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 쿠폰 리스트 */}
-      <div className={clsx(!isMobile && 'min-h-[190px] min-w-[420px]')}>
-        {coupons.map((coupon) => (
-          <CouponItem key={coupon.id} coupon={coupon} />
-        ))}
-      </div>
+      <div className={clsx(!isMobile && 'min-w-[420px]')}>{couponList()}</div>
 
       {/* 버튼 영역 */}
       <div
