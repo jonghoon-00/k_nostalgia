@@ -13,6 +13,8 @@ import { toast } from '@/components/ui/use-toast';
 import useDaumPostcode from '@/hooks/deliveryAddress/daumPostCode/usePopup';
 import clsx from 'clsx';
 
+type FieldKey = 'addressName' | 'receiverName' | 'phoneNumber' | 'baseAddress';
+
 interface AddAddressFormProps {
   onSuccess?: () => void; // 등록 성공 시
 }
@@ -26,120 +28,159 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
   const [form, setForm] = useState({
     addressName: '',
     receiverName: '',
-    phoneNumber: '',
     detailAddress: ''
   });
-  // 유효성 검사 상태
-  const [validationErrors, setValidationErrors] = useState<{
-    [key: string]: boolean;
-  }>({});
+
+  // 유효성/터치 상태
+  const [validationErrors, setValidationErrors] = useState<
+    Record<FieldKey, boolean>
+  >({
+    addressName: false,
+    receiverName: false,
+    phoneNumber: false,
+    baseAddress: false
+  });
+  const [touched, setTouched] = useState<Record<FieldKey, boolean>>({
+    addressName: false,
+    receiverName: false,
+    phoneNumber: false,
+    baseAddress: false
+  });
 
   const { data } = useUser();
   const userId = data?.id;
 
-  //주소 검색 - react-daum-postcode
+  // 개별 필드 검증 helper
+  const validateSingleField = (key: FieldKey, value?: string) => {
+    const snapshot = {
+      addressName: form.addressName,
+      receiverName: form.receiverName,
+      phoneNumber: formattedPhoneNumber,
+      baseAddress: baseAddressWithZoneCode
+    };
+
+    // 전달된 value가 있으면 해당 필드만 최신값으로 대체
+    if (typeof value === 'string') {
+      if (key === 'phoneNumber') snapshot.phoneNumber = value;
+      else if (key === 'baseAddress') snapshot.baseAddress = value;
+      else (snapshot as any)[key] = value;
+    }
+
+    const all = validateAddressFields(snapshot);
+    setValidationErrors((prev) => ({ ...prev, [key]: all[key] }));
+  };
+
+  //주소 검색 - react-daum-postcode (선택 시 baseAddress touched + 검증)
   const { daumPostcodeClickHandler } = useDaumPostcode(
     setBaseAddressWithZoneCode
   );
 
-  // input 실시간 유효성 검사 및 상태 업데이트
+  // input 실시간 유효성 검사 및 상태 업데이트 (텍스트 필드 공통)
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    const val = type === 'checkbox' ? checked : value;
+    const { name, value } = e.target;
+    if (name === 'phoneNumber') return; // 휴대폰은 별도 handler
+    if (name === 'baseAddress') return; // baseAddress는 우편번호 선택으로만 변경
 
-    // form state 업데이트
-    setForm((prev) => ({ ...prev, [name]: val }));
-
-    // 검증할 필드 모아서 호출
-    const fields = {
-      addressName:
-        name === 'addressName' ? (val as string) : prevField('addressName'),
-      receiverName:
-        name === 'receiverName' ? (val as string) : prevField('receiverName'),
-      phoneNumber:
-        name === 'phoneNumber' ? (val as string) : formattedPhoneNumber,
-      baseAddress: baseAddressWithZoneCode
-    };
-
-    const errors = validateAddressFields(fields);
-    setValidationErrors(errors);
+    setForm((prev) => ({ ...prev, [name]: value }));
+    setTouched((prev) => ({ ...prev, [name as FieldKey]: true }));
+    validateSingleField(name as FieldKey, value);
   };
 
-  const prevField = (key: keyof typeof form) => {
-    // form 업데이트 비동기 문제 대비 getter
-    return form[key as keyof typeof form];
+  // blur 시 touched 활성화 (에러 표시 트리거)
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const key = e.target.name as FieldKey;
+    setTouched((prev) => ({ ...prev, [key]: true }));
   };
 
-  //휴대폰 번호 포맷팅 -> useState에 set
+  //휴대폰 번호 포맷팅 + 개별 검증
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const currentValue = e.target.value;
-    setFormattedPhoneNumber(
-      //010-????-???? 형식으로 포맷팅
-      formatPhoneNumber({
-        value: currentValue,
-        prevValue: formattedPhoneNumber
-      })
-    );
+    const next = formatPhoneNumber({
+      value: currentValue,
+      prevValue: formattedPhoneNumber
+    });
+    setFormattedPhoneNumber(next);
+    setTouched((prev) => ({ ...prev, phoneNumber: true }));
+    validateSingleField('phoneNumber', next);
   };
 
   //배송지 등록
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!userId) {
-      return console.error('유저 정보 찾을 수 없음');
+      console.error('유저 정보 찾을 수 없음');
+      return;
     }
 
-    const form = new FormData(e.currentTarget);
+    const formEl = e.currentTarget;
+    const fd = new FormData(formEl);
 
     const fields = {
-      addressName: form.get('addressName')?.toString() ?? '',
-      receiverName: form.get('receiverName')?.toString() ?? '',
+      addressName: (fd.get('addressName') ?? '').toString(),
+      receiverName: (fd.get('receiverName') ?? '').toString(),
       phoneNumber: formattedPhoneNumber.replace(/[^\d]/g, ''),
       baseAddress: baseAddressWithZoneCode
     };
 
-    // 공통 유효성 검사 호출
+    // 전체 검증
     const errors = validateAddressFields(fields);
-    setValidationErrors(errors);
+    setValidationErrors((prev) => ({ ...prev, ...errors }));
+
     if (hasValidationError(errors)) {
-      return toast({ description: '모든 정보를 바르게 입력해주세요' });
+      // 모든 필드를 touched로 바꿔 에러를 보여줌
+      setTouched({
+        addressName: true,
+        receiverName: true,
+        phoneNumber: true,
+        baseAddress: true
+      });
+      toast({ description: '모든 정보를 바르게 입력해주세요' });
+      return;
     }
 
     const payload: AddAddressPayload = {
       userId,
       addressName: fields.addressName,
       receiverName: fields.receiverName,
-      phoneNumber: fields.phoneNumber.replace(/[^0-9]/g, ''),
+      phoneNumber: fields.phoneNumber,
       baseAddress: fields.baseAddress,
-      detailAddress: form.get('detailAddress')?.toString() ?? '',
+      detailAddress: (fd.get('detailAddress') ?? '').toString(),
       isDefault: isDefaultAddress
     };
 
     try {
-      api.address.addNewAddress(payload);
+      await api.address.addNewAddress(payload);
     } catch (error) {
       console.error('배송지 업데이트 중 에러:', error);
-      return toast({
-        description: '잠시 후 다시 시도해주세요'
-      });
+      toast({ description: '잠시 후 다시 시도해주세요' });
+      return;
     }
 
-    toast({
-      description: '배송지 등록 완료'
-    });
+    toast({ description: '배송지 등록 완료' });
 
     //초기화
     setFormattedPhoneNumber('');
     setBaseAddressWithZoneCode('');
     setIsDefaultAddress(false);
+    setForm({ addressName: '', receiverName: '', detailAddress: '' });
+    setValidationErrors({
+      addressName: false,
+      receiverName: false,
+      phoneNumber: false,
+      baseAddress: false
+    });
+    setTouched({
+      addressName: false,
+      receiverName: false,
+      phoneNumber: false,
+      baseAddress: false
+    });
     e.currentTarget.reset();
-    setValidationErrors({});
 
-    if (onSuccess) onSuccess(); // 콜백 호출
+    onSuccess?.();
   };
 
-  //throttling 적용
+  //throttling
   const { throttleButtonClick: submitWithThrottling, isDelay } = useThrottle({
     fn: handleSubmit,
     delay: 2000
@@ -147,14 +188,11 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
 
   useEffect(() => {
     if (isDelay) {
-      toast({
-        description: '주소지 저장 중입니다'
-      });
+      toast({ description: '주소지 저장 중입니다' });
     }
   }, [isDelay]);
 
   const ERROR_MESSAGE_STYLE = 'text-red-500 text-sm mt-1 ml-1';
-
   const inputBaseClass =
     'w-full p-3 rounded-[8px] focus:outline-none focus:ring-1 focus:ring-gray-400';
   const labelClass = 'text-base font-medium text-[#1F1E1E]';
@@ -177,14 +215,16 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
               placeholder="최대 10자 이내로 작성해 주세요"
               className={clsx(
                 inputBaseClass,
-                validationErrors.addressName
+                touched.addressName && validationErrors.addressName
                   ? 'border border-red-700'
                   : 'border'
               )}
               onChange={handleInput}
+              onBlur={handleBlur}
+              defaultValue={form.addressName}
             />
           </div>
-          {validationErrors.addressName && (
+          {touched.addressName && validationErrors.addressName && (
             <p className={ERROR_MESSAGE_STYLE}>
               배송지명을 정확하게 입력해 주세요
             </p>
@@ -205,14 +245,16 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
               placeholder="최대 10자 이내로 작성해 주세요"
               className={clsx(
                 inputBaseClass,
-                validationErrors.receiverName
+                touched.receiverName && validationErrors.receiverName
                   ? 'border border-red-700'
                   : 'border'
               )}
               onChange={handleInput}
+              onBlur={handleBlur}
+              defaultValue={form.receiverName}
             />
           </div>
-          {validationErrors.receiverName && (
+          {touched.receiverName && validationErrors.receiverName && (
             <p className={ERROR_MESSAGE_STYLE}>
               수령인 이름을 정확하게 입력해 주세요
             </p>
@@ -228,19 +270,19 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
             <input
               value={formattedPhoneNumber}
               onChange={handlePhoneNumberChange}
-              onInput={handleInput}
+              onBlur={handleBlur}
               name="phoneNumber"
               type="text"
               placeholder="010-0000-0000"
               className={clsx(
                 inputBaseClass,
-                validationErrors.phoneNumber
+                touched.phoneNumber && validationErrors.phoneNumber
                   ? 'border border-red-700'
                   : 'border'
               )}
             />
           </div>
-          {validationErrors.phoneNumber && (
+          {touched.phoneNumber && validationErrors.phoneNumber && (
             <p className={ERROR_MESSAGE_STYLE}>
               ‘010’을 포함한 숫자만 입력해 주세요
             </p>
@@ -259,7 +301,12 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
               name="baseAddress"
               type="text"
               placeholder="주소 찾기로 입력해 주세요"
-              className={clsx('w-full p-3 border rounded-[8px] select-none')}
+              className={clsx(
+                'w-full p-3 border rounded-[8px] select-none',
+                touched.baseAddress && validationErrors.baseAddress
+                  ? 'border-red-700'
+                  : undefined
+              )}
               value={baseAddressWithZoneCode}
             />
             <button
@@ -273,11 +320,17 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
               주소 찾기
             </button>
           </div>
+          {touched.baseAddress && validationErrors.baseAddress && (
+            <p className={ERROR_MESSAGE_STYLE}>주소를 선택해 주세요</p>
+          )}
           <input
             name="detailAddress"
             type="text"
             placeholder="상세 주소를 입력해 주세요"
             className={clsx(inputBaseClass, 'border')}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, detailAddress: e.target.value }))
+            }
           />
         </div>
       </div>
@@ -314,9 +367,11 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
       >
         <button
           type="submit"
+          disabled={isDelay}
           className={clsx(
             'w-full py-3 rounded-[8px] text-center',
-            'bg-primary-20 text-white'
+            'bg-primary-20 text-white',
+            isDelay && 'opacity-60 cursor-not-allowed'
           )}
         >
           등록하기
