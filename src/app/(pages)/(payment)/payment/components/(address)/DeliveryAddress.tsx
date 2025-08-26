@@ -100,7 +100,7 @@ export default function DeliveryAddress({
             )}
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            {shippingRequest || '직접 입력하기'}
+            {'직접 입력하기'}
             {isDropdownOpen ? <UpButton /> : <DownButton />}
           </button>
         </DropdownMenuTrigger>
