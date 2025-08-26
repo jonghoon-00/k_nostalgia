@@ -3,7 +3,7 @@
 import { toast } from '@/components/ui/use-toast';
 import supabase from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 
 import requestPayment from '@/app/api/payment/requestPayment';
@@ -41,13 +41,12 @@ const OrderSummary = () => {
       useShallow((s) => ({
         products: s.products,
         orderName: s.orderName,
-        totalAmount: s.totalAmount,
+        totalAmount: s.totalAmount + DELIVERY_FEE,
         payMethod: s.payMethod,
         getTotalQuantity: s.getTotalQuantity
       }))
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const totalQuantity = useMemo(() => getTotalQuantity(), [products]);
 
   // 쿠폰 할인 금액
   const discountAmount = useCouponDiscount();
@@ -85,6 +84,7 @@ const OrderSummary = () => {
         products,
         orderName
       });
+      console.log(response);
 
       // response.code가 있는 경우 결제 실패
       if (response?.code) {
@@ -102,6 +102,10 @@ const OrderSummary = () => {
           .eq('id', user.id);
       }
 
+      // === 결제 플로우 종료: 가드 해제(히스토리 더미 1개 제거) ===
+      releaseBackGuard();
+      console.log('release backguard');
+
       if (!response?.code) {
         router.push(`/check-payment?paymentId=${response?.paymentId}`);
       }
@@ -111,9 +115,6 @@ const OrderSummary = () => {
         variant: 'destructive',
         description: '결제 처리 중 오류가 발생했습니다.'
       });
-    } finally {
-      // === 결제 플로우 종료: 가드 해제(히스토리 더미 1개 제거) ===
-      releaseBackGuard();
     }
   };
 
