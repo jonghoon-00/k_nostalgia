@@ -17,10 +17,12 @@ interface PayRequestParameters {
   products: Products,
 }
 
-const PRODUCTION_URL = 'https://k-nostalgia.vercel.app/'
-const DEV_URL = process.env.NEXT_PUBLIC_DOMAIN;
+const PRODUCTION_URL = 'https://k-nostalgia.vercel.app';
+const DEV_URL = 'http://localhost:3000';
 
 //결제 요청 함수
+//TODO 카카오 페이 결제에 products, customer 정보 추가 필요
+// docs 우선 확인 
 export default async function requestPayment({
   payMethod,
   user,
@@ -44,8 +46,10 @@ export default async function requestPayment({
 
   if (payMethod === 'toss') {
     response = await requestTossPayment(
+      user,
       orderName,
       totalAmount,
+      products
     );
   }
   if (payMethod === 'kakao') {
@@ -116,8 +120,10 @@ async function requestInicisPayment(
 }
 
 async function requestTossPayment(
+  user: Tables<'users'>,
   orderName: string,
   totalAmount: number,
+  products: Products,
 ) {
   const response = await PortOne.requestPayment({
     storeId: process.env.NEXT_PUBLIC_STORE_ID as string,
@@ -134,6 +140,17 @@ async function requestTossPayment(
       process.env.NODE_ENV === 'production'
       ? `${PRODUCTION_URL}/check-payment`
       : `${DEV_URL}/check-payment`,
+    windowType: {
+      pc: 'POPUP',
+      mobile: 'REDIRECTION'
+    },
+    products: products,
+    customer: {
+      customerId: user.id,
+      email: user.email as string,
+      phoneNumber: '01000000000',
+      fullName: user.name as string
+    },
   });
   return response;
 }

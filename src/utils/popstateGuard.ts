@@ -1,4 +1,3 @@
-// popstate-guard.ts
 type Options = {
   onBack?: () => void;
 };
