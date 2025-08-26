@@ -1,12 +1,12 @@
 import { queryKeys } from '@/constants/keys';
 
-import { PayHistory } from '@/types/payHistory';
+import { PortOnePayment } from '@/types/portone';
 import { Tables } from '@/types/supabase';
 
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 
-async function fetchPayHistoryItem(paymentId: string, signal?: AbortSignal): Promise<PayHistory> {
+async function fetchPayHistoryItem(paymentId: string, signal?: AbortSignal): Promise<PortOnePayment> {
   const res = await fetch(`/api/payment/transaction?paymentId=${paymentId}`, { signal });
   if (!res.ok) throw new Error('Failed to fetch payment history');
   return res.json();
@@ -24,17 +24,18 @@ async function fetchPayHistoryPage(
 
 // 주문 내역 단건 조회
 export const useGetPayHistory = ({ paymentId }: { paymentId: string }) => {
-  const { data: payHistory, isPending: payHistoryIsPending } = useQuery<
-    PayHistory,
+  const { data: payment, isPending: paymentIsPending } = useQuery<
+    PortOnePayment,
     Error,
-    PayHistory
+    PortOnePayment
   >({
     queryKey: queryKeys.payHistory(paymentId),
     enabled: !!paymentId,
-    queryFn: ({signal}) => fetchPayHistoryItem(paymentId,signal),
-    staleTime: 1000 * 60 * 1000, // 10분 
+    queryFn: ({ signal }) => fetchPayHistoryItem(paymentId, signal),
+    staleTime: 1000 * 60 * 10 // 10분
   });
-  return { payHistory, payHistoryIsPending };
+
+  return { payment, paymentIsPending };
 };
 
 type OrderedList = Tables<'ordered_list'>
