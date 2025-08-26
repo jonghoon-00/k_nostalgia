@@ -1,8 +1,9 @@
 'use client';
 
 import Loading from '@/components/common/Loading';
+import { toast } from '@/components/ui/use-toast';
 import { productImgObject } from '@/hooks/payment/getProductImage';
-import { useGetPaymentHistory } from '@/hooks/payment/useGetPaymentHistory';
+import { useGetPayHistory } from '@/hooks/payment/useGetPaymentHistory';
 import { useCouponStore } from '@/zustand/coupon/useCouponStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 import clsx from 'clsx';
@@ -11,9 +12,22 @@ import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
+const formatKR = (num: number) => num.toLocaleString('ko-KR');
+
 const CompletePaymentContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  //paymentId 없을 경우
+  const paymentId = searchParams.get('paymentId');
+  useEffect(() => {
+    if (!paymentId) {
+      toast({
+        description: '일시적인 오류로 인해 내역 페이지로 이동합니다.'
+      });
+      router.push('/pay-history');
+    }
+  }, [paymentId, router]);
 
   //store reset
   const resetState = usePaymentRequestStore((state) => state.resetState);
@@ -26,22 +40,18 @@ const CompletePaymentContent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const paymentId = searchParams.get('paymentId');
   const products = usePaymentRequestStore((state) => state.products);
 
-  const { payHistory, payHistoryIsPending } = useGetPaymentHistory({
-    paymentId
+  const { payment, paymentIsPending } = useGetPayHistory({
+    paymentId: paymentId || ''
   });
 
-  if (payHistoryIsPending || !payHistory) {
+  if (paymentIsPending || !payment || !paymentId) {
     return <Loading />;
   }
-  const { paidAt, amount } = payHistory;
 
-  const price = products?.reduce(
-    (acc: number, item: any) => acc + item.amount,
-    0
-  );
+  const paidAt = payment.paidAt ?? new Date().toISOString();
+  const total = Number(payment.amount?.total ?? 0);
 
   const PAYMENT_COMPLETE_IMAGE =
     'https://kejbzqdwablccrontqrb.supabase.co/storage/v1/object/public/images/Tiger_congrats.png';
@@ -145,9 +155,7 @@ const CompletePaymentContent = () => {
             <div className="px-[16px] flex flex-col gap-[8px]">
               <div className="flex justify-between">
                 <p className="font-normal">총 상품금액</p>
-                <p className="font-semibold">
-                  {price?.toLocaleString('ko-KR')}
-                </p>
+                <p className="font-semibold">{total.toLocaleString('ko-KR')}</p>
               </div>
               <div className="flex justify-between">
                 <p className="font-normal">배송비</p>
@@ -167,7 +175,7 @@ const CompletePaymentContent = () => {
             >
               <p className="font-semibold text-[18px]">총 결제 금액</p>
               <p className="font-semibold text-[20px] md:text-primary-20">
-                {amount.total.toLocaleString('ko-KR')}원
+                {total.toLocaleString('ko-KR')}원
               </p>
             </div>
           </div>
