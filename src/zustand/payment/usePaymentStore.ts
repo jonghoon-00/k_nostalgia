@@ -38,7 +38,7 @@ const initialState : State = {
   orderName: '',
   totalAmount: 0,
   products:[],
-  payMethod: 'toss',
+  payMethod: 'kakao',
   isCouponApplied: false,
 }
 
