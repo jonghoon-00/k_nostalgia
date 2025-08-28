@@ -1,10 +1,8 @@
 'use client';
 
 import { toast } from '@/components/ui/use-toast';
+import { Products } from '@/types/portone';
 import { Tables } from '@/types/supabase';
-import {
-  Products
-} from '@/zustand/payment/usePaymentStore';
 import * as PortOne from '@portone/browser-sdk/v2';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,9 +18,6 @@ interface PayRequestParameters {
 const PRODUCTION_URL = 'https://k-nostalgia.vercel.app';
 const DEV_URL = 'http://localhost:3000';
 
-//결제 요청 함수
-//TODO 카카오 페이 결제에 products, customer 정보 추가 필요
-// docs 우선 확인 
 export default async function requestPayment({
   payMethod,
   user,

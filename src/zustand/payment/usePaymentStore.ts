@@ -1,13 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-export type Product = {
-  id: string;
-  name: string;
-  amount: number;
-  quantity: number;
-}
-export type Products = Product[];
+import { Products } from '@/types/portone';
 
 type PayMethod = 'toss' | 'kakao' | 'normal';
 // 런타임 가드 (RadioGroup이 string을 줄 때 안전하게 좁히기)
