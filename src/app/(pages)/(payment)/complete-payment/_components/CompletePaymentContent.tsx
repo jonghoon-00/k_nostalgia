@@ -155,7 +155,7 @@ const CompletePaymentContent = () => {
             <div className="px-[16px] flex flex-col gap-[8px]">
               <div className="flex justify-between">
                 <p className="font-normal">총 상품금액</p>
-                <p className="font-semibold">{total.toLocaleString('ko-KR')}</p>
+                <p className="font-semibold">{formatKR(total)}</p>
               </div>
               <div className="flex justify-between">
                 <p className="font-normal">배송비</p>
@@ -175,7 +175,7 @@ const CompletePaymentContent = () => {
             >
               <p className="font-semibold text-[18px]">총 결제 금액</p>
               <p className="font-semibold text-[20px] md:text-primary-20">
-                {total.toLocaleString('ko-KR')}원
+                {formatKR(total)}원
               </p>
             </div>
           </div>
