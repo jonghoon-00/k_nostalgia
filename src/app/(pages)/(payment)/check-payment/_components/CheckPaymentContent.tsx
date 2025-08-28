@@ -12,9 +12,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { toast } from '@/components/ui/use-toast';
 import { useUser } from '@/hooks/useUser';
+import { Customer, PortOnePaymentBase, Products } from '@/types/portone';
 import { BeatLoader } from 'react-spinners';
 
-async function getPayHistory({ paymentId }: { paymentId: string }) {
+async function getPayHistory({
+  paymentId
+}: {
+  paymentId: string;
+}): Promise<PortOnePaymentBase> {
   const getPayHistory = await fetch(
     `/api/payment/transaction?paymentId=${paymentId}`
   );
@@ -33,6 +38,8 @@ async function cancelPayment({ paymentId }: { paymentId: string }) {
 const CheckPaymentContent = () => {
   const router = useRouter();
   const { data: user } = useUser();
+  if (!user) throw new Error('User not found');
+
   const [isPaymentHistoryLoaded, setIsPaymentHistoryLoaded] =
     useState<boolean>(false);
 
@@ -40,6 +47,7 @@ const CheckPaymentContent = () => {
   const paymentId = searchParams.get('paymentId');
   const code = searchParams.get('code');
 
+  const globalProducts = usePaymentRequestStore((state) => state.products);
   const isCouponApplied = usePaymentRequestStore(
     (state) => state.isCouponApplied
   );
@@ -60,6 +68,9 @@ const CheckPaymentContent = () => {
 
       if (paymentId) {
         const postPaymentHistory = async () => {
+          let orderProducts: Products;
+          let orderCustomer: Customer;
+
           //결제 내역 조회
           const payHistory = await getPayHistory({ paymentId });
           const {
@@ -71,6 +82,16 @@ const CheckPaymentContent = () => {
             customer,
             products
           } = payHistory;
+
+          orderProducts = products ? products : globalProducts;
+          orderCustomer = customer
+            ? customer
+            : {
+                id: user.id,
+                name: user.name!,
+                email: user.email,
+                phoneNumber: '01000000000'
+              };
 
           const newPaidAt = dayjs(paidAt) //결제 일시 형식 변경(dayjs)
             .locale('ko')
@@ -99,16 +120,16 @@ const CheckPaymentContent = () => {
                 status,
                 order_name: orderName,
                 amount: totalQuantity,
-                price: amount.total,
+                price: amount?.total,
                 user_id: user?.id,
-                user_name: customer.name,
+                user_name: orderCustomer.name,
                 payment_id: paymentId,
-                pay_provider: method.provider
+                pay_provider: method?.provider
                   ? method.provider
-                  : method.card.name,
-                phone_number: customer.phoneNumber,
+                  : method?.card?.name,
+                phone_number: orderCustomer.phoneNumber,
                 products,
-                user_email: customer.email,
+                user_email: orderCustomer.email,
                 is_CouponApplied: isCouponApplied
               })
             });
