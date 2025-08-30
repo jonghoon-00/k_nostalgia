@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { toast } from '@/components/ui/use-toast';
 import { useUser } from '@/hooks/useUser';
-import { Customer, PortOnePaymentBase, Products } from '@/types/portone';
+import { PortOnePaymentBase } from '@/types/portone';
 import { BeatLoader } from 'react-spinners';
 
 async function getPayHistory({
@@ -66,104 +66,94 @@ const CheckPaymentContent = () => {
         return router.replace(`/cart`);
       }
 
-      if (paymentId) {
-        const postPaymentHistory = async () => {
-          let orderProducts: Products;
-          let orderCustomer: Customer;
+      if (!paymentId || !user) return;
 
-          //결제 내역 조회
-          const payHistory = await getPayHistory({ paymentId });
-          const {
-            paidAt,
-            status,
-            orderName,
-            amount,
-            method,
-            customer,
-            products
-          } = payHistory;
+      const postPaymentHistory = async () => {
+        //결제 내역 조회
+        const payHistory = await getPayHistory({ paymentId });
+        const { paidAt, status, orderName, amount, method, customer } =
+          payHistory;
 
-          orderProducts = products ? products : globalProducts;
-          orderCustomer = customer
-            ? customer
-            : {
-                id: user.id,
-                name: user.name!,
-                email: user.email,
-                phoneNumber: '01000000000'
-              };
+        const newPaidAt = dayjs(paidAt) //결제 일시 형식 변경(dayjs)
+          .locale('ko')
+          .format('YYYY-MM-DD HH:mm');
 
-          const newPaidAt = dayjs(paidAt) //결제 일시 형식 변경(dayjs)
-            .locale('ko')
-            .format('YYYY-MM-DD HH:MM');
+        //status === 'PAID' : 결제 성공
+        if (status === 'PAID') {
+          setIsPaymentHistoryLoaded(true);
+          toast({
+            variant: 'destructive',
+            description: '결제 완료되었습니다'
+          });
+        }
 
-          //status === 'PAID' : 결제 성공
-          if (status === 'PAID') {
-            setIsPaymentHistoryLoaded(true);
+        //결제 내역 supabase 저장
+        //내역 저장에 실패 -> 결제 취소(환불)후 이전 페이지로 REDIRECT
+        try {
+          await fetch('/api/payment/pay-supabase', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              id: uuidv4(),
+              payment_date: newPaidAt,
+              status,
+              order_name: orderName,
+              amount: totalQuantity,
+              price: amount?.total,
+              user_id: user?.id,
+              user_name: customer?.name ? customer.name : user.name,
+              payment_id: paymentId,
+              pay_provider: method?.provider
+                ? method.provider
+                : method?.card?.name,
+              phone_number: customer?.phoneNumber
+                ? customer.phoneNumber
+                : '01000000000',
+              products: globalProducts,
+              user_email: customer?.email ? customer.email : user.email,
+              is_CouponApplied: isCouponApplied
+            })
+          });
+        } catch (error) {
+          console.error('failed_update pay history,', error);
+
+          //db 저장 실패시 결제 취소
+          await cancelPayment({ paymentId });
+          toast({
+            description: '결제 건 처리 과정에서 문제가 발생했습니다'
+          });
+          setTimeout(() => {
             toast({
-              variant: 'destructive',
-              description: '결제 완료되었습니다'
+              description: '결제 취소되었습니다, 잠시 후 다시 시도해주세요'
             });
-          }
+          }, 1500);
 
-          //결제 내역 supabase 저장
-          //내역 저장에 실패 -> 결제 취소(환불)후 이전 페이지로 REDIRECT
-          try {
-            await fetch('/api/payment/pay-supabase', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                id: uuidv4(),
-                payment_date: newPaidAt,
-                status,
-                order_name: orderName,
-                amount: totalQuantity,
-                price: amount?.total,
-                user_id: user?.id,
-                user_name: orderCustomer.name,
-                payment_id: paymentId,
-                pay_provider: method?.provider
-                  ? method.provider
-                  : method?.card?.name,
-                phone_number: orderCustomer.phoneNumber,
-                products,
-                user_email: orderCustomer.email,
-                is_CouponApplied: isCouponApplied
-              })
-            });
-          } catch (error) {
-            console.error('failed_update pay history,', error);
+          return router.replace(`/cart`);
+        }
 
-            //db 저장 실패시 결제 취소
-            await cancelPayment({ paymentId });
-            toast({
-              description: '결제 건 처리 과정에서 문제가 발생했습니다'
-            });
-            setTimeout(() => {
-              toast({
-                description: '결제 취소되었습니다, 잠시 후 다시 시도해주세요'
-              });
-            }, 1500);
-
-            return router.replace(`/cart`);
-          }
-
-          //쿠폰이 추가될 경우 수정 필요
-          if (isCouponApplied) {
-            await supabase
-              .from('users')
-              .update({ coupons: null })
-              .eq('id', user?.id as string);
-          }
-          router.replace(`complete-payment?paymentId=${paymentId}`);
-        };
-        postPaymentHistory();
-      }
+        //쿠폰이 추가될 경우 수정 필요
+        if (isCouponApplied) {
+          await supabase
+            .from('users')
+            .update({ coupons: null })
+            .eq('id', user?.id as string);
+        }
+        router.replace(`complete-payment?paymentId=${paymentId}`);
+      };
+      postPaymentHistory();
     };
     syncPaymentHistory();
-  }, [code, paymentId, router, totalQuantity, isCouponApplied]);
+  }, [
+    code,
+    paymentId,
+    router,
+    totalQuantity,
+    isCouponApplied,
+    user,
+    globalProducts
+  ]);
 
   return (
     <div className="bg-normal">

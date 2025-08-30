@@ -36,14 +36,13 @@ const OrderSummary = () => {
     (s) => s.shouldStoreDeliveryRequest
   );
 
-  const { products, orderName, totalAmount, payMethod, getTotalQuantity } =
+  const { products, orderName, totalAmount, payMethod } =
     usePaymentRequestStore(
       useShallow((s) => ({
         products: s.products,
         orderName: s.orderName,
         totalAmount: s.totalAmount + DELIVERY_FEE,
-        payMethod: s.payMethod,
-        getTotalQuantity: s.getTotalQuantity
+        payMethod: s.payMethod
       }))
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps

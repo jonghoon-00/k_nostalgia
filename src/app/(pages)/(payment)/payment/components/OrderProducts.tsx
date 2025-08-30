@@ -21,7 +21,6 @@ const formatCurrency = (number: number) =>
 const OrderProducts = () => {
   const router = useRouter();
   const products = usePaymentRequestStore((state) => state.products);
-  const resetState = usePaymentRequestStore((state) => state.resetState);
 
   const handleRef = useRef(false);
 
@@ -46,7 +45,6 @@ const OrderProducts = () => {
         });
       }, 2000);
 
-      resetState();
       usePaymentRequestStore.persist.clearStorage();
       router.replace('/cart');
     }
@@ -57,7 +55,7 @@ const OrderProducts = () => {
         }
       }
     };
-  }, [products, resetState, router]);
+  }, [products, router]);
 
   const arrivalDateText = useMemo(
     () => `${dayjs().add(1, 'day').format('MM/DD(ddd)')} 도착`,
