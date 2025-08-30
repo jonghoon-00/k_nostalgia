@@ -1,16 +1,15 @@
 'use client';
-import React from 'react';
-import { GoHeart, GoHeartFill } from 'react-icons/go';
-import { BsChevronRight } from 'react-icons/bs';
-import Image from 'next/image';
-import { useQuery } from '@tanstack/react-query';
+import NoList from '@/components/common/NoList';
 import { useUser } from '@/hooks/useUser';
-import { Swiper, SwiperSlide } from 'swiper/react';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { BsChevronRight } from 'react-icons/bs';
+import { GoHeart } from 'react-icons/go';
+import { LuDot } from 'react-icons/lu';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { useRouter } from 'next/navigation';
-import { LuDot } from 'react-icons/lu';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import { LikeButton } from '../../(home)/_components/LikeButton';
 import MarketImage from '../../market/_components/MarketImage';
 
@@ -250,16 +249,7 @@ const LikeMarket = () => {
           </div>
         </>
       ) : (
-        <div className="text-center text-label-assistive flex flex-col items-center justify-center">
-          <Image
-            src="/image/StateSad.png"
-            alt="관심전통시장 없을때"
-            width={114}
-            height={97}
-            className="w-[114px] h-[97px] mb-4"
-          />
-          관심 전통시장이 없습니다.{' '}
-        </div>
+        <NoList message={'관심 전통 시장이 없어요'} />
       )}
     </div>
   );
