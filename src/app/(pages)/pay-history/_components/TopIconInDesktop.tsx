@@ -1,5 +1,6 @@
 //desktop 사이즈의 마이페이지에 들어가는 최상단 이미지 (주문 내역 페이지에서는 사용하지 않음)
 
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { BsChevronRight } from 'react-icons/bs';
 
@@ -12,15 +13,20 @@ const TopIconInDesktop = () => {
         pathName === '/my-page' && 'border-none'
       }`}
     >
-      <img src="/image/pay_history_tiger.png" alt="복숭아를 든 호랑이 이미지" />
+      <Image
+        src="/image/pay_history_tiger.png"
+        alt="주문 내역 상단 안내 이미지"
+        width={140}
+        height={88}
+      />
       <div
         className={`flex items-center text-[14px] gap-1 ${
-          pathName === '/payment' && 'hidden'
+          pathName === '/pay-history' && 'hidden'
         }`}
       >
         <span
           className="underline cursor-pointer"
-          onClick={() => route.push('payment')}
+          onClick={() => route.push('/pay-history')}
         >
           더보기
         </span>
