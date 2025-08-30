@@ -10,6 +10,7 @@ import clsx from 'clsx';
 import dayjs from 'dayjs';
 import { v4 as uuidv4 } from 'uuid';
 
+import Loading from '@/components/common/Loading';
 import { toast } from '@/components/ui/use-toast';
 import { useUser } from '@/hooks/useUser';
 import { PortOnePaymentBase } from '@/types/portone';
@@ -37,8 +38,7 @@ async function cancelPayment({ paymentId }: { paymentId: string }) {
 
 const CheckPaymentContent = () => {
   const router = useRouter();
-  const { data: user } = useUser();
-  if (!user) throw new Error('User not found');
+  const { data: user, isPending } = useUser();
 
   const [isPaymentHistoryLoaded, setIsPaymentHistoryLoaded] =
     useState<boolean>(false);
@@ -155,6 +155,8 @@ const CheckPaymentContent = () => {
     globalProducts
   ]);
 
+  if (isPending) return <Loading />;
+  if (!user) throw new Error('User not found');
   return (
     <div className="bg-normal">
       <main
