@@ -146,6 +146,11 @@ async function requestTossPayment(
       phoneNumber: '01000000000',
       fullName: user.name as string
     },
+    noticeUrls: [
+      //webhook url
+      `${PRODUCTION_URL}/api/payment/webhook`, //실 배포 url
+      'https://7ac2-121-163-241-29.ngrok-free.app/api/payment/webhook' //테스트용 ngrok 서버
+    ],
   });
   return response;
 }
@@ -168,9 +173,14 @@ async function requestKakaoPayment(
       }
     },
     redirectUrl:
-    process.env.NODE_ENV === 'production'
-    ? `${PRODUCTION_URL}/check-payment`
-    : `${DEV_URL}/check-payment`,
+      process.env.NODE_ENV === 'production'
+      ? `${PRODUCTION_URL}/check-payment`
+      : `${DEV_URL}/check-payment`,
+    noticeUrls: [
+      //webhook url
+      `${PRODUCTION_URL}/api/payment/webhook`, //실 배포 url
+      'https://7ac2-121-163-241-29.ngrok-free.app/api/payment/webhook' //테스트용 ngrok 서버
+    ],
   });
   return response;
 }
