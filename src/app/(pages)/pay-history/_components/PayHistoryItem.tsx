@@ -23,6 +23,7 @@ import {
   RenderPayHistoryList
 } from '@/types/payHistory';
 //components
+import { Tables } from '@/types/supabase';
 import ReviewProductDetail from './ReviewProductDetail';
 
 dayjs.locale('ko');
@@ -38,7 +39,7 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
   const userId = nowUser?.id;
 
   const deletePayHistory = useDeletePayHistory(userId!);
-  const cancelPaymentMutation = usePaymentCancellation(userId);
+  const cancelPaymentMutation = usePaymentCancellation();
 
   const currency = useMemo(
     () => new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 }),
@@ -117,14 +118,17 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
     }
 
     const { status: _omit, ...rest } = order;
-    const newHistory: PartialOrder = {
-      ...rest,
+    const newHistory: Partial<Tables<'ordered_list'>> = {
       payment_id,
       status: 'CANCELLED'
     };
 
     try {
-      cancelPaymentMutation.mutate({ payment_id, patch: newHistory });
+      cancelPaymentMutation.mutate({
+        payment_id,
+        user_id: userId,
+        patch: newHistory
+      });
     } catch (err) {
       console.error('주문 취소 중 오류 발생:', err);
       toast({
