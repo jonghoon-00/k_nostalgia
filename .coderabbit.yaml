@@ -11,6 +11,7 @@ reviews:
   collapse_walkthrough: false
   auto_review:
     enabled: true
-    drafts: false
+    drafts: true
 chat:
   auto_reply: true
+review_status: true

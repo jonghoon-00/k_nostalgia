@@ -1,14 +1,12 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import React from 'react';
-import { BsChevronRight } from 'react-icons/bs';
-import { BsListUl } from 'react-icons/bs';
+import { BsChevronRight, BsListUl } from 'react-icons/bs';
 
 const OrderList_mypage = () => {
   const route = useRouter();
 
   const gotoOrderlist = () => {
-    route.push('/payment');
+    route.push('/pay-history');
   };
   return (
     <div className="p-4">

@@ -1,28 +1,26 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-export type Product = {
-  id: string;
-  name: string;
-  amount: number;
-  quantity: number;
-}
-export type Products = Product[];
+import { Products } from '@/types/portone';
 
-type payMethod = 'toss' | 'kakao' | 'normal';
+type PayMethod = 'toss' | 'kakao' | 'normal';
+// 런타임 가드 (RadioGroup이 string을 줄 때 안전하게 좁히기)
+export function isPayMethod(v: string): v is PayMethod {
+  return v === 'toss' || v === 'kakao' || v === 'normal';
+}
 
 type State = {
   orderName: string;
   totalAmount: number;
   products: Products;
-  payMethod: payMethod;
+  payMethod: PayMethod;
   isCouponApplied: boolean;
 }
 type Actions = {
   setOrderName: (orderName: string) => void;
   setTotalAmount: (amount: number) => void;
   setProducts: (products: Products) => void;
-  setPayMethod: (method: payMethod) => void;
+  setPayMethod: (method: PayMethod) => void;
   setIsCouponApplied: (isApplied: boolean) => void;
 
   getTotalQuantity: () => number;
@@ -34,7 +32,7 @@ const initialState : State = {
   orderName: '',
   totalAmount: 0,
   products:[],
-  payMethod: 'toss',
+  payMethod: 'kakao',
   isCouponApplied: false,
 }
 

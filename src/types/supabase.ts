@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -280,7 +280,7 @@ export type Database = {
         }
         Relationships: []
       }
-      orderd_list: {
+      ordered_list: {
         Row: {
           amount: number | null
           created_at: string | null
@@ -295,7 +295,6 @@ export type Database = {
           products: Json | null
           shipping_request: string | null
           status: string | null
-          used_coupon_code: string[] | null
           user_email: string | null
           user_id: string | null
           user_name: string | null
@@ -314,7 +313,6 @@ export type Database = {
           products?: Json | null
           shipping_request?: string | null
           status?: string | null
-          used_coupon_code?: string[] | null
           user_email?: string | null
           user_id?: string | null
           user_name?: string | null
@@ -333,7 +331,6 @@ export type Database = {
           products?: Json | null
           shipping_request?: string | null
           status?: string | null
-          used_coupon_code?: string[] | null
           user_email?: string | null
           user_id?: string | null
           user_name?: string | null
@@ -506,7 +503,7 @@ export type Database = {
     }
     Functions: {
       get_random_markets: {
-        Args: { region: string; lim: number }
+        Args: { lim: number; region: string }
         Returns: {
           id: number
           고객휴게실_보유여부: string | null

@@ -17,7 +17,6 @@ const NoList: React.FC<Props> = ({ message }) => {
     <figure
       className={clsx(
         'w-full',
-        // 부모 높이가 있을 땐 100%, 없으면 뷰포트 전체 높이
         'h-[min(100vh,100%)]',
         'flex flex-col justify-center items-center gap-4'
       )}

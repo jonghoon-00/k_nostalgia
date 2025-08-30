@@ -60,8 +60,6 @@ const Navigation = () => {
           }`}
           onClick={() => handleNavigationClick(item.path)}
         >
-          {/* /my-page/setting 같은 path name이 생길 때, 아이콘 활성화가 안 되어서 */}
-          {/* 코드 수정했습니다 - 종훈 */}
           {pathname.includes(item.path) ? (
             <item.activeIcon fill="#9C6D2E" />
           ) : (

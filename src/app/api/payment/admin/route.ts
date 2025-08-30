@@ -1,5 +1,4 @@
 //admin 페이지 - 전체 유저의 전체 주문 내역 리스트 (미환불 건 팀원들 확인용)
-//update : 24.7.31
 
 import supabase from "@/utils/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
@@ -7,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const GET = async (request: NextRequest) => {
   try {
     const response = await supabase
-      .from('orderd_list')
+      .from('ordered_list')
       .select('*')
       .order('created_at', { ascending: false })
       .eq('status','PAID')

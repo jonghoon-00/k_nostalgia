@@ -1,3 +1,4 @@
+import { COUPON_CODE } from '@/constants/coupon';
 import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -38,10 +39,9 @@ export async function POST(request: NextRequest) {
   }
 
   // user 테이블에 추가
-  // WELCOME01 : 회원가입 쿠폰 code
   const { error: insertError } = await supabase
     .from('users')
-    .insert({ id: userId, email, nickname, name, avatar: defaultimage.publicUrl, coupons: ['WELCOME01']});
+    .insert({ id: userId, email, nickname, name, avatar: defaultimage.publicUrl, coupons: [COUPON_CODE.signUp]});
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 400 });

@@ -1,6 +1,7 @@
 'use client';
 import { getCouponList } from '@/app/api/coupon/getCouponForClient';
 import Loading from '@/components/common/Loading';
+import NoList from '@/components/common/NoList';
 import useDeviceSize from '@/hooks/useDeviceSize';
 import { useUser } from '@/hooks/useUser';
 import { Tables } from '@/types/supabase';
@@ -70,13 +71,13 @@ const Mypage = () => {
               alt="관심전통시장 "
               width={141}
               height={88}
-              className="w-[163px] h-[88px] mt-10"
+              className="mt-10"
             />
             <div
-              className="items-center flex p-3 gap-2 cursor-pointer"
+              className="items-center flex p-3 gap-1 cursor-pointer"
               onClick={handleGoMarket}
             >
-              <span className="underline"> 더보기 </span>
+              <span className="underline text-sm"> 더보기 </span>
               <BsChevronRight className=" w-4 h-4 text-[#545454] cursor-pointer" />
             </div>
           </div>
@@ -90,25 +91,29 @@ const Mypage = () => {
                 alt="마이페이지 쿠폰호랑이 "
                 width={141}
                 height={88}
-                className="w-[140px] h-[88px] mt-10"
+                className="mt-10"
               />
               <div
-                className="items-center flex p-3 gap-2 cursor-pointer"
+                className="flex items-center p-3 gap-1 cursor-pointer"
                 onClick={handleGoCoupon}
               >
-                <span className="underline"> 더보기 </span>
+                <span className="underline text-sm"> 더보기 </span>
                 <BsChevronRight className=" w-4 h-4 text-[#545454] cursor-pointer" />
               </div>
             </div>
 
             {/* 쿠폰 */}
             <div className={clsx('p-4')}>
-              {couponList.map((coupon) => (
-                <CouponItem
-                  imageUrl={coupon.image_url as string}
-                  key={coupon.image_url}
-                />
-              ))}
+              {couponList.length === 0 ? (
+                <NoList message={'사용 가능 쿠폰이 없어요'} />
+              ) : (
+                couponList.map((coupon) => (
+                  <CouponItem
+                    imageUrl={coupon.image_url as string}
+                    key={coupon.image_url}
+                  />
+                ))
+              )}
             </div>
 
             <div className="border-4  border-[#F2F2F2] mt-10" />

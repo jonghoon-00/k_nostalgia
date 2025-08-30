@@ -5,9 +5,9 @@ import FirstLoading from '@/components/common/FirstLoading';
 import Footer from '@/components/common/Footer';
 import AppHeader from '@/components/common/header/AppHeader';
 import WebHeader from '@/components/common/header/WebHeader';
+import Navigation from '@/components/common/Navigation';
 import TopButton from '@/components/icons/TopButton';
 import Cookies from 'js-cookie';
-import { Navigation } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 

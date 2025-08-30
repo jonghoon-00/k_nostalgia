@@ -1,3 +1,4 @@
+import { COUPON_CODE } from '@/constants/coupon'
 import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
           name: user.user_metadata.full_name,
           nickname: user.user_metadata.user_name || user.user_metadata.name, 
           avatar: user.user_metadata.avatar_url, 
-          coupons: ['WELCOME01']
+          coupons: [COUPON_CODE.signUp]
         })
         if (error) {
           console.error(error.message, '유저 정보 저장 실패');

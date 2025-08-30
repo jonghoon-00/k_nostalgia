@@ -1,6 +1,7 @@
 //webhook api(포트원)
 //해당 파일 위치가 webhook url 입니다
 
+import { COUPON_CODE } from "@/constants/coupon";
 import supabase from "@/utils/supabase/client";
 import { NextRequest } from "next/server";
 
@@ -21,9 +22,9 @@ export const POST = async (request: NextRequest) => {
 
     if(response.type === 'Transaction.Cancelled'){
       //결제때 사용한 쿠폰 코드 get
-      const {data : usedCouponCode , error : usedCouponCodeError} = await supabase
-      .from('orderd_list')
-      .select('used_coupon_code')
+      const {data : isCouponApplied , error : usedCouponCodeError} = await supabase
+      .from('ordered_list')
+      .select('is_CouponApplied')
       .eq('payment_id', paymentId)
       .single()
       
@@ -31,7 +32,7 @@ export const POST = async (request: NextRequest) => {
 
       //결제 status 업데이트
       const {data: newHistoryData, error : historyUpdateError} = await supabase
-      .from('orderd_list')
+      .from('ordered_list')
       .update({status:'CANCELLED'})
       .eq('payment_id',paymentId)
       .select()
@@ -40,10 +41,10 @@ export const POST = async (request: NextRequest) => {
       if(historyUpdateError) return console.error('Failed to update order status : ', historyUpdateError);
 
       //사용 회원가입 쿠폰 복구
-      if(newHistoryData){
+      if(newHistoryData && isCouponApplied){
         const {error : addCouponError} = await supabase
         .from('users')
-        .update({coupons: usedCouponCode?.used_coupon_code})
+        .update({coupons: [COUPON_CODE.signUp]})
         .eq('id', newHistoryData.user_id as string)
 
         if(addCouponError) return console.log('Failed to restore membership coupon :', addCouponError);
