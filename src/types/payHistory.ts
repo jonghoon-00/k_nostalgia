@@ -1,5 +1,3 @@
-// types/payHistory.ts (기존 파일)
-
 import { Tables } from "./supabase";
 
 // 앱 내부 상품 타입
@@ -30,3 +28,7 @@ export type PartialOrder = Partial<Tables<'ordered_list'>>;
 
 // 가독성 별칭
 export type Order = PayHistory;
+
+export type PayHistoryCache =
+  Omit<OrderedListRow, 'products'> & { products: Product[] | null };
+export type PayHistoryPatch = Partial<PayHistoryCache>;
