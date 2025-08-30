@@ -16,20 +16,16 @@ import 'dayjs/locale/ko';
 import { CgClose } from 'react-icons/cg';
 import Swal from 'sweetalert2';
 
-//types
-import {
-  PartialOrder,
-  PayHistory,
-  RenderPayHistoryList
-} from '@/types/payHistory';
-//components
-import { Tables } from '@/types/supabase';
+// types, components
+import { PayHistoryCache, Product } from '@/types/payHistory';
 import ReviewProductDetail from './ReviewProductDetail';
 
 dayjs.locale('ko');
 
+type RenderPayHistoryCacheList = Record<string, PayHistoryCache[]>;
+
 interface Props {
-  orderList: RenderPayHistoryList;
+  orderList: RenderPayHistoryCacheList;
   date: string;
 }
 
@@ -39,7 +35,7 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
   const userId = nowUser?.id;
 
   const deletePayHistory = useDeletePayHistory(userId!);
-  const cancelPaymentMutation = usePaymentCancellation();
+  const cancelPaymentMutation = usePaymentCancellation(userId!);
 
   const currency = useMemo(
     () => new Intl.NumberFormat('ko-KR', { maximumFractionDigits: 0 }),
@@ -74,14 +70,11 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
     });
 
     if (result.isConfirmed) {
-      // paymentId: string으로 내로잉
-      console.log(paymentId);
-      console.log(typeof paymentId);
       deletePayHistory.mutate(paymentId);
     }
   };
 
-  const confirmCancel = async (order: PartialOrder) => {
+  const confirmCancel = async (order: PayHistoryCache) => {
     if (!userId) {
       toast({ variant: 'destructive', description: '로그인 후 이용해주세요.' });
       return;
@@ -107,7 +100,6 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
 
     if (!result.isConfirmed) return;
 
-    // ----- 타입/런타임 가드 -----
     const { payment_id } = order;
     if (!payment_id) {
       toast({
@@ -117,8 +109,14 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
       return;
     }
 
-    const { status: _omit, ...rest } = order;
-    const newHistory: Partial<Tables<'ordered_list'>> = {
+    const uiPatch: Partial<PayHistoryCache> = {
+      status: 'CANCELLED'
+    };
+
+    // DB 반영 패치 — 서버 Row 기준
+    const dbPatch: Partial<Pick<PayHistoryCache, 'payment_id' | 'status'>> & {
+      payment_id: string;
+    } = {
       payment_id,
       status: 'CANCELLED'
     };
@@ -127,7 +125,8 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
       cancelPaymentMutation.mutate({
         payment_id,
         user_id: userId,
-        patch: newHistory
+        uiPatch,
+        dbPatch: dbPatch as any
       });
     } catch (err) {
       console.error('주문 취소 중 오류 발생:', err);
@@ -140,7 +139,7 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
 
   return (
     <div className="px-[16px] md:p-0">
-      {orderList[date].map((order: PayHistory) => {
+      {orderList[date].map((order) => {
         const isCancelled = order.status === 'CANCELLED';
         const arrivalText =
           order.status === 'PAID'
@@ -187,8 +186,8 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
               </div>
 
               {/* 상품 목록 */}
-              {order.products?.map((product, index) => {
-                const isLast = index === order.products!.length - 1;
+              {order.products?.map((product: Product, index: number) => {
+                const isLast = index === (order.products?.length ?? 0) - 1;
                 const imgSrc =
                   productImgObject[product.name] ?? '/images/placeholder.png';
 
@@ -242,7 +241,7 @@ const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
               >
                 <button
                   type="button"
-                  onClick={() => confirmCancel(order as PartialOrder)}
+                  onClick={() => confirmCancel(order)}
                   className={clsx(
                     'flex flex-1 h-[40px] items-center justify-center rounded-[10px]',
                     'py-[10px] px-[16px] border',
