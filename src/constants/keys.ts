@@ -6,4 +6,5 @@ export const queryKeys = {
 
 export const mutationKeys = {
   deletePayHistory: () => ['deletePayHistory'] as const,
+  cancelPayment: () => ['cancelPayment'] as const
 }
