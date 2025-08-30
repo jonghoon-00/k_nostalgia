@@ -23,7 +23,6 @@ import ReviewProductDetail from './ReviewProductDetail';
 dayjs.locale('ko');
 
 type RenderPayHistoryCacheList = Record<string, PayHistoryCache[]>;
-
 interface Props {
   orderList: RenderPayHistoryCacheList;
   date: string;
@@ -31,6 +30,7 @@ interface Props {
 
 const PayHistoryItem: React.FC<Props> = ({ orderList, date }) => {
   const router = useRouter();
+  // isPending 처리 상위 컴포넌트에서 되어있음
   const { data: nowUser } = useUser();
   const userId = nowUser?.id;
 

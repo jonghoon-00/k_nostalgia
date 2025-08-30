@@ -1,6 +1,12 @@
 // 사이트 URL 상수
 export const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 
+export const PAGE_PATH_NAME = {
+  payHistory: '/pay-history' as const,
+  myPage: 'my-page' as const,
+  
+}
+
 // 전역 모달 ID. Modal.tsx
 export const MODAL_IDS = {
   COUPON: 'coupon',

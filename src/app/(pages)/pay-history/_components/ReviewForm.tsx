@@ -1,8 +1,6 @@
 //리뷰 작성 폼 (모달)
 //feat : 리뷰 작성, 수정, 삭제
 
-//update : 24.10.30
-
 import {
   AlertDialog,
   AlertDialogAction,
