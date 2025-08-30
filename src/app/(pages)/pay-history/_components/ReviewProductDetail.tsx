@@ -1,8 +1,3 @@
-//작성 리뷰 확인 모달
-//작성 리뷰 존재 시 리뷰 수정 , 없을 시 리뷰 작성 버튼 활성화
-
-//update : 24.9.30
-
 import {
   Dialog,
   DialogContent,
@@ -11,28 +6,40 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog';
-import { productImgObject } from '@/hooks/payment/getProductImage';
-import { Order, Product } from '@/types/payHistory';
-import supabase from '@/utils/supabase/client';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
+
+import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
+
+import { productImgObject } from '@/hooks/payment/getProductImage';
+import supabase from '@/utils/supabase/client';
+// types, components
+import { PayHistoryCache, Product } from '@/types/payHistory';
 import { StarRating } from '../../local-food/[id]/_components/StarRating';
 import ReviewForm from './ReviewForm';
 
 interface Props {
-  order: Order;
+  order: PayHistoryCache;
 }
 
-const ReviewProductDetail = ({ order }: Props) => {
-  //selectedProduct : 리뷰 수정에 사용되는 state
-  //186번줄 이벤트 - selectedProduct가 존재할 경우 reviewForm으로 컴포넌트 전환
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+// 리뷰 렌더링에 사용하는 로컬 타입 (리뷰 유무/값 포함)
+type ProductWithReview = Product & {
+  hasReview: boolean;
+  payment_id: string;
+  // reviews 테이블의 일부 칼럼이 합쳐서 들어오므로 느슨하게 둠
+  [key: string]: any;
+};
 
-  //리뷰 렌더링에 사용되는 state
-  const [productsWithReviewStatus, setProductsWithReviewStatus] = useState<any>(
-    []
-  );
+const ReviewProductDetail = ({ order }: Props) => {
+  // selectedProduct : 리뷰 수정에 사용되는 state
+  // selectedProduct가 존재할 경우 ReviewForm으로 전환
+  const [selectedProduct, setSelectedProduct] =
+    useState<ProductWithReview | null>(null);
+
+  // 리뷰 렌더링에 사용되는 state
+  const [productsWithReviewStatus, setProductsWithReviewStatus] = useState<
+    ProductWithReview[]
+  >([]);
 
   const [reviewIsOpen, setReviewIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -41,35 +48,41 @@ const ReviewProductDetail = ({ order }: Props) => {
 
   useEffect(() => {
     const fetchReview = async () => {
-      if (order.products) {
-        const updatedProducts = await Promise.all(
-          order.products.map(async (product) => {
-            const { data, error } = await supabase
-              .from('reviews')
-              .select('*')
-              .eq('product_id', product.id)
-              .eq('user_id', user_id as string)
-              .eq('payment_id', payment_id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .maybeSingle();
-            if (error) {
-              console.error(error);
-            }
-            return {
-              ...product,
-              hasReview: !!data, //작성 리뷰 존재 여부를 위한 boolean 값
-              ...data,
-              payment_id: payment_id //해당 주문건의 리뷰만 불러오기 위해 필요
-            };
-          })
-        );
-        setProductsWithReviewStatus(updatedProducts);
+      if (!order.products || !user_id || !payment_id) {
+        setProductsWithReviewStatus([]);
+        return;
       }
+
+      const updatedProducts = await Promise.all(
+        order.products.map(async (product) => {
+          const { data, error } = await supabase
+            .from('reviews')
+            .select('*')
+            .eq('product_id', product.id)
+            .eq('user_id', user_id as string)
+            .eq('payment_id', payment_id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (error) {
+            console.error(error);
+          }
+
+          return {
+            ...product,
+            hasReview: !!data, // 작성 리뷰 존재 여부
+            ...data, // 최신 리뷰 값(있다면) 병합
+            payment_id // 해당 주문건 리뷰만 불러오기 위해 포함
+          } as ProductWithReview;
+        })
+      );
+
+      setProductsWithReviewStatus(updatedProducts);
     };
 
     fetchReview();
-  }, [order.products, user_id, isEditing]);
+  }, [order.products, user_id, payment_id, isEditing]);
 
   const handleOpenChange = async (open: boolean) => {
     if (!open && isEditing) {
@@ -115,11 +128,9 @@ const ReviewProductDetail = ({ order }: Props) => {
       <Dialog open={reviewIsOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger
           onClick={(e) => {
-            if (isDisabled) {
-              e.preventDefault();
-            }
+            if (isDisabled) e.preventDefault();
           }}
-          className={`flex gap-2 w-[100%] h-[40px] justify-center items-center px-[10px] py-[16px]   text-[14px] text-[#F6F5F3] font-semibold leading-[140%] rounded-[10px] ${
+          className={`flex gap-2 w-[100%] h-[40px] justify-center items-center px-[10px] py-[16px] text-[14px] text-[#F6F5F3] font-semibold leading-[140%] rounded-[10px] ${
             isDisabled ? 'bg-[#E0DDD9]' : 'bg-[#9C6D2E]'
           }`}
         >
@@ -129,9 +140,9 @@ const ReviewProductDetail = ({ order }: Props) => {
           <DialogContent className="bg-[#FAF8F5] min-w-[330px] w-[80%] h-[627px] rounded-2xl md:max-w-[608px] md:h-[840px] md:overflow-y-auto">
             {selectedProduct ? (
               <ReviewForm
-                product={selectedProduct} //상품 정보
-                onBack={() => setSelectedProduct(null)} //작성 완료 시, selectedProduct를 비워서 해당 컴포넌트로 복귀
-                hasReview={selectedProduct.hasReview} //<boolean>
+                product={selectedProduct} // 상품 정보(+리뷰 상태)
+                onBack={() => setSelectedProduct(null)} // 작성 완료 시 복귀
+                hasReview={selectedProduct.hasReview} // boolean
                 payment_date={payment_date}
                 setIsEditing={setIsEditing}
                 isEditing={isEditing}
@@ -146,9 +157,15 @@ const ReviewProductDetail = ({ order }: Props) => {
                   </DialogTitle>
                   <div className="flex flex-col">
                     <div className="flex-shrink-0">
-                      {productsWithReviewStatus.map((product: Product) => {
-                        const { name, id, amount, quantity, hasReview } =
-                          product;
+                      {productsWithReviewStatus.map((product) => {
+                        const {
+                          name,
+                          id,
+                          amount,
+                          quantity,
+                          hasReview,
+                          rating
+                        } = product;
                         const date = dayjs(order.payment_date)
                           .locale('ko')
                           .format('YYYY. MM. DD');
@@ -158,7 +175,10 @@ const ReviewProductDetail = ({ order }: Props) => {
                             <div>
                               <img
                                 className="rounded-[8px] w-[64px] h-[64px] md:w-[88px] md:h-[88px]"
-                                src={productImgObject[name]}
+                                src={
+                                  productImgObject[name] ??
+                                  '/images/placeholder.png'
+                                }
                                 alt={name}
                               />
                             </div>
@@ -176,20 +196,17 @@ const ReviewProductDetail = ({ order }: Props) => {
                                   작성 가능 기한 : {date}
                                 </p>
                                 <div>
-                                  {product.rating ? (
-                                    <StarRating
-                                      rating={product.rating}
-                                      size={24}
-                                    />
+                                  {rating ? (
+                                    <StarRating rating={rating} size={24} />
                                   ) : null}
                                 </div>
                               </div>
-                              {/* 작성 리뷰가 있을 경우, selectedProduct에 담아서 reviewForm으로 전환 */}
+                              {/* 작성 리뷰가 있을 경우, selectedProduct에 담아서 ReviewForm으로 전환 */}
                               <button
                                 onClick={() =>
                                   setSelectedProduct({
                                     ...product,
-                                    user_id: user_id as string
+                                    user_id: order.user_id as string // ReviewForm에서 필요 시 사용
                                   })
                                 }
                                 className="flex flex-col g-[33px] px-3 py-2 justify-center self-stretch items-center text-[12px] font-semibold leading-[140%] text-[#9C6D2E] border-[1px] border-[#9C6D2E] rounded-[8px]"
@@ -204,7 +221,7 @@ const ReviewProductDetail = ({ order }: Props) => {
                       })}
                     </div>
                   </div>
-                  <DialogDescription></DialogDescription>
+                  <DialogDescription />
                 </DialogHeader>
               </>
             )}
