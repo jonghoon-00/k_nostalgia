@@ -1,11 +1,12 @@
 'use client';
 
 import { usePaymentCancellation } from '@/hooks/payment/cancelPayWithDbUpdate';
-import { PayHistory, PayHistoryList, Product } from '@/types/payHistory';
+import { PayHistoryCache, Product } from '@/types/payHistory';
 import type { Tables } from '@/types/supabase';
 import { useEffect, useState } from 'react';
 
-type OrderList = Tables<'ordered_list'>;
+type OrderRow = Tables<'ordered_list'>;
+type PayHistoryList = PayHistoryCache[];
 
 // undefined 키 자동 제거
 function stripUndefined<T extends object>(obj: T): Partial<T> {
@@ -41,9 +42,11 @@ const AdminPayHistory = () => {
     getAllPay();
   }, []);
 
-  const cancelPaymentMutation = usePaymentCancellation();
+  // 훅 생성 시 userId는 넘기지 않음
+  // 실제 호출 시 mutate에 row.user_id 주입
+  const cancelPaymentMutation = usePaymentCancellation('');
 
-  const cancelPaymentInAdminPage = async (row: PayHistory) => {
+  const cancelPaymentInAdminPage = async (row: PayHistoryCache) => {
     const { payment_id, user_id } = row;
 
     if (!payment_id || !user_id) {
@@ -51,17 +54,22 @@ const AdminPayHistory = () => {
       return;
     }
 
-    const patch: Partial<OrderList> = stripUndefined({
+    //uiPatch만 전달
+    const uiPatch = { status: 'CANCELLED' } as Partial<PayHistoryCache>;
+
+    // DB용 패치: jsonb products까지 포함
+    const dbPatch: Partial<OrderRow> = stripUndefined({
       payment_id,
       status: 'CANCELLED',
-      products: toJsonProducts(row.products) // jsonb 호환
+      products: toJsonProducts(row.products)
     });
 
     try {
       await cancelPaymentMutation.mutateAsync({
-        payment_id, // string
-        user_id, // string
-        patch // Partial<OrderList>
+        payment_id,
+        user_id, // [FIX] 현재 로그인 유저가 아니라 해당 row의 user_id 사용
+        uiPatch,
+        dbPatch
       });
 
       window.location.reload();
