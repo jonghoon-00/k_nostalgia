@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react';
 
-import { usePaymentCancellation } from '@/hooks/payment/canclePayWithDbUpdate';
+import { usePaymentCancellation } from '@/hooks/payment/cancelPayWithDbUpdate';
 import { productImgObject } from '@/hooks/payment/getProductImage';
 import useDeletePayHistory from '@/hooks/payment/useDeletePayHistory';
 import { useUser } from '@/hooks/useUser';

@@ -1,6 +1,6 @@
 'use client';
 
-import { usePaymentCancellation } from '@/hooks/payment/canclePayWithDbUpdate';
+import { usePaymentCancellation } from '@/hooks/payment/cancelPayWithDbUpdate';
 import { PayHistory, PayHistoryList, Product } from '@/types/payHistory';
 import type { Tables } from '@/types/supabase';
 import { useEffect, useState } from 'react';
