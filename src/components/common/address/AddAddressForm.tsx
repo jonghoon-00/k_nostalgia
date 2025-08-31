@@ -10,8 +10,10 @@ import { formatPhoneNumber } from '@/utils/format';
 import { hasValidationError, validateAddressFields } from '@/utils/validate';
 
 import { toast } from '@/components/ui/use-toast';
+import { ROUTES } from '@/constants';
 import useDaumPostcode from '@/hooks/deliveryAddress/daumPostCode/usePopup';
 import clsx from 'clsx';
+import { usePathname, useRouter } from 'next/navigation';
 
 type FieldKey = 'addressName' | 'receiverName' | 'phoneNumber' | 'baseAddress';
 
@@ -20,6 +22,8 @@ interface AddAddressFormProps {
 }
 
 const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
+  const pathName = usePathname();
+  const router = useRouter();
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState('');
   const [baseAddressWithZoneCode, setBaseAddressWithZoneCode] = useState('');
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
@@ -336,7 +340,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
       </div>
 
       {/* 기본 배송지 설정 */}
-      <div className={clsx('flex items-center my-2')}>
+      <div className={clsx('flex items-center mt-4 mb-8')}>
         <input
           type="checkbox"
           id="defaultAddress"
@@ -362,9 +366,25 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
         className={clsx(
           'fixed inset-x-0 bottom-0 w-full pt-6 pb-6',
           'shadow-[0_-4px_10px_rgba(0,0,0,0.1)]',
-          'md:static md:bg-normal md:shadow-none'
+          'md:static md:bg-normal md:shadow-none',
+          pathName === ROUTES.ADD_NEW_ADDRESS && 'flex gap-2'
         )}
       >
+        {pathName === ROUTES.ADD_NEW_ADDRESS && (
+          <button
+            type="button"
+            disabled={isDelay}
+            className={clsx(
+              'w-full py-3 text-center',
+              'bg-white text-primary-20',
+              'border border-primary-20 rounded-[8px]',
+              isDelay && 'opacity-60 cursor-not-allowed'
+            )}
+            onClick={() => router.replace(ROUTES.ADDRESS)}
+          >
+            취소
+          </button>
+        )}
         <button
           type="submit"
           disabled={isDelay}
