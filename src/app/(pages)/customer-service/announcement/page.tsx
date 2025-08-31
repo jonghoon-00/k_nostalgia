@@ -10,9 +10,9 @@ const Announcement: React.FC = () => {
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   return (
-    <div>
-      <div className="px-4 py-6 border-b border-[#E0E0E0] md:max-w-[999px] mx-auto">
-        <div className="hidden md:flex md:mt-14 text-label-strong font-semibold text-2xl mb-7">
+    <div className="flex flex-col items-center">
+      <div className="border-b border-[#E0E0E0] w-full mx-auto">
+        <div className="hidden md:flex text-label-strong font-semibold text-2xl">
           {' '}
           공지사항{' '}
         </div>

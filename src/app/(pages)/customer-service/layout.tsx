@@ -1,28 +1,35 @@
 'use client';
+import useDeviceSize from '@/hooks/useDeviceSize';
+import clsx from 'clsx';
 import { PropsWithChildren, useState } from 'react';
 import CustomerHeader from './_components/CustomerHeader';
-import useDeviceSize from '@/hooks/useDeviceSize';
-import CustomerSidebar from './_components/CustomerSidebar';
 import CustomerNoContext from './_components/CustomerNoContext';
+import CustomerSidebar from './_components/CustomerSidebar';
 
 function CustomerPageLayout({ children }: PropsWithChildren) {
   const { isDesktop } = useDeviceSize();
   const [selected, setSelected] = useState(1);
 
   return (
-    <>
+    <div className="w-full flex flex-col items-center">
       <CustomerHeader />
-      <div className={`mx-auto ${isDesktop ? 'flex' : ''}`}>
+      <div
+        className={clsx(
+          'w-full',
+          'md:w-[1280px]',
+          'flex justify-center gap-10 md:pt-20'
+        )}
+      >
         {isDesktop && (
-          <aside className="flex flex-col mt-20 ml-4 mr-10">
+          <aside className="flex flex-col">
             <CustomerSidebar selected={selected} setSelected={setSelected} />
           </aside>
         )}
-        <main className={`${isDesktop ? 'w-[999px]' : 'w-full'}`}>
+        <main className="w-full p-4">
           {selected === 3 || selected === 4 ? <CustomerNoContext /> : children}
         </main>
       </div>
-    </>
+    </div>
   );
 }
 

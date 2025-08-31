@@ -1,11 +1,9 @@
 'use client';
-import React from 'react';
-import { GoHeart, GoHeartFill } from 'react-icons/go';
-import { BsChevronRight } from 'react-icons/bs';
-import Image from 'next/image';
-import { useUser } from '@/hooks/useUser';
 import Loading from '@/components/common/Loading';
+import NoList from '@/components/common/NoList';
+import { useUser } from '@/hooks/useUser';
 import { useQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import { LuDot } from 'react-icons/lu';
 import { LikeButton } from '../../(home)/_components/LikeButton';
 import MarketImage from '../../market/_components/MarketImage';
@@ -50,7 +48,7 @@ const LikeMarketPage = () => {
     : [likedMarkets].filter(Boolean);
 
   return (
-    <div className="m-4 ">
+    <div className="m-4">
       {/* 앱버전 */}
       <div className="mt-20">
         <div className="block md:hidden mb-40">
@@ -104,7 +102,9 @@ const LikeMarketPage = () => {
               </div>
             ))
           ) : (
-            <div className="text-center"> 관심 전통시장이 없습니다. </div>
+            <div className="flex items-center justify-center">
+              <NoList message={'관심 전통 시장이 없습니다'} />
+            </div>
           )}
         </div>
       </div>
@@ -234,16 +234,7 @@ const LikeMarketPage = () => {
             </div>
           ))
         ) : (
-          <div className="text-center text-label-assistive flex flex-col items-center justify-center">
-            <Image
-              src="/image/StateSad.png"
-              alt="관심전통시장 없을때"
-              width={114}
-              height={97}
-              className="w-[114px] h-[97px] mb-4"
-            />
-            관심 전통시장이 없습니다.{' '}
-          </div>
+          <NoList message={'관심 전통 시장이 없습니다'} />
         )}
       </div>
     </div>

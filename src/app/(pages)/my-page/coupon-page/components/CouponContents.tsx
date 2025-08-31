@@ -28,8 +28,8 @@ const CouponContents: React.FC<Props> = ({ imageUrlList, hasNoList }) => {
       {/* 쿠폰 탭 */}
       <div
         className={clsx(
-          'flex w-[50vw] min-w-[375px] md:w-full justify-between md:justify-center items-center gap-4 mt-[15px]',
-          'mx-auto mt-[15px]'
+          'flex w-[50vw] min-w-[375px] md:w-full justify-between md:justify-center items-center gap-4',
+          'mx-auto'
         )}
       >
         {['coupons', 'download'].map((tab) => (
