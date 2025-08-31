@@ -1,6 +1,8 @@
+import { useRouter } from 'next/navigation';
 import React, { useRef } from 'react';
 import { BsChevronRight } from 'react-icons/bs';
-import { useRouter } from 'next/navigation';
+
+import { ROUTES } from '@/constants';
 import CancelUser, {
   CancelUserHandle
 } from '../../my-page/_components/CancelUser';
@@ -26,11 +28,11 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
   ];
 
   const handlegoAnnounce = () => {
-    router.push('/customer-service/announcement');
+    router.push(ROUTES.NOTICE);
   };
 
   const handlegoFaq = () => {
-    router.push('/customer-service/faq-page');
+    router.push(ROUTES.FAQ);
   };
 
   const handleCancelClick = () => {
@@ -39,8 +41,8 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
   };
 
   return (
-    <div className="w-[193px] mb-[208px]">
-      <div className="h-[290px] border-[#E0E0E0] border">
+    <div className="w-[193px]">
+      <div className="border border-[#E0E0E0]">
         {menuItems.map((item) => (
           <div
             key={item.id}
@@ -50,8 +52,8 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
               if (item.id === 2) handlegoFaq();
               if (item.id === 5) handleCancelClick();
             }}
-            className={`h-[58px] border-b flex px-5 py-4 justify-between items-center font-medium cursor-pointer ${
-              selected === item.id
+            className={`border-b flex px-5 py-4 justify-between items-center font-medium cursor-pointer ${
+              selected === item.id && item.id !== 5
                 ? 'text-primary-20 bg-[#F2F2F2]'
                 : 'text-label-alternative'
             }`}
