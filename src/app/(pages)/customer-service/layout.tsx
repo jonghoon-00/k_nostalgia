@@ -8,7 +8,9 @@ import CustomerSidebar from './_components/CustomerSidebar';
 
 function CustomerPageLayout({ children }: PropsWithChildren) {
   const { isDesktop } = useDeviceSize();
-  const [selected, setSelected] = useState(1);
+  const [selected, setSelected] = useState(
+    Number(sessionStorage.getItem('selected_customer_sidebar')) ?? 1
+  );
 
   return (
     <div className="w-full flex flex-col items-center">
