@@ -1,6 +1,6 @@
 //desktop 사이즈의 마이페이지에 들어가는 최상단 이미지 (주문 내역 페이지에서는 사용하지 않음)
 
-import { PAGE_PATH_NAME } from '@/constants';
+import { ROUTES } from '@/constants';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { BsChevronRight } from 'react-icons/bs';
@@ -11,7 +11,7 @@ const TopIconInDesktop = () => {
   return (
     <figure
       className={`hidden py-10 border-b-8 border-[#F2F2F2] md:flex md:justify-between ${
-        pathName === PAGE_PATH_NAME.myPage && 'border-none'
+        pathName === ROUTES.MY_PAGE && 'border-none'
       }`}
     >
       <Image
@@ -22,12 +22,12 @@ const TopIconInDesktop = () => {
       />
       <div
         className={`flex items-center text-[14px] gap-1 ${
-          pathName === PAGE_PATH_NAME.payHistory && 'hidden'
+          pathName === ROUTES.PAYMENT_HISTORY && 'hidden'
         }`}
       >
         <span
           className="underline cursor-pointer"
-          onClick={() => route.push(PAGE_PATH_NAME.payHistory)}
+          onClick={() => route.push(ROUTES.PAYMENT_HISTORY)}
         >
           더보기
         </span>
