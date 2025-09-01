@@ -13,7 +13,7 @@ export const ROUTES  = {
   ADDRESS: '/my-page/setting/delivery-address' as const,
   ADD_NEW_ADDRESS: '/my-page/setting/delivery-address/add-new' as const,
   NOTICE: '/customer-service/announcement' as const,
-  FAQ: 'customer-service/faq-page' as const,
+  FAQ: '/customer-service/faq-page' as const,
 }
 
 // 전역 모달 ID. Modal.tsx
