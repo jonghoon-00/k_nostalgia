@@ -1,5 +1,5 @@
-import { useRouter } from 'next/navigation';
-import React, { useRef } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useEffect, useRef } from 'react';
 import { BsChevronRight } from 'react-icons/bs';
 
 import { ROUTES } from '@/constants';
@@ -25,8 +25,11 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
   setSelected
 }) => {
   const router = useRouter();
+  const pathName = usePathname();
   const cancelUserRef = useRef<CancelUserHandle>(null);
 
+  console.log(`pathname : ${pathName}`);
+  console.log(`constants: ${ROUTES.FAQ}`);
   const menuItems: MenuItemList = [
     { id: 1, label: '공지사항' },
     { id: 2, label: '자주 묻는 질문' },
@@ -37,7 +40,7 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
   const routeMap: Record<number, RoutePath> = {
     1: ROUTES.NOTICE,
     2: ROUTES.FAQ
-    // 3,4 : 추후에 추가
+    // 3,4 : 추후에 추가시 menuItems.id와 동일하게 추가해야함
   };
 
   const navigateTo = (path: RoutePath) => {
@@ -56,6 +59,26 @@ const CustomerSidebar: React.FC<CustomerSidebarProps> = ({
     const path = routeMap[item.id];
     if (path) navigateTo(path);
   };
+
+  // path 변경시 동기화
+  useEffect(() => {
+    const matched = Object.entries(routeMap).find(([, base]) =>
+      pathName.startsWith(base)
+    );
+
+    if (matched) {
+      const id = Number(matched[0]);
+      //회원 탈퇴 강조 x
+      if (id !== 5) {
+        setSelected(id);
+        sessionStorage.setItem('selected_customer_sidebar', String(id));
+      }
+      return;
+    }
+    // 매칭 없으면 기본값으로
+    setSelected(1);
+    sessionStorage.setItem('selected_customer_sidebar', '1');
+  }, [pathName]);
 
   return (
     <div className="w-[193px]">
