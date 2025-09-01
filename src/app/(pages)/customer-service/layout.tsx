@@ -1,7 +1,7 @@
 'use client';
 import useDeviceSize from '@/hooks/useDeviceSize';
 import clsx from 'clsx';
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import CustomerHeader from './_components/CustomerHeader';
 import CustomerNoContext from './_components/CustomerNoContext';
 import CustomerSidebar from './_components/CustomerSidebar';
@@ -12,14 +12,19 @@ function CustomerPageLayout({ children }: PropsWithChildren) {
     Number(sessionStorage.getItem('selected_customer_sidebar')) ?? 1
   );
 
+  useEffect(() => {
+    () => sessionStorage.removeItem('selected_customer_sidebar');
+  }, []);
+
   return (
     <div className="w-full flex flex-col items-center">
       <CustomerHeader />
       <div
         className={clsx(
           'w-full',
-          'md:w-[1280px]',
-          'flex justify-center gap-10 md:pt-20'
+          'md:max-w-[1280px]',
+          'flex justify-center gap-10 md:pt-20',
+          'mx-auto'
         )}
       >
         {isDesktop && (
