@@ -1,9 +1,15 @@
-export const XClose = () => {
+import React from 'react';
+
+interface Props {
+  width?: number;
+  height?: number;
+}
+export const XClose: React.FC<Props> = ({ width, height }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
+      width={width ? `${width}` : '24'}
+      height={height ? `${height}` : '24'}
       viewBox="0 0 24 24"
       fill="none"
     >
