@@ -1,6 +1,7 @@
 'use client';
 import DownButton from '@/components/icons/DownButton';
 import UpButton from '@/components/icons/UpButton';
+import clsx from 'clsx';
 import React, { useState } from 'react';
 import CustomerEmail from '../_components/CustomerEmail';
 
@@ -10,39 +11,98 @@ const Announcement: React.FC = () => {
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="border-b border-[#E0E0E0] w-full mx-auto">
-        <div className="hidden md:flex text-label-strong font-semibold text-2xl">
+    <div className={clsx('flex items-center flex-col')}>
+      <div className={clsx('w-full mx-auto', 'border-b border-[#E0E0E0]')}>
+        <div
+          className={clsx(
+            'hidden md:flex',
+            'text-label-strong text-2xl font-semibold',
+            'mb-7'
+          )}
+        >
           {' '}
           공지사항{' '}
         </div>
 
         <div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center md:gap-6">
-              <span className="text-primary-20 mr-2 text-base font-normal">
+          <div
+            className={clsx(
+              'flex justify-between items-center',
+              'cursor-pointer',
+              'pl-6'
+            )}
+            onClick={toggleDropdown}
+          >
+            <div className={clsx('flex items-center', 'md:gap-6')}>
+              <span
+                className={clsx(
+                  'text-primary-20 font-semibold',
+                  'text-base font-normal'
+                )}
+              >
                 [ 공지 ]
               </span>
-              <span className="text-label-strong font-normal text-base">
+              <span
+                className={clsx(
+                  'text-label-strong font-semibold',
+                  'text-base font-normal'
+                )}
+              >
                 회원가입 시 할인 쿠폰 발급 안내
               </span>
             </div>
 
-            <div className="text-label-assistive text-sm font-normal md:flex md:mt-0 hidden ml-auto">
-              24.09.04
+            {/* 우측 날짜, 토글버튼 */}
+            <div className={clsx('flex items-center', 'gap-6')}>
+              <span
+                className={clsx(
+                  'hidden md:flex md:mt-0',
+                  'text-label-assistive text-sm font-normal'
+                )}
+              >
+                24.09.04
+              </span>
+              <button
+                className={clsx(
+                  'cursor-pointer rounded',
+                  'border border-label-assistive',
+                  'transition-transform duration-200',
+                  isOpen ? 'rotate-180' : 'rotate-0 bg-primary-20'
+                )}
+              >
+                {isOpen ? <UpButton /> : <DownButton color={'#F2F2F2'} />}
+              </button>
             </div>
-
-            <button className="cursor-pointer md:ml-6" onClick={toggleDropdown}>
-              {isOpen ? <UpButton /> : <DownButton />}
-            </button>
           </div>
 
-          <div className="text-label-assistive text-sm font-normal mt-1 md:hidden">
+          {/* 모바일에서만 보임 */}
+          <div
+            className={clsx(
+              'md:hidden',
+              'text-label-assistive text-sm font-normal mt-1'
+            )}
+          >
             24.09.04
           </div>
 
-          {isOpen && (
-            <div className="mt-3 text-label-strong text-sm font-normal space-y-5">
+          {/* 펼친 내용 */}
+          <div
+            role="region"
+            className={clsx(
+              'space-y-5',
+              'pl-[70px]',
+              'text-label-strong text-sm font-normal',
+              'grid transition-all duration-300 ease-in-out motion-reduce:transition-none',
+              isOpen
+                ? 'grid-rows-[1fr] opacity-100 pt-8'
+                : 'grid-rows-[0fr] opacity-0'
+            )}
+          >
+            <div
+              className={clsx(
+                'overflow-hidden space-y-5 pb-7 will-change-[grid-template-rows]'
+              )}
+            >
               <p>
                 향그리움 회원가입 시 첫 구매 할인 쿠폰을 발급해 드리고 있습니다.
               </p>
@@ -56,7 +116,7 @@ const Announcement: React.FC = () => {
               </p>
               <p>감사합니다.</p>
             </div>
-          )}
+          </div>
         </div>
       </div>
       <CustomerEmail />

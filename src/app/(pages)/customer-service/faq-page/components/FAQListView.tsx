@@ -39,7 +39,6 @@ export const FAQListView = ({
             <li
               key={item.id}
               className={clsx('border-b border-[#E0E0E0]')}
-              // 리스트 어디를 눌러도 토글하고 싶으면 유지
               onClick={(e) => {
                 e.preventDefault();
                 history.replaceState?.(null, '', `#${item.id}`);
@@ -109,15 +108,15 @@ export const FAQListView = ({
                     className={clsx(
                       'cursor-pointer rounded border border-label-assistive p-0.5',
                       'transition-transform duration-200',
-                      isOpen ? 'rotate-180' : 'rotate-0'
+                      isOpen ? 'rotate-180' : 'rotate-0 bg-primary-20'
                     )}
                     onClick={(e) => {
-                      e.stopPropagation(); // 🔑 버튼 클릭 시 상위 li onClick 막기
+                      e.stopPropagation();
                       onToggle(item.id);
                     }}
                     title={isOpen ? '접기' : '펼치기'}
                   >
-                    {isOpen ? <UpButton /> : <DownButton />}
+                    {isOpen ? <UpButton /> : <DownButton color={'#F2F2F2'} />}
                   </button>
                 </div>
               </div>
@@ -134,7 +133,7 @@ export const FAQListView = ({
                 </div>
               )}
 
-              {/* 펼친 내용: 항상 렌더 + grid 애니메이션 */}
+              {/* 펼친 내용 */}
               <div
                 id={regionId}
                 role="region"

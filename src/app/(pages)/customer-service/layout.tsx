@@ -17,7 +17,7 @@ function CustomerPageLayout({ children }: PropsWithChildren) {
   }, []);
 
   return (
-    <div className="w-full flex flex-col items-center">
+    <div className="w-full flex flex-col items-center mb-24">
       <CustomerHeader />
       <div
         className={clsx(
