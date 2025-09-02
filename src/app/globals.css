@@ -8,11 +8,10 @@
 }
 
 *::-webkit-scrollbar {
-  background-color: #f4e9db;
-  width: 14px;
+  background-color: transparent;
+  width: 12px;
   border-radius: 4px;
 }
-
 /* 스크롤바 막대 */
 *::-webkit-scrollbar-thumb {
   background-color: #ab834e;
@@ -25,7 +24,7 @@
 }
 *::-webkit-scrollbar-button {
   height: 0.3rem;
-  background-color: #f4e9db;
+  background-color: transparent;
 }
 
 /* 모바일 스크롤 바  */
@@ -157,4 +156,9 @@
   width: 24px;
   height: 24px;
   accent-color: #9c6d2e;
+}
+
+[type='search']::-webkit-search-cancel-button,
+[type='search']::-webkit-search-results-button {
+  display: none; /* X 버튼 및 검색 결과 버튼 숨기기 */
 }

@@ -6,7 +6,7 @@ const CouponPage = async () => {
   const { couponImageUrlList, hasNoList } = await getCouponImageUrlList();
 
   return (
-    <div className=" p-4 bg-normal mt-20">
+    <div className="p-4 bg-normal mt-20">
       <div className="hidden md:mb-[48px] md:flex">
         <Image
           src="/image/Coupon_Tiger2.png"

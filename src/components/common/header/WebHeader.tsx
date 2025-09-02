@@ -7,7 +7,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { toast } from '@/components/ui/use-toast';
 import { useUser } from '@/hooks/useUser';
 import api from '@/service/service';
 import { useQueryClient } from '@tanstack/react-query';
@@ -118,10 +117,6 @@ const WebHeader = () => {
     try {
       await api.auth.logOut();
       queryClient.invalidateQueries();
-      toast({
-        variant: 'destructive',
-        description: '로그아웃 되었습니다.'
-      });
       router.push('/log-in');
     } catch (err) {
       console.log('로그아웃 에러');

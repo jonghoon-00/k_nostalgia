@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 //types
 import { PayHistory, RenderPayHistoryList } from '@/types/payHistory';
 //components
+import { ROUTES } from '@/constants';
 import clsx from 'clsx';
 import { useEffect, useMemo } from 'react';
 import NoPayHistory from './NoPayHistory';
@@ -23,7 +24,7 @@ dayjs.locale('ko');
 
 const PayHistoryList = () => {
   const pathName = usePathname();
-  const isPayHistoryPage = pathName === '/pay-history';
+  const isPayHistoryPage = pathName === ROUTES.PAYMENT_HISTORY;
 
   const { data: user, isPending: userIsPending } = useUser();
   const userId = user?.id;

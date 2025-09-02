@@ -1,11 +1,10 @@
 import Image from 'next/image';
-import React from 'react';
 import CustomerEmail from './CustomerEmail';
 
 const CustomerNoContext = () => {
   return (
     <div>
-      <div className="flex justify-center items-center flex-col mt-[234px]">
+      <div className="flex justify-center items-center flex-col">
         <Image
           src="/image/StateSad.png"
           alt="우는 호랑이"

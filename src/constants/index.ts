@@ -1,6 +1,21 @@
 // 사이트 URL 상수
 export const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 
+export const ROUTES  = {
+  HOME: '/' as const,
+  MARKET: '/market' as const,
+  INTERESTED_MARKET_PATH: '/my-page/likemarket-page' as const,
+  LOCAL_FOOD: '/local-food' as const,
+  CART: '/cart' as const,
+  PAYMENT_HISTORY: '/pay-history' as const,
+  MY_PAGE: 'my-page' as const,
+  COUPON: '/my-page/coupon-page' as const,
+  ADDRESS: '/my-page/setting/delivery-address' as const,
+  ADD_NEW_ADDRESS: '/my-page/setting/delivery-address/add-new' as const,
+  NOTICE: '/customer-service/announcement' as const,
+  FAQ: '/customer-service/faq-page' as const,
+}
+
 // 전역 모달 ID. Modal.tsx
 export const MODAL_IDS = {
   COUPON: 'coupon',
