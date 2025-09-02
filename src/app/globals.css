@@ -157,3 +157,8 @@
   height: 24px;
   accent-color: #9c6d2e;
 }
+
+[type='search']::-webkit-search-cancel-button,
+[type='search']::-webkit-search-results-button {
+  display: none; /* X 버튼 및 검색 결과 버튼 숨기기 */
+}

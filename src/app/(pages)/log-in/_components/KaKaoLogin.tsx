@@ -1,18 +1,12 @@
 import { toast } from '@/components/ui/use-toast';
 import api from '@/service/service';
 import Image from 'next/image';
-import React from 'react';
 
 const KaKaoLogin = () => {
   //카카오로그인
   const handleClickKaKaoLogin = async () => {
     try {
-      const socialuser = await api.auth.socialLogin('kakao');
-
-      toast({
-        variant: 'destructive',
-        description: '로그인 되었습니다.'
-      });
+      await api.auth.socialLogin('kakao');
     } catch (error) {
       console.error('카카오 로그인 실패', error);
       toast({

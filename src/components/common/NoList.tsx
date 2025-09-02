@@ -17,7 +17,8 @@ const NoList: React.FC<Props> = ({ message }) => {
     <figure
       className={clsx(
         'w-full',
-        'h-[min(100vh,100%)]',
+        'min-h-[calc(100vh-150px)] overflow-hidden',
+        'md:min-h-[min(100vh,100%)]',
         'flex flex-col justify-center items-center gap-4'
       )}
     >
