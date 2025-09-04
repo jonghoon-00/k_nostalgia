@@ -6,6 +6,7 @@ import Footer from '@/components/common/Footer';
 import AppHeader from '@/components/common/header/AppHeader';
 import WebHeader from '@/components/common/header/WebHeader';
 import Navigation from '@/components/common/Navigation';
+import { TopSentinel } from '@/components/common/TopSentinel';
 import TopButton from '@/components/icons/TopButton';
 import Cookies from 'js-cookie';
 import { usePathname } from 'next/navigation';
@@ -216,6 +217,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* 최상단 여부 파악용 컴포넌트 */}
+      <TopSentinel />
       {/* 헤더 - 모바일/데스크톱 공용 */}
       <div className="md:hidden">
         {showHeader && (
@@ -234,7 +237,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       <main className="flex-grow">{children}</main>
 
       {/* 채팅/탑 버튼 */}
-      <div className="fixed bottom-[86px] right-3 z-50 flex-col gap-3 md:hidden">
+      <div className="fixed bottom-[90px] right-3 z-50 flex flex-col gap-2 md:hidden">
         {showChat && <Chat />}
         {showTopButton && <TopButton />}
       </div>
