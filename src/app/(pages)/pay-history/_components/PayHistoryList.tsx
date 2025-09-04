@@ -16,6 +16,7 @@ import { PayHistory, RenderPayHistoryList } from '@/types/payHistory';
 //components
 import { ROUTES } from '@/constants';
 import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import NoPayHistory from './NoPayHistory';
 import PayHistoryItem from './PayHistoryItem';
@@ -23,6 +24,7 @@ import PayHistoryItem from './PayHistoryItem';
 dayjs.locale('ko');
 
 const PayHistoryList = () => {
+  const router = useRouter();
   const pathName = usePathname();
   const isPayHistoryPage = pathName === ROUTES.PAYMENT_HISTORY;
 
@@ -79,8 +81,11 @@ const PayHistoryList = () => {
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   // ----- jsx render -----
-  if (userIsPending || isPending) {
+  if (userIsPending && isPending) {
     return <Loading />;
+  }
+  if (!user) {
+    router.replace(ROUTES.LOG_IN);
   }
   if (Object.keys(orderList).length === 0) {
     return (

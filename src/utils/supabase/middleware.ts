@@ -37,36 +37,42 @@ export async function updateSession(request: NextRequest) {
   const isGuest = guestCookie?.value === 'true';
 
   const publicRoutes = ['/sign-up', '/log-in', '/api']; // 누구나 접근 가능 
-  const protectedRoutes = ['/my-page']; // 비회원 접근 불가능 
+  const protectedRoutes = ['/my-page','/cart','/pay-history']; // 비회원 접근 불가능 
+
+
 
   const url = request.nextUrl.clone();
   const path = request.nextUrl.pathname;
-  // 비회원이 불가능 경로에 접근하려고 할 때 리다이렉트
-  if (!user && isGuest && protectedRoutes.includes(request.nextUrl.pathname)) {
-    url.pathname = '/log-in'; 
-    return NextResponse.redirect(url);
-  }
 
-  if(!user && !isGuest && !publicRoutes.some((route) => path.startsWith(route))){
-    url.pathname = '/log-in';
-    return NextResponse.redirect(url);
-  }
+  // prefix 매칭 유틸
+const isUnder = (bases: string[], p: string) =>
+  bases.some((base) => p === base || p.startsWith(`${base}/`));
 
-  //some은 순회 method 포함하는거 찾을때 일치하는거 찾으면 true 반환 
+const isPublic = isUnder(publicRoutes, path);
+const isProtected = isUnder(protectedRoutes, path);
 
-  // 비회원 접근 허용 페이지 또는 인증되지 않은 사용자 허용 페이지 접근 허용
-  if (user && publicRoutes.includes(request.nextUrl.pathname)) {
-    url.pathname = '/my-page'; 
-    
-    return NextResponse.redirect(url);
-  }
+// 1) 비회원(게스트)이 보호 경로 접근 → 로그인으로
+if (!user && isGuest && isProtected) {
+  url.pathname = '/log-in';
+  return NextResponse.redirect(url);
+}
 
+// 2) 비로그인 & 비게스트가 비공개(=public 아님) 경로 접근 → 로그인으로
+if (!user && !isGuest && !isPublic) {
+  url.pathname = '/log-in';
+  return NextResponse.redirect(url);
+}
 
-  // 로그인한 사용자에게는 모든 페이지 접근 허용
-  if (user) {
-    // 로그인 성공 시 비회원 쿠키 삭제
-    supabaseResponse.cookies.delete('guest');
-    return supabaseResponse;
+// 3) 로그인 사용자가 public 페이지(로그인/회원가입 등) 접근 → 마이페이지로
+if (user && isPublic) {
+  url.pathname = '/my-page';
+  return NextResponse.redirect(url);
+}
+
+// 4) 로그인 사용자 접근 허용 + 게스트 쿠키 정리
+if (user) {
+  supabaseResponse.cookies.delete('guest');
+  return supabaseResponse;
 }
 
   return supabaseResponse;
