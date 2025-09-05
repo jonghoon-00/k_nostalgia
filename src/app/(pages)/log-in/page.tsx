@@ -1,7 +1,6 @@
-import React from 'react';
-import LoginHeader from './_components/LoginHeader';
-import LoginForm from './_components/LoginForm';
 import DesktopLoginLayout from './_components/DesktopLayout';
+import LoginForm from './_components/LoginForm';
+import LoginHeader from './_components/LoginHeader';
 
 const LoginPage = () => {
   return (
@@ -10,7 +9,7 @@ const LoginPage = () => {
         <LoginHeader />
         <LoginForm />
       </div>
-      <div className="hidden md:flex bg-primary-20 md:min-h-screen md:justify-center md:items-center">
+      <div className="hidden md:flex bg-primary-20 md:min-h-screen md:justify-center md:items-center mt-[-1px]">
         <DesktopLoginLayout />
       </div>
     </>
