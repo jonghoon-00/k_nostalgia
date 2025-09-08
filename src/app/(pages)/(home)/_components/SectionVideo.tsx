@@ -1,66 +1,201 @@
+'use client';
+
+import clsx from 'clsx';
 import Image from 'next/image';
-import Link from 'next/link';
-import { BsChevronRight } from 'react-icons/bs';
+import { useEffect, useRef } from 'react';
+import 'swiper/css';
+import { Autoplay, Pagination } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+import useDeviceSize from '@/hooks/useDeviceSize';
+import { MARKET_VIDEOS } from '../data/videoInfo';
 
 export const SectionVideo = () => {
+  const { isMobile } = useDeviceSize();
+
   return (
-    <>
-      {/* xs:375 sm:640 md:768 lg:1024 xl:1280 */}
-      <div className="flex flex-col md:flex-row md:border md:items-start md:gap-6 md:w-[650px] md:mx-auto md:rounded-[12px] md:p-8 md:border-[#C8C8C8] justify-center items-center text-center my-20">
-        <div className="md:py-2 md:flex md:flex-col md:justify-between gap-6 order-1 md:order-2 md:text-left">
-          <div>
-            <h1 className="text-lg text-label-strong font-semibold">
-              안 가면 후회하는 K-관광마켓 4선
-            </h1>
-            <p className="text-sm font-medium tracking-tight text-label-assistive mt-1">
-              한국에서만 만나볼 수 있는 특별한 관광, 전통시장 <br />그 중에서도
-              제일 인기있는 4개의 시장을 소개합니다!
-            </p>
-          </div>
-          <Link
-            href={'https://www.youtube.com/watch?v=ym2iQ9HCydM'}
-            target="_blank"
-            className="hidden md:flex items-center gap-1 mt-[20%] translate-y-[-17%]"
-          >
-            <p className="underline text-label-normal text-sm font-medium">
-              영상보러 가기
-            </p>
-            <BsChevronRight className="w-4 h-4" />
-          </Link>
-        </div>
-        <Link
-          href={'https://www.youtube.com/watch?v=ym2iQ9HCydM'}
-          target="_blank"
-          className="order-2 md:order-1"
-        >
-          <Image
-            src={
-              'https://kejbzqdwablccrontqrb.supabase.co/storage/v1/object/public/local-food/youtube.png'
-            }
-            width={260}
-            height={180}
-            priority
-            alt="시장 유튜브 이미지"
-            style={{
-              width: 260,
-              height: 180,
-              objectFit: 'cover',
-              borderRadius: '12px'
-            }}
-            className="md:my-0 my-8"
-          />
-        </Link>
-        <Link
-          href={'https://www.youtube.com/watch?v=ym2iQ9HCydM'}
-          target="_blank"
-          className="flex items-center gap-1 order-3 md:hidden"
-        >
-          <p className="underline text-label-normal text-sm font-medium">
-            영상보러 가기
-          </p>
-          <BsChevronRight className="w-4 h-4" />
-        </Link>
-      </div>
-    </>
+    <div
+      className={clsx(
+        'flex flex-col justify-center items-center',
+        'h-auto min-h-[405px]',
+        'text-center',
+        'p-4',
+        'md:flex-row md:items-start md:gap-6 md:mx-auto',
+        'md:rounded-[12px] md:p-8 md:border md:border-[#C8C8C8]'
+      )}
+    >
+      {isMobile ? <MobileSwiper /> : <DesktopSwiper />}
+
+      <style jsx global>{`
+        .marquee-swiper .swiper-wrapper {
+          transition-timing-function: linear !important;
+        }
+      `}</style>
+    </div>
   );
 };
+
+/* ----------- 데스크탑 ----------- */
+function DesktopSwiper() {
+  const swiperRef = useRef<any>(null);
+
+  // 호버 시 수동 멈춤/재시작
+  useEffect(() => {
+    const el: HTMLElement | null =
+      swiperRef.current?.el || swiperRef.current?.$el?.[0] || null;
+    if (!el) return;
+
+    const stop = () => swiperRef.current?.autoplay?.stop?.();
+    const start = () => swiperRef.current?.autoplay?.start?.();
+
+    el.addEventListener('mouseenter', stop);
+    el.addEventListener('mouseleave', start);
+    return () => {
+      el.removeEventListener('mouseenter', stop);
+      el.removeEventListener('mouseleave', start);
+    };
+  }, []);
+
+  return (
+    <Swiper
+      key="desktop"
+      className="marquee-swiper !h-auto"
+      modules={[Autoplay]}
+      onSwiper={(sw) => (swiperRef.current = sw)}
+      slidesPerView="auto"
+      spaceBetween={16}
+      grabCursor
+      allowTouchMove
+      loop
+      loopAdditionalSlides={Math.max(24, MARKET_VIDEOS.length * 4)}
+      speed={10000}
+      autoplay={{
+        delay: 0, // 연속 흐름
+        disableOnInteraction: false,
+        pauseOnMouseEnter: true
+      }}
+    >
+      {MARKET_VIDEOS.map((item) => (
+        <SwiperSlide key={item.id} className="!w-[311px]">
+          <article className="flex flex-col gap-3">
+            <div>
+              <Image
+                src={item.imageUrl}
+                alt={item.title}
+                width={260}
+                height={260}
+                className="w-[260px] h-[260px] object-cover rounded-[12px] md:h-[260px]"
+              />
+            </div>
+            <div>
+              <h3>{item.title}</h3>
+              <ul>
+                {item.contents.map((line, idx) => (
+                  <li key={idx}>{line}</li>
+                ))}
+              </ul>
+              <button type="button" aria-label={`${item.title} 영상 보러가기`}>
+                영상 보러가기
+              </button>
+            </div>
+          </article>
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  );
+}
+
+/* ---------- 모바일 ---------- */
+function MobileSwiper() {
+  const swiperRef = useRef<any>(null);
+
+  // 가드 (드래그 후 재시작 방지)
+  const hardStop = (sw?: any) => {
+    const s = sw ?? swiperRef.current;
+    s?.autoplay?.stop?.();
+    if (s?.params) s.params.autoplay = false as any;
+  };
+
+  return (
+    <>
+      <Swiper
+        key="mobile"
+        className="mobile-swiper"
+        modules={[Pagination]}
+        onSwiper={(sw) => {
+          swiperRef.current = sw;
+          hardStop(sw);
+        }}
+        slidesPerView="auto"
+        spaceBetween={16}
+        loop
+        autoplay={false}
+        centeredSlides
+        onInit={hardStop}
+        onTouchStart={hardStop}
+        onTouchEnd={hardStop}
+        onBreakpoint={hardStop}
+      >
+        {MARKET_VIDEOS.map((item) => (
+          <SwiperSlide key={item.id} className="">
+            <article className={clsx('flex flex-col gap-3', '')}>
+              <div>
+                <Image
+                  src={item.imageUrl}
+                  alt={item.title}
+                  width={238}
+                  height={144}
+                  className=" rounded-[12px]"
+                />
+              </div>
+              <div>
+                <h3 className="text-label-strong font-semibold text-lg">
+                  {item.title}
+                </h3>
+                <ul>
+                  {item.contents.map((line, idx) => (
+                    <li key={idx} className="text-label-alternative text-sm">
+                      {line}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  aria-label={`${item.title} 영상 보러가기`}
+                >
+                  영상 보러가기
+                </button>
+              </div>
+            </article>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      {/*  잘림 방지 & 활성 슬라이드 확대 */}
+      <style jsx global>{`
+        .mobile-swiper {
+          overflow: visible !important;
+          padding-inline: 12px;
+        }
+        .mobile-swiper .swiper-wrapper {
+          overflow: visible !important;
+        }
+
+        /* 슬라이드 기본 상태 */
+        .mobile-swiper .swiper-slide {
+          position: relative;
+          transform: scale(1);
+          transition: transform 0.3s ease;
+          will-change: transform;
+          z-index: 0;
+        }
+
+        /* 활성 슬라이드만 확대 + 위로 올리기 */
+        .mobile-swiper .swiper-slide-active {
+          transform: scale(1.1);
+          z-index: 10;
+        }
+      `}</style>
+    </>
+  );
+}

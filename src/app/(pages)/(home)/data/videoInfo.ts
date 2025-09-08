@@ -8,7 +8,7 @@ export interface MarketVideoItems  {
 export const MARKET_VIDEOS: MarketVideoItems[] = [
   {
     id: 1,
-    imageUrl: 'https://kejbzqdwablccrontqrb.supabase.co/storage/v1/object/public/local-food/youtube.png',
+    imageUrl: '/image/market_video_1.png',
     title: '안 가면 후회하는 K-관광마켓 4선',
     contents: [
       '한국에서만 만나볼 수 있는 특별한 관광, 전통시장',
