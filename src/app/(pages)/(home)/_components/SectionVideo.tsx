@@ -2,7 +2,7 @@
 
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import 'swiper/css';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -30,6 +30,11 @@ export const SectionVideo = () => {
         .marquee-swiper .swiper-wrapper {
           transition-timing-function: linear !important;
         }
+        .marquee-swiper,
+        .marquee-swiper * {
+          user-select: none;
+          -webkit-user-drag: none;
+        }
       `}</style>
     </div>
   );
@@ -38,6 +43,11 @@ export const SectionVideo = () => {
 /* ----------- 데스크탑 ----------- */
 function DesktopSwiper() {
   const swiperRef = useRef<any>(null);
+
+  const BASE = MARKET_VIDEOS;
+  const N = BASE.length;
+  // 리스트 확장
+  const EXT = useMemo(() => [...BASE, ...BASE, ...BASE], [BASE]);
 
   // 호버 시 수동 멈춤/재시작
   useEffect(() => {
@@ -56,27 +66,47 @@ function DesktopSwiper() {
     };
   }, []);
 
+  // 경계 보정 함수: 가운데 블록(N ~ 2N-1) 안에 머물도록 즉시(s=0) 이동
+  const keepInMiddle = (sw: any) => {
+    const idx = sw.activeIndex ?? 0;
+    if (idx >= 2 * N) {
+      sw.slideTo(idx - N, 0); // 오른쪽 끝 넘어가면 왼쪽으로 즉시 보정
+    } else if (idx < N) {
+      sw.slideTo(idx + N, 0); // 왼쪽 끝 넘어가면 오른쪽으로 즉시 보정
+    }
+  };
+
   return (
     <Swiper
       key="desktop"
-      className="marquee-swiper !h-auto"
+      className="!h-auto"
       modules={[Autoplay]}
-      onSwiper={(sw) => (swiperRef.current = sw)}
+      onSwiper={(sw) => {
+        swiperRef.current = sw;
+        // 시작을 가운데 블록의 첫 슬라이드로 고정
+        sw.slideTo(N, 0);
+      }}
       slidesPerView="auto"
       spaceBetween={16}
       grabCursor
       allowTouchMove
-      loop
-      loopAdditionalSlides={Math.max(24, MARKET_VIDEOS.length * 4)}
+      loop={false}
+      watchSlidesProgress={true}
+      normalizeSlideIndex={false}
       speed={10000}
       autoplay={{
-        delay: 0, // 연속 흐름
-        disableOnInteraction: false,
-        pauseOnMouseEnter: true
+        delay: 0,
+        disableOnInteraction: true // 사용자 개입 시 정지
       }}
+      // 드래그/자동재생으로 인덱스 변경마다 경계 보정
+      onSlideChange={(sw) => keepInMiddle(sw)}
+      onTransitionEnd={(sw) => keepInMiddle(sw)}
     >
-      {MARKET_VIDEOS.map((item) => (
-        <SwiperSlide key={item.id} className="!w-[311px]">
+      {EXT.map((item, index) => (
+        <SwiperSlide
+          key={`${item.id}-${index}`}
+          className="!w-[312px] select-none"
+        >
           <article className="flex flex-col gap-3">
             <div>
               <Image
@@ -84,14 +114,15 @@ function DesktopSwiper() {
                 alt={item.title}
                 width={260}
                 height={260}
-                className="w-[260px] h-[260px] object-cover rounded-[12px] md:h-[260px]"
+                className="w-[260px] h-[260px] rounded-[12px] md:h-[260px]"
+                draggable={false}
               />
             </div>
             <div>
               <h3>{item.title}</h3>
               <ul>
-                {item.contents.map((line, idx) => (
-                  <li key={idx}>{line}</li>
+                {item.contents.map((line, index) => (
+                  <li key={index}>{line}</li>
                 ))}
               </ul>
               <button type="button" aria-label={`${item.title} 영상 보러가기`}>
@@ -125,6 +156,10 @@ function MobileSwiper() {
         onSwiper={(sw) => {
           swiperRef.current = sw;
           hardStop(sw);
+          const slides = sw.slides;
+          if (slides.length > 0) {
+            slides[0].style.transform = 'scale(1.1)';
+          }
         }}
         slidesPerView="auto"
         spaceBetween={16}
@@ -153,8 +188,8 @@ function MobileSwiper() {
                   {item.title}
                 </h3>
                 <ul>
-                  {item.contents.map((line, idx) => (
-                    <li key={idx} className="text-label-alternative text-sm">
+                  {item.contents.map((line, index) => (
+                    <li key={index} className="text-label-alternative text-sm">
                       {line}
                     </li>
                   ))}
