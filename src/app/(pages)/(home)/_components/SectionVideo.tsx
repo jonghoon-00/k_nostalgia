@@ -2,11 +2,13 @@
 
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import 'swiper/css';
 import { Autoplay, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+import ChevronRightIcon from '@/components/icons/ChevronRightIcon';
+import { toast } from '@/components/ui/use-toast';
 import useDeviceSize from '@/hooks/useDeviceSize';
 import { MARKET_VIDEOS } from '../data/videoInfo';
 
@@ -14,120 +16,142 @@ export const SectionVideo = () => {
   const { isMobile } = useDeviceSize();
 
   return (
-    <div
-      className={clsx(
-        'flex flex-col justify-center items-center',
-        'h-auto min-h-[405px]',
-        'text-center',
-        'p-4',
-        'md:flex-row md:items-start md:gap-6 md:mx-auto',
-        'md:rounded-[12px] md:p-8 md:border md:border-[#C8C8C8]'
-      )}
-    >
-      {isMobile ? <MobileSwiper /> : <DesktopSwiper />}
+    <div className="my-20 bg-normal">
+      <h2
+        className={clsx(
+          'text-[26px] text-secondary-10 font-custom',
+          'flex justify-center',
+          'mb-20 md:mb-10'
+        )}
+      >
+        향그리움 추천 영상
+      </h2>
+      <div
+        className={clsx(
+          'flex flex-col justify-center items-center',
+          'h-auto w-full',
+          'text-center',
+          'md:flex-row md:items-start md:gap-6 md:mx-auto',
+          'md:rounded-[12px]'
+        )}
+      >
+        {isMobile ? <MobileSwiper /> : <DesktopSwiper />}
 
-      <style jsx global>{`
-        .marquee-swiper .swiper-wrapper {
-          transition-timing-function: linear !important;
-        }
-        .marquee-swiper,
-        .marquee-swiper * {
-          user-select: none;
-          -webkit-user-drag: none;
-        }
-      `}</style>
+        <style jsx global>{`
+          .marquee-swiper .swiper-wrapper {
+            transition-timing-function: linear !important;
+          }
+          .marquee-swiper,
+          .marquee-swiper * {
+            user-select: none;
+            -webkit-user-drag: none;
+          }
+          .mobile-swiper {
+            overflow: visible !important;
+          }
+          .mobile-swiper .swiper-wrapper {
+            overflow: visible !important;
+          }
+          .mobile-swiper .swiper-slide {
+            overflow: visible;
+          }
+          /* 겹침 순서 보정 */
+          .mobile-swiper .swiper-slide {
+            z-index: 0;
+          }
+          .mobile-swiper .swiper-slide-active {
+            z-index: 10;
+          }
+        `}</style>
+      </div>
     </div>
   );
 };
 
-/* ----------- 데스크탑 ----------- */
+//style
+const cardCls = clsx(
+  'flex flex-col justify-center items-center gap-2',
+  'border border-secondary-50 rounded-[12px]',
+  'p-4 mx-auto',
+  'bg-white',
+  'md:w-[292px]'
+);
+const titleText = clsx(
+  'text-label-strong font-semibold text-base truncate w-[250px]'
+);
+const contentText = clsx('text-label-alternative text-xs');
+const buttonCls = clsx('text-xs text-label-normal', 'flex gap-1 items-center');
+
+/* ---------- 데스크탑 ---------- */
 function DesktopSwiper() {
-  const swiperRef = useRef<any>(null);
-
   const BASE = MARKET_VIDEOS;
-  const N = BASE.length;
-  // 리스트 확장
   const EXT = useMemo(() => [...BASE, ...BASE, ...BASE], [BASE]);
-
-  // 호버 시 수동 멈춤/재시작
-  useEffect(() => {
-    const el: HTMLElement | null =
-      swiperRef.current?.el || swiperRef.current?.$el?.[0] || null;
-    if (!el) return;
-
-    const stop = () => swiperRef.current?.autoplay?.stop?.();
-    const start = () => swiperRef.current?.autoplay?.start?.();
-
-    el.addEventListener('mouseenter', stop);
-    el.addEventListener('mouseleave', start);
-    return () => {
-      el.removeEventListener('mouseenter', stop);
-      el.removeEventListener('mouseleave', start);
-    };
-  }, []);
-
-  // 경계 보정 함수: 가운데 블록(N ~ 2N-1) 안에 머물도록 즉시(s=0) 이동
-  const keepInMiddle = (sw: any) => {
-    const idx = sw.activeIndex ?? 0;
-    if (idx >= 2 * N) {
-      sw.slideTo(idx - N, 0); // 오른쪽 끝 넘어가면 왼쪽으로 즉시 보정
-    } else if (idx < N) {
-      sw.slideTo(idx + N, 0); // 왼쪽 끝 넘어가면 오른쪽으로 즉시 보정
-    }
-  };
 
   return (
     <Swiper
       key="desktop"
-      className="!h-auto"
+      className="marquee-swiper !h-auto"
       modules={[Autoplay]}
-      onSwiper={(sw) => {
-        swiperRef.current = sw;
-        // 시작을 가운데 블록의 첫 슬라이드로 고정
-        sw.slideTo(N, 0);
-      }}
       slidesPerView="auto"
-      spaceBetween={16}
       grabCursor
       allowTouchMove
-      loop={false}
-      watchSlidesProgress={true}
+      loop={true}
+      watchSlidesProgress
       normalizeSlideIndex={false}
       speed={10000}
       autoplay={{
-        delay: 0,
-        disableOnInteraction: true // 사용자 개입 시 정지
+        delay: 1,
+        disableOnInteraction: true,
+        pauseOnMouseEnter: true
       }}
-      // 드래그/자동재생으로 인덱스 변경마다 경계 보정
-      onSlideChange={(sw) => keepInMiddle(sw)}
-      onTransitionEnd={(sw) => keepInMiddle(sw)}
     >
       {EXT.map((item, index) => (
         <SwiperSlide
           key={`${item.id}-${index}`}
           className="!w-[312px] select-none"
         >
-          <article className="flex flex-col gap-3">
+          <article
+            className={cardCls}
+            onClick={() => {
+              toast({
+                description: '데모용 영상 카드입니다.'
+              });
+              setTimeout(() => {
+                toast({
+                  description: '실제 영상은 제공되지 않습니다.'
+                });
+              }, 800);
+            }}
+          >
             <div>
               <Image
                 src={item.imageUrl}
                 alt={item.title}
                 width={260}
                 height={260}
-                className="w-[260px] h-[260px] rounded-[12px] md:h-[260px]"
+                className="!w-[260px] h-[260px] rounded-[12px] md:!h-[148px] overflow-hidden"
                 draggable={false}
               />
             </div>
             <div>
-              <h3>{item.title}</h3>
-              <ul>
-                {item.contents.map((line, index) => (
-                  <li key={index}>{line}</li>
+              <h3 className={titleText}>{item.title}</h3>
+              <ul className="h-24">
+                {item.contents.map((line, i) => (
+                  <li key={i} className={contentText}>
+                    {line}
+                  </li>
                 ))}
               </ul>
-              <button type="button" aria-label={`${item.title} 영상 보러가기`}>
-                영상 보러가기
-              </button>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  aria-label={`${item.title} 영상 보러가기`}
+                  className={buttonCls}
+                >
+                  <span className="underline">영상 보러가기</span>
+                  <ChevronRightIcon width={12} height={12} />
+                </button>
+              </div>
             </div>
           </article>
         </SwiperSlide>
@@ -138,99 +162,72 @@ function DesktopSwiper() {
 
 /* ---------- 모바일 ---------- */
 function MobileSwiper() {
-  const swiperRef = useRef<any>(null);
-
-  // 가드 (드래그 후 재시작 방지)
-  const hardStop = (sw?: any) => {
-    const s = sw ?? swiperRef.current;
-    s?.autoplay?.stop?.();
-    if (s?.params) s.params.autoplay = false as any;
+  const handleSwiperInit = (swiper: any) => {
+    const slides = swiper.slides;
+    // 첫 번째 슬라이드에 scale(1.1) 적용
+    if (slides.length > 0) {
+      slides[0].style.transform = 'scale(1.1)';
+    }
   };
 
   return (
-    <>
-      <Swiper
-        key="mobile"
-        className="mobile-swiper"
-        modules={[Pagination]}
-        onSwiper={(sw) => {
-          swiperRef.current = sw;
-          hardStop(sw);
-          const slides = sw.slides;
-          if (slides.length > 0) {
-            slides[0].style.transform = 'scale(1.1)';
-          }
-        }}
-        slidesPerView="auto"
-        spaceBetween={16}
-        loop
-        autoplay={false}
-        centeredSlides
-        onInit={hardStop}
-        onTouchStart={hardStop}
-        onTouchEnd={hardStop}
-        onBreakpoint={hardStop}
-      >
-        {MARKET_VIDEOS.map((item) => (
-          <SwiperSlide key={item.id} className="">
-            <article className={clsx('flex flex-col gap-3', '')}>
-              <div>
-                <Image
-                  src={item.imageUrl}
-                  alt={item.title}
-                  width={238}
-                  height={144}
-                  className=" rounded-[12px]"
-                />
-              </div>
-              <div>
-                <h3 className="text-label-strong font-semibold text-lg">
-                  {item.title}
-                </h3>
-                <ul>
-                  {item.contents.map((line, index) => (
-                    <li key={index} className="text-label-alternative text-sm">
-                      {line}
-                    </li>
-                  ))}
-                </ul>
+    <Swiper
+      key="mobile"
+      modules={[Pagination]}
+      onSlideChange={(swiper) => {
+        const slides = swiper.slides;
+        slides.forEach((slide) => {
+          slide.style.transform = 'scale(1)';
+          slide.style.transition = 'transform 0.3s ease';
+        });
+        slides[swiper.activeIndex].style.transform = 'scale(1.22)';
+      }}
+      slidesPerView="auto"
+      spaceBetween={46}
+      loop
+      centeredSlides={true}
+      onInit={handleSwiperInit}
+      className="mobile-swiper"
+    >
+      {MARKET_VIDEOS.map((item) => (
+        <SwiperSlide key={item.id} className="!w-[264px]">
+          <article className={cardCls}>
+            <div>
+              <Image
+                src={item.imageUrl}
+                alt={item.title}
+                width={238}
+                height={144}
+                style={{
+                  borderRadius: '12px',
+                  width: '238px',
+                  height: '144px'
+                }}
+              />
+            </div>
+            <div>
+              <h3 className={titleText}>{item.title}</h3>
+              <ul className="h-24">
+                {item.contents.map((line, index) => (
+                  <li key={index} className={contentText}>
+                    {line}
+                  </li>
+                ))}
+              </ul>
+              <div className="flex justify-end">
                 <button
                   type="button"
                   aria-label={`${item.title} 영상 보러가기`}
+                  className={buttonCls}
                 >
-                  영상 보러가기
+                  <span className="underline">영상 보러가기</span>
+                  <ChevronRightIcon width={12} height={12} />
                 </button>
               </div>
-            </article>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-
-      {/*  잘림 방지 & 활성 슬라이드 확대 */}
-      <style jsx global>{`
-        .mobile-swiper {
-          overflow: visible !important;
-          padding-inline: 12px;
-        }
-        .mobile-swiper .swiper-wrapper {
-          overflow: visible !important;
-        }
-
-        /* 슬라이드 기본 상태 */
-        .mobile-swiper .swiper-slide {
-          position: relative;
-          transform: scale(1);
-          transition: transform 0.3s ease;
-          will-change: transform;
-          z-index: 0;
-        }
-
-        /* 활성 슬라이드만 확대 + 위로 올리기 */
-        .mobile-swiper .swiper-slide-active {
-          transform: scale(1.1);
-          z-index: 10;
-        }
-      `}</style>
-    </>
+            </div>
+          </article>
+        </SwiperSlide>
+      ))}
+    </Swiper>
   );
 }

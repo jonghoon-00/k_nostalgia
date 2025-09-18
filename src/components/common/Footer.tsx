@@ -15,9 +15,9 @@ const Footer = () => {
   return (
     <footer
       className={clsx(
-        'bg-normal w- z-50',
+        'bg-normal z-50',
         'border-t border-[#C8C8C8]',
-        'px-20 py-10',
+        'px-20 md:py-10',
         'flex-nowrap'
         // 'flex flex-col justify-between'
       )}
