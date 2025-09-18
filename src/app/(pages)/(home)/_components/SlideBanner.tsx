@@ -4,14 +4,14 @@ import { Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 // import Swiper and modules styles
+import { useUser } from '@/hooks/useUser';
+import Image from 'next/image';
+import Link from 'next/link';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import Image from 'next/image';
-import { MainMarket } from './SectionMarket';
 import { LikeButton } from './LikeButton';
-import Link from 'next/link';
-import { useUser } from '@/hooks/useUser';
+import { MainMarket } from './SectionMarket';
 
 interface marketProps {
   images: MainMarket | null | undefined;
@@ -24,7 +24,7 @@ export const SlideBanner = ({ images }: marketProps) => {
     const slides = swiper.slides;
     // 첫 번째 슬라이드에 대해 scale(1.1) 적용
     if (slides.length > 0) {
-      slides[0].style.transform = 'scale(1.1)';
+      slides[1].style.transform = 'scale(1.2)';
     }
   };
 
@@ -32,8 +32,9 @@ export const SlideBanner = ({ images }: marketProps) => {
     <Swiper
       // install Swiper modules
       modules={[Pagination]}
-      spaceBetween={32}
+      spaceBetween={44}
       slidesPerView={'auto'}
+      initialSlide={1}
       onInit={handleSwiperInit}
       onSlideChange={(swiper) => {
         const slides = swiper.slides;
@@ -41,11 +42,11 @@ export const SlideBanner = ({ images }: marketProps) => {
           slide.style.transform = 'scale(1)';
           slide.style.transition = 'transform 0.3s ease';
         });
-        slides[swiper.activeIndex].style.transform = 'scale(1.1)';
+        slides[swiper.activeIndex].style.transform = 'scale(1.2)';
       }}
       centeredSlides={true}
       pagination={{ clickable: true }}
-      className="!pb-[110px] !pt-10"
+      className="!pb-[110px] !pt-14"
     >
       {images?.slice(0, 6).map((item, index) => (
         <SwiperSlide key={index} className="!w-[319px] ">
