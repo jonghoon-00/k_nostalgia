@@ -1,16 +1,39 @@
 'use client';
 
+import clsx from 'clsx';
+import { useEffect, useState } from 'react';
+
 const TopButton = () => {
+  const [show, setShow] = useState(false);
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || document.documentElement.scrollTop;
+      setShow(y > 0); // 최상단(0)이면 숨김
+    };
+    // 초기 상태 반영 + 이벤트 등록
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   return (
     <button
       type="button"
-      className="whitespace-nowrap rounded-md text-sm font-medium text-primary-foreground h-10 w-10 flex justify-center items-center"
+      className={clsx(
+        'whitespace-nowrap rounded-md',
+        'text-sm font-medium text-primary-foreground',
+        'h-10 w-10',
+        'flex justify-center items-center',
+        'transition-all duration-200 ease-in-out',
+        show
+          ? 'opacity-100 translate-y-0 pointer-events-auto'
+          : 'opacity-0 translate-y-4 pointer-events-none'
+      )}
       onClick={scrollToTop}
     >
       <div className="flex items-center justify-center rounded-full bg-secondary-60 shadow w-10 h-10 p-[6px] cursor-pointer z-50 hover:bg-secondary-40">
