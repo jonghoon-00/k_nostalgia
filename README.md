@@ -5,6 +5,7 @@
 <img src='https://github.com/user-attachments/assets/c76663ca-3368-4c04-9b02-d608c41c2039' width=800 />
   
 #### 전국 전통시장 정보를 제공하고 특산품을 온라인으로 큐레이션/판매하는 웹 사이트
+
 #### 🔗 [향그리움 바로가기](https://k-nostalgia.vercel.app/)
 
 <br/> 
@@ -36,6 +37,23 @@
 
 
 <br />
+
+### 설치 및 실행
+
+```bash
+
+$ git clone https://github.com/jonghoon-00/k_nostalgia.git
+$ cd k_nostelgia
+
+$ yarn
+$ yarn dev
+
+# env 정보는 담지 않습니다.
+# 데모는 배포 링크에서 확인 가능합니다.
+
+```
+
+<hr />
 <br/> 
 
 ## 1. 전체 기능 
@@ -57,7 +75,7 @@
 
 <br/>
 
-## 2. 내가 기여한 부분
+### 2. 내가 기여한 부분
 
 - 할인 쿠폰
 - 배송지 CRUD
@@ -65,26 +83,38 @@
 - 주문 내역 & 리뷰
 - 고객센터 (공지사항, faq)
 
-
-
-
-
-<br/>
-
-
-
+<br />
 
 ## 주요 개발 내용
   - .
-
-
-
 
 <br><br>
 
 
 <br></br>
+<hr /> <br/>
 
+### 폴더 구조
+
+```
+src
+┣ app : Next.js App Router
+┃ ┣ (pages) : 페이지
+┃ ┣ api : API 라우트
+┃ ┣ globals.css
+┃ ┣ layout.tsx
+┃ ┗ Providers.tsx
+┣ components : 공용 컴포넌트
+┣ constants : 상수
+┣ fonts : 폰트 파일
+┣ hooks : 커스텀 훅 모음
+┣ lib : 공용 유틸/라이브러리 
+┣ service : 비즈니스 로직 서비스 계층 
+┣ types : 전역 타입 정의 
+┣ utils : 유틸리티 함수
+┣ zustand : 전역 상태 관리 
+┗ middleware.ts : 미들웨어 설정
+``` 
 
 
 <br>
