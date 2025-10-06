@@ -179,7 +179,7 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
       phoneNumber: false,
       baseAddress: false
     });
-    e.currentTarget.reset();
+    formEl.reset();
 
     onSuccess?.();
   };

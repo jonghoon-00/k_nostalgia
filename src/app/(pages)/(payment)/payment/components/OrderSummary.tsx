@@ -65,7 +65,8 @@ const OrderSummary = () => {
         description: '로그인이 필요합니다. 로그인 후 다시 시도해주세요'
       });
     }
-    if (!address) {
+    console.log(address);
+    if (address?.length === 0) {
       return toast({ description: '배송지 추가 혹은 선택 해주세요' });
     }
 
