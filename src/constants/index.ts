@@ -18,10 +18,6 @@ export const ROUTES  = {
   FAQ: '/customer-service/faq-page' as const,
 }
 
-export const TEST_USER_IDS = new Set([
-  '5359e616-84a1-44c7-bcd5-831d78a30292',
-])
-
 // 전역 모달 ID. Modal.tsx
 export const MODAL_IDS = {
   COUPON: 'coupon',
