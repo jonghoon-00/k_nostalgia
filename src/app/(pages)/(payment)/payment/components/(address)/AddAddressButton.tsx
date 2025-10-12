@@ -11,11 +11,6 @@ const AddAddressButton = () => {
   const open = useModalStore((state) => state.open);
   const closeModal = useModalStore((s) => s.close);
 
-  const onSuccess = () => {
-    closeModal();
-    window.location.reload();
-  };
-
   return (
     <>
       <button
@@ -38,7 +33,7 @@ const AddAddressButton = () => {
         isFullOnMobile
         modalId={MODAL_IDS.ADDRESS}
       >
-        <AddAddressForm onSuccess={onSuccess} />
+        <AddAddressForm onSuccess={closeModal} />
       </Modal>
     </>
   );

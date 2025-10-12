@@ -5,13 +5,14 @@ import React, { useEffect, useState } from 'react';
 import useThrottle from '@/hooks/useThrottle';
 import { useUser } from '@/hooks/useUser';
 import api from '@/service/service';
-import { AddAddressPayload } from '@/types/deliveryAddress';
+import { AddAddressPayload, Address } from '@/types/deliveryAddress';
 import { formatPhoneNumber } from '@/utils/format';
 import { hasValidationError, validateAddressFields } from '@/utils/validate';
 
 import { toast } from '@/components/ui/use-toast';
 import { ROUTES } from '@/constants';
 import useDaumPostcode from '@/hooks/deliveryAddress/daumPostCode/usePopup';
+import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import clsx from 'clsx';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -53,6 +54,11 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
 
   const { data } = useUser();
   const userId = data?.id;
+
+  const { addAddress, setSelectedAddressId } = useDeliveryStore((s) => ({
+    addAddress: s.addAddress,
+    setSelectedAddressId: s.setSelectedAddressId
+  }));
 
   // 개별 필드 검증 helper
   const validateSingleField = (key: FieldKey, value?: string) => {
@@ -152,36 +158,38 @@ const AddAddressForm: React.FC<AddAddressFormProps> = ({ onSuccess }) => {
       isDefault: isDefaultAddress
     };
 
+    let created: Address;
     try {
-      await api.address.addNewAddress(payload);
+      created = await api.address.addNewAddress(payload);
+      addAddress(created);
+      setSelectedAddressId(created.id); // 선택 주소 갱신
+
+      toast({ description: '배송지 등록 완료' });
+
+      onSuccess?.();
+
+      // 폼 초기화
+      setFormattedPhoneNumber('');
+      setBaseAddressWithZoneCode('');
+      setIsDefaultAddress(false);
+      setForm({ addressName: '', receiverName: '', detailAddress: '' });
+      setValidationErrors({
+        addressName: false,
+        receiverName: false,
+        phoneNumber: false,
+        baseAddress: false
+      });
+      setTouched({
+        addressName: false,
+        receiverName: false,
+        phoneNumber: false,
+        baseAddress: false
+      });
+      formEl.reset();
     } catch (error) {
-      console.error('배송지 업데이트 중 에러:', error);
+      console.error('배송지 등록 중 에러:', error);
       toast({ description: '잠시 후 다시 시도해주세요' });
-      return;
     }
-
-    toast({ description: '배송지 등록 완료' });
-
-    //초기화
-    setFormattedPhoneNumber('');
-    setBaseAddressWithZoneCode('');
-    setIsDefaultAddress(false);
-    setForm({ addressName: '', receiverName: '', detailAddress: '' });
-    setValidationErrors({
-      addressName: false,
-      receiverName: false,
-      phoneNumber: false,
-      baseAddress: false
-    });
-    setTouched({
-      addressName: false,
-      receiverName: false,
-      phoneNumber: false,
-      baseAddress: false
-    });
-    formEl.reset();
-
-    onSuccess?.();
   };
 
   //throttling
