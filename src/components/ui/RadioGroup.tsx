@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 
 interface RadioOption {
   value: any;
@@ -26,6 +26,19 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
   withDivider = false,
   labelTextSize
 }) => {
+  // 현재 selectedValue가 유효한지 검사
+  const hasSelectedInOptions = useMemo(
+    () => options.some((opt) => opt.value === selectedValue),
+    [options, selectedValue]
+  );
+
+  // 마운트/옵션 변경 시, 선택값이 없거나 잘못된 경우 첫 번째로 강제 세팅
+  useEffect(() => {
+    if (options.length === 0) return;
+    if (!hasSelectedInOptions) {
+      onChange(options[0].value);
+    }
+  }, [options, hasSelectedInOptions, onChange]);
   return (
     <div className="flex flex-col gap-2">
       {options.map((option, index) => (
