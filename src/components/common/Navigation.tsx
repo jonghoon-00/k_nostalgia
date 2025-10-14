@@ -1,5 +1,6 @@
 'use client';
 
+import clsx from 'clsx';
 import { usePathname, useRouter } from 'next/navigation';
 import { IconType } from 'react-icons/lib';
 import KNostalgiaIcon1 from '../icons/KNostalgiaIcon1';
@@ -51,25 +52,34 @@ const Navigation = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 flex border-t-2 justify-between pt-3 px-5 pb-6 mt-auto bg-normal ">
-      {naviList.map((item, index) => (
-        <div
-          key={index}
-          className={`flex flex-col items-center cursor-pointer gap-1 w-[80px] h-[48px] px-2 ${
-            pathname === item.path ? 'text-primary-strong' : 'text-black'
-          }`}
-          onClick={() => handleNavigationClick(item.path)}
-        >
-          {pathname.includes(item.path) ? (
-            <item.activeIcon fill="#9C6D2E" />
-          ) : (
-            <item.icon />
-          )}
-          <div className="text-[12px] text-nowrap flex items-center justify-center">
-            {item.label}
+    <div
+      className={clsx(
+        'fixed left-0 right-0 bottom-0',
+        'bg-normal w-screen',
+        'z-50 border-t-2',
+        'px-10 pt-3 pb-6 mt-auto'
+      )}
+    >
+      <div className="flex justify-between">
+        {naviList.map((item, index) => (
+          <div
+            key={index}
+            className={`flex flex-col items-center cursor-pointer gap-1 w-[44px] h-[48px] px-2 ${
+              pathname === item.path ? 'text-primary-strong' : 'text-black'
+            }`}
+            onClick={() => handleNavigationClick(item.path)}
+          >
+            {pathname.includes(item.path) ? (
+              <item.activeIcon fill="#9C6D2E" />
+            ) : (
+              <item.icon />
+            )}
+            <div className="text-[12px] text-nowrap flex items-center justify-center">
+              {item.label}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

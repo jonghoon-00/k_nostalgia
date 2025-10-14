@@ -4,17 +4,17 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
   CarouselPrevious,
-  CarouselNext
+  type CarouselApi
 } from '@/components/ui/carousel';
-import { type CarouselApi } from '@/components/ui/carousel';
+import useDeviceSize from '@/hooks/useDeviceSize';
 import { banners, webBanners } from '@/lib/banners';
+import Autoplay from 'embla-carousel-autoplay';
+import Cookies from 'js-cookie';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import Autoplay from 'embla-carousel-autoplay';
-import useDeviceSize from '@/hooks/useDeviceSize';
-import Cookies from 'js-cookie';
 
 export const SectionBanner = () => {
   const [api, setApi] = useState<CarouselApi>();
@@ -37,7 +37,7 @@ export const SectionBanner = () => {
   }, [api]);
 
   return (
-    <div className={` max-w-screen-xl mx-auto mt-16 ${isDesktop && 'mt-20'}`}>
+    <div className={`w-full mx-auto mt-16`}>
       <Carousel
         setApi={setApi}
         plugins={[
@@ -79,13 +79,13 @@ export const SectionBanner = () => {
           className={`absolute right-4 translate-x-[-10%] bottom-[1rem] translate-y-0 `}
         >
           {isDesktop ? (
-            <div className="flex gap-2 px-3 py-2 rounded-[16px] bg-[rgba(0,0,0,.24)] text-center text-label-light text-xs font-medium">
+            <div className="flex gap-2 px-3 py-2 bg-[rgba(0,0,0,.24)] rounded-[12px] text-center text-label-light text-xs font-medium">
               <CarouselPrevious />
               {`${current} / ${count}`}
               <CarouselNext />
             </div>
           ) : (
-            <div className="px-[10px] py-[2px] rounded-[16px] bg-[rgba(0,0,0,.24)] text-center text-label-light text-xs font-medium">{`${current} / ${count}`}</div>
+            <div className="px-[10px] py-[2px] bg-[rgba(0,0,0,.24)] rounded-[12px] text-center text-label-light text-xs font-medium">{`${current} / ${count}`}</div>
           )}
         </div>
       </Carousel>

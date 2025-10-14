@@ -1,3 +1,6 @@
+'use client';
+
+import AddAddressForm from '@/components/common/address/AddAddressForm';
 import PlusIcon from '@/components/icons/PlusIcon';
 import { Modal } from '@/components/ui/Modal';
 import { MODAL_IDS } from '@/constants';
@@ -6,6 +9,8 @@ import clsx from 'clsx';
 
 const AddAddressButton = () => {
   const open = useModalStore((state) => state.open);
+  const closeModal = useModalStore((s) => s.close);
+
   return (
     <>
       <button
@@ -28,7 +33,7 @@ const AddAddressButton = () => {
         isFullOnMobile
         modalId={MODAL_IDS.ADDRESS}
       >
-        <div>dd</div>
+        <AddAddressForm onSuccess={closeModal} />
       </Modal>
     </>
   );

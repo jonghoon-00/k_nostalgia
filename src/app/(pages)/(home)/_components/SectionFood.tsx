@@ -1,13 +1,12 @@
 'use client';
 
+import useDeviceSize from '@/hooks/useDeviceSize';
+import { Tables } from '@/types/supabase';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { FoodBox } from './FoodBox';
-import { useQuery } from '@tanstack/react-query';
-import { Tables } from '@/types/supabase';
-import { HashLoader } from 'react-spinners';
-import { WideFoodBox } from './WideFoodBox';
-import useDeviceSize from '@/hooks/useDeviceSize';
 import { SkeletonCard } from './LoadingSkeleton';
+import { WideFoodBox } from './WideFoodBox';
 
 export const SectionFood = () => {
   const { isDesktop } = useDeviceSize();
@@ -40,7 +39,7 @@ export const SectionFood = () => {
           )
         ) : isDesktop ? (
           <ul className="max-w-screen-xl grid grid-cols-4 relative gap-10">
-            {localFood?.slice(0, 4).map((item, index) => {
+            {localFood?.slice(0, 6).map((item, index) => {
               return (
                 <WideFoodBox
                   key={item.product_id}

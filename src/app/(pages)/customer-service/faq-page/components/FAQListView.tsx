@@ -167,6 +167,7 @@ export const FAQListView = ({
                         'underline font-normal',
                         'mt-2'
                       )}
+                      onClick={(e) => e.stopPropagation()}
                     >
                       {(item.category ?? '담당') + ' 관리자 이메일 (클릭)'}
                     </a>

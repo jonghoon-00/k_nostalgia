@@ -11,7 +11,7 @@ import { useCouponDiscount } from '@/hooks/coupon/useCouponDiscount';
 import { useUser } from '@/hooks/useUser';
 
 import Accordion from '@/components/ui/Accordion';
-import { ACCORDION_IDS, DELIVERY_FEE } from '@/constants';
+import { ACCORDION_IDS, DELIVERY_FEE, ROUTES } from '@/constants';
 import { startBackGuard } from '@/utils/popstateGuard';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
@@ -60,12 +60,13 @@ const OrderSummary = () => {
     }
     if (!user) {
       console.error('Get user failed');
-      router.push('/login');
+      router.push(ROUTES.LOG_IN);
       return toast({
         description: '로그인이 필요합니다. 로그인 후 다시 시도해주세요'
       });
     }
-    if (!address) {
+    console.log(address);
+    if (address?.length === 0) {
       return toast({ description: '배송지 추가 혹은 선택 해주세요' });
     }
 

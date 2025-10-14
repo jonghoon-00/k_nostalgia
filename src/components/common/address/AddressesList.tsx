@@ -2,7 +2,7 @@
 
 import { toast } from '@/components/ui/use-toast';
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { useUser } from '@/hooks/useUser';
 import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
@@ -35,21 +35,38 @@ const AddressesList: React.FC<AddressListProps> = ({
   const updateAddress = useUpdateAddress();
   const deleteAddress = useDeleteAddress();
 
-  const [addressesState, setAddressesState] = useState<Address[]>(initialData);
-  const [editingId, setEditingId] = useState<string | null>(null);
-
+  const addresses = useDeliveryStore((s) => s.address) || [];
   const selectedAddressId = useDeliveryStore((s) => s.selectedAddressId);
-  const setSelectedAddressId = useDeliveryStore((s) => s.setSelectedAddressId);
+
+  const { setSelectedAddressId, removeAddress, setAddress } = useDeliveryStore(
+    (s) => ({
+      setSelectedAddressId: s.setSelectedAddressId,
+      removeAddress: s.removeAddress,
+      setAddress: s.setAddress
+    })
+  );
 
   const closeModal = useModalStore((s) => s.close);
 
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   useEffect(() => {
-    setAddressesState(initialData);
-    // 편집 중 대상이 새 데이터에 없으면 편집 종료
-    if (editingId && !initialData.some((a) => a.id === editingId)) {
+    if (!addresses.length && initialData.length) {
+      setAddress(initialData.map((a) => ({ ...a })));
+      // 선택 보정
+      const pick =
+        initialData.find((a) => a.isDefault)?.id ?? initialData[0]?.id ?? null;
+      setSelectedAddressId(pick ?? null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 편집 중 대상이 사라지면 편집 종료
+  useEffect(() => {
+    if (editingId && !addresses.some((a) => a.id === editingId)) {
       setEditingId(null);
     }
-  }, [initialData]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [addresses, editingId]);
 
   const startEdit = (id: string) => setEditingId(id);
   const cancelEdit = () => setEditingId(null);
@@ -62,23 +79,29 @@ const AddressesList: React.FC<AddressListProps> = ({
       toast({ description: '로그인 후 이용해 주세요.' });
       return;
     }
+
+    // 낙관적 업데이트
+    const prev = addresses;
+    const optimisticallyUpdated = (() => {
+      let next = prev.map((a) =>
+        a.id === addressId ? { ...a, ...changes } : { ...a }
+      );
+      if (changes.isDefault) {
+        next = next.map((a) => ({ ...a, isDefault: a.id === addressId }));
+      }
+      return next;
+    })();
+
+    setAddress(optimisticallyUpdated);
     try {
       await updateAddress(addressId, userId, changes);
-      setAddressesState((prev) => {
-        // 값 갱신
-        const updated = prev.map((a) =>
-          a.id === addressId ? { ...a, ...changes } : a
-        );
-        // 기본 배송지 변경을 요청한 경우 반영(하나만 true)
-        if (changes.isDefault) {
-          return updated.map((a) => ({
-            ...a,
-            isDefault: a.id === addressId
-          }));
-        }
-        return updated;
-      });
+      // 기본 배송지로 바꿨으면 선택도 변경
+      if (changes.isDefault) setSelectedAddressId(addressId);
+      closeModal();
+      toast({ description: '배송지가 수정되었습니다.' });
     } catch (err) {
+      // 롤백
+      setAddress(prev);
       console.error(err);
       toast({ description: '배송지 수정에 실패했습니다.' });
     }
@@ -97,26 +120,43 @@ const AddressesList: React.FC<AddressListProps> = ({
       toast({ description: '로그인 후 이용해 주세요.' });
       return;
     }
+    closeModal();
     showCustomAlert({
       title: '배송지 삭제',
       message: '정말 이 배송지를 삭제하시겠습니까?',
       confirmButtonText: '삭제하기',
       cancelButtonText: '취소',
       onConfirm: async () => {
+        const prev = addresses;
+
+        // 낙관적 삭제 + 기본/선택 보정
+        const filtered = prev
+          .filter((a) => a.id !== addressId)
+          .map((a) => ({ ...a }));
+        let next = filtered;
+
+        // 기본 배송지가 사라졌다면 맨 앞을 기본으로
+        if (next.length && !next.some((a) => a.isDefault)) {
+          next = next.map((a, i) => ({ ...a, isDefault: i === 0 }));
+        }
+
+        // 선택 주소가 삭제되면 기본 또는 첫 번째로 보정
+        const nextSelected =
+          (selectedAddressId && selectedAddressId !== addressId
+            ? selectedAddressId
+            : next.find((a) => a.isDefault)?.id ?? next[0]?.id) ?? null;
+
+        setAddress(next);
+        setSelectedAddressId(nextSelected);
+
         try {
           await deleteAddress(addressId, userId);
-          setAddressesState((prev) => {
-            const filtered = prev.filter((a) => a.id !== addressId);
-            // 기본 배송지가 없으면 맨 앞 항목을 기본으로(불변성 유지)
-            if (!filtered.some((a) => a.isDefault) && filtered.length > 0) {
-              return filtered.map((a, i) => ({ ...a, isDefault: i === 0 }));
-            }
-            return filtered;
-          });
-          // 삭제 대상이 편집 중이었으면 편집 종료
           if (editingId === addressId) setEditingId(null);
           toast({ description: '배송지가 삭제되었습니다.' });
         } catch (err) {
+          // 롤백
+          setAddress(prev);
+          setSelectedAddressId(selectedAddressId ?? null);
           console.error(err);
           toast({ description: '배송지 삭제에 실패했습니다.' });
         }
@@ -124,12 +164,18 @@ const AddressesList: React.FC<AddressListProps> = ({
     });
   };
 
-  const defaultAddress = addressesState.find((a) => a.isDefault);
-  const otherAddresses = addressesState.filter((a) => !a.isDefault);
+  const defaultAddress = useMemo(
+    () => addresses.find((a) => a.isDefault) ?? null,
+    [addresses]
+  );
+  const otherAddresses = useMemo(
+    () => addresses.filter((a) => !a.isDefault),
+    [addresses]
+  );
 
   //선택 모드 (라디오 선택 + 편집 스왑)
   if (isSelecting) {
-    const options = addressesState.map((a) => ({
+    const options = addresses.map((a) => ({
       value: a.id,
       label:
         editingId === a.id ? (
@@ -158,8 +204,7 @@ const AddressesList: React.FC<AddressListProps> = ({
             deleteDeliveryAddress={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              // 선택 모드에서 삭제를 허용하려면 아래 주석 해제
-              // handleDelete(a.id);
+              handleDelete(a.id);
             }}
             selectedAddressId={selectedAddressId}
             isSelecting
