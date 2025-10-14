@@ -1,4 +1,3 @@
-// 사이트 URL 상수
 export const SITE_URL = process.env.NEXT_PUBLIC_BASE_URL!;
 
 export const ROUTES  = {
@@ -9,6 +8,7 @@ export const ROUTES  = {
   INTERESTED_MARKET_PATH: '/my-page/likemarket-page' as const,
   LOCAL_FOOD: '/local-food' as const,
   CART: '/cart' as const,
+  PAYMENT: '/payment' as const,
   PAYMENT_HISTORY: '/pay-history' as const,
   MY_PAGE: '/my-page' as const,
   COUPON: '/my-page/coupon-page' as const,

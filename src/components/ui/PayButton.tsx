@@ -1,5 +1,6 @@
 'use client';
 
+import { ROUTES } from '@/constants';
 import { useUser } from '@/hooks/useUser';
 import { usePaymentRequestStore } from '@/zustand/payment/usePaymentStore';
 import clsx from 'clsx';
@@ -59,7 +60,7 @@ export default function PayButton({ orderNameArr, product, variant }: Props) {
   const handleClick = () => {
     if (!nowUser) {
       toast({ description: '로그인 후 이용 가능합니다' });
-      router.push('/login');
+      router.push(ROUTES.LOG_IN);
       return;
     }
     if (product.length === 0) {
@@ -71,7 +72,7 @@ export default function PayButton({ orderNameArr, product, variant }: Props) {
     setOrderName(formatOrderName(orderNameArr));
     setProducts(product as any);
 
-    router.push('/payment');
+    router.push(ROUTES.PAYMENT);
   };
 
   const className = clsx(

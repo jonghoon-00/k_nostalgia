@@ -1,20 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
-import clsx from 'clsx';
-
+import DownButton from '@/components/icons/DownButton';
+import UpButton from '@/components/icons/UpButton';
 import { Address } from '@/types/deliveryAddress';
-
+import useDeliveryStore from '@/zustand/payment/useDeliveryStore';
 import {
   DropdownMenu,
   DropdownMenuTrigger
 } from '@radix-ui/react-dropdown-menu';
-
-import DownButton from '@/components/icons/DownButton';
-import UpButton from '@/components/icons/UpButton';
-
+import clsx from 'clsx';
+import { useEffect, useMemo, useState } from 'react';
 import AddAddressButton from './AddAddressButton';
 import AddressChangeButton from './AddressChangeButton';
 import AddressSummaryCard from './AddressSummaryCard';
@@ -24,49 +19,62 @@ interface Props {
   initialShippingRequest: string;
 }
 
-export default function DeliveryAddress({
+export const DeliveryAddress = ({
   initialAddresses,
   initialShippingRequest
-}: Props) {
+}: Props) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Zustand
   const addresses = useDeliveryStore((s) => s.address);
   const selectedAddressId = useDeliveryStore((s) => s.selectedAddressId);
   const shippingRequest = useDeliveryStore((s) => s.shippingRequest);
   const shouldStoreDeliveryRequest = useDeliveryStore(
     (s) => s.shouldStoreDeliveryRequest
   );
-  const { setAddress, setShippingRequest, setShouldStoreDeliveryRequest } =
-    useDeliveryStore((s) => ({
-      setAddress: s.setAddress,
-      setShippingRequest: s.setShippingRequest,
-      setShouldStoreDeliveryRequest: s.setShouldStoreDeliveryRequest
-    }));
 
-  const addressList =
-    addresses && addresses.length > 0 ? addresses : initialAddresses;
-  const hasNoAddress = !addressList.length;
+  const {
+    setAddress,
+    setShippingRequest,
+    setShouldStoreDeliveryRequest,
+    setSelectedAddressId
+  } = useDeliveryStore((s) => ({
+    setAddress: s.setAddress,
+    setShippingRequest: s.setShippingRequest,
+    setShouldStoreDeliveryRequest: s.setShouldStoreDeliveryRequest,
+    setSelectedAddressId: s.setSelectedAddressId
+  }));
 
-  // 선택된 배송지 우선 > 없으면 default
-  const getSelectedAddress = () => {
-    if (hasNoAddress) return null;
-
-    if (!selectedAddressId) {
-      const selected = addressList.find((a) => a.id === selectedAddressId);
-      if (selected) return selected;
+  useEffect(() => {
+    if (!addresses || addresses.length === 0) {
+      setAddress(initialAddresses.map((a) => ({ ...a })));
     }
-    return addressList.find((a) => a.isDefault) ?? null;
-  };
-  const selectedAddress = getSelectedAddress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Initialize store from props
   useEffect(() => {
-    setAddress(initialAddresses);
-  }, [initialAddresses, setAddress]);
-  useEffect(() => {
-    setShippingRequest(initialShippingRequest);
+    setShippingRequest(initialShippingRequest ?? '');
   }, [initialShippingRequest, setShippingRequest]);
+
+  const selectedAddress = useMemo(() => {
+    if (!addresses || addresses.length === 0) return null;
+
+    if (selectedAddressId) {
+      const hit = addresses.find((a) => a.id === selectedAddressId);
+      if (hit) return hit;
+    }
+    return addresses.find((a) => a.isDefault) ?? addresses[0];
+  }, [addresses, selectedAddressId]);
+
+  useEffect(() => {
+    if (!addresses || addresses.length === 0) {
+      if (selectedAddressId) setSelectedAddressId(null);
+      return;
+    }
+    if (!selectedAddress) {
+      const pick = addresses.find((a) => a.isDefault)?.id ?? addresses[0].id;
+      setSelectedAddressId(pick);
+    }
+  }, [addresses, selectedAddress, selectedAddressId, setSelectedAddressId]);
 
   return (
     <div
@@ -82,8 +90,11 @@ export default function DeliveryAddress({
       {!selectedAddress ? (
         <AddAddressButton />
       ) : (
-        <div className={clsx('flex justify-between items-start')}>
-          <AddressSummaryCard selectedAddress={selectedAddress} />
+        <div className="flex justify-between items-start">
+          <AddressSummaryCard
+            key={selectedAddress.id}
+            selectedAddress={selectedAddress}
+          />
           <AddressChangeButton />
         </div>
       )}
@@ -98,7 +109,7 @@ export default function DeliveryAddress({
               'w-full flex justify-between items-center',
               'px-4 py-3 border rounded-lg text-sm text-gray-500 bg-white'
             )}
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onClick={() => setIsDropdownOpen((p) => !p)}
           >
             {'직접 입력하기'}
             {isDropdownOpen ? <UpButton /> : <DownButton />}
@@ -130,4 +141,6 @@ export default function DeliveryAddress({
       </label>
     </div>
   );
-}
+};
+
+export default DeliveryAddress;
