@@ -1,5 +1,4 @@
 import NoList from '@/components/common/NoList';
-import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 
 const NoPayHistory = () => {
@@ -22,20 +21,13 @@ const NoPayHistory = () => {
           pathName === '/pay-history' ? 'md:h-[68vh]' : 'mb-[80px]'
         }`}
       >
-        <NoList message="주문 내역이 없어요" />
-        <button
-          type="button"
-          onClick={() => (window.location.href = '/local-food')}
-          className={clsx(
-            'h-[48px]',
-            'px-[32px] py-[12px] mt-[12px]',
-            'rounded-[12px]',
-            'text-white font-semibold leading-[140%]',
-            'bg-[#9C6D2E]'
-          )}
-        >
-          특산물 보러 가기
-        </button>
+        <NoList
+          message="주문 내역이 없어요"
+          linkButton={{
+            href: '/local-food',
+            label: '특산물 보러 가기'
+          }}
+        />
       </div>
     </main>
   );
