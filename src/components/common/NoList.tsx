@@ -1,18 +1,31 @@
 'use client';
 
-import clsx from 'clsx';
 import Image from 'next/image';
 import React from 'react';
 
+import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
+
+interface LinkButton {
+  href: string;
+  label: string;
+}
 interface Props {
   message: string | string[];
+  linkButton?: LinkButton;
+}
+function normalizeHref(href: string) {
+  if (!href.startsWith('/')) return `/${href}`;
+  return href;
 }
 
 /**
  * @description 리스트가 없을 때 사용하는 컴포넌트
  * @param {string | string[]} message - 띄울 텍스트. 2줄 이상이라면 배열로
+ * @param {Object} linkButton - 이동 버튼 정보 ({ href, label })
  */
-const NoList: React.FC<Props> = ({ message }) => {
+const NoList: React.FC<Props> = ({ message, linkButton }) => {
+  const router = useRouter();
   return (
     <figure
       className={clsx(
@@ -42,6 +55,21 @@ const NoList: React.FC<Props> = ({ message }) => {
           ))
         )}
       </figcaption>
+      {linkButton && (
+        <button
+          type="button"
+          onClick={() => router.push(normalizeHref(linkButton.href))}
+          className={clsx(
+            'h-[48px]',
+            'px-[32px] py-[12px] mt-[12px]',
+            'rounded-[12px]',
+            'text-white font-semibold leading-[140%]',
+            'bg-[#9C6D2E]'
+          )}
+        >
+          {linkButton.label}
+        </button>
+      )}
     </figure>
   );
 };
