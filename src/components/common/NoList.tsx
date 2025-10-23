@@ -37,7 +37,7 @@ const NoList: React.FC<Props> = ({ message, linkButton }) => {
     >
       <Image
         src="/image/StateSad.png"
-        alt="우는 호랑이"
+        alt="리스트가 없음을 나타내는 아이콘"
         width={114}
         height={97}
         className="w-[114px] h-[97px]"
