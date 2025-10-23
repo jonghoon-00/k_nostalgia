@@ -36,19 +36,19 @@ const OrderSummary = () => {
     (s) => s.shouldStoreDeliveryRequest
   );
 
-  const { products, orderName, totalAmount, payMethod } =
-    usePaymentRequestStore(
-      useShallow((s) => ({
-        products: s.products,
-        orderName: s.orderName,
-        totalAmount: s.totalAmount + DELIVERY_FEE,
-        payMethod: s.payMethod
-      }))
-    );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const { products, orderName, amount, payMethod } = usePaymentRequestStore(
+    useShallow((s) => ({
+      products: s.products,
+      orderName: s.orderName,
+      amount: s.totalAmount, // 배송비 포함 금액
+      payMethod: s.payMethod
+    }))
+  );
 
   // 쿠폰 할인 금액
   const discountAmount = useCouponDiscount();
+  // 총 결제 금액 (상품 금액 - 쿠폰 할인 + 배송비)
+  const totalAmount = amount - discountAmount;
 
   const { data: user, isPending: isUserLoading } = useUser();
 
@@ -137,7 +137,7 @@ const OrderSummary = () => {
         <div className="text-label-strong text-[16px] flex flex-col gap-2">
           <div className="w-full flex justify-between">
             <span>상품 금액</span>
-            <span>{totalAmount.toLocaleString('ko-KR')}원</span>
+            <span>{(amount - DELIVERY_FEE).toLocaleString('ko-KR')}원</span>
           </div>
           <div className="flex justify-between">
             <span>배송비</span>
