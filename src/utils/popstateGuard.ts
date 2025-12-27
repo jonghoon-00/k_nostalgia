@@ -31,15 +31,11 @@ export function startBackGuard(options?: Options) {
   history.pushState({ [MARKER]: true }, '', location.href);
   added += 1;
 
-  // 첫 popstate 타이밍 글리치 방지
-  const noopOnce = () => {};
-  window.addEventListener('popstate', noopOnce, { once: true });
-
   onPop = (event: PopStateEvent) => {
     if (!active) return;
+    if (event.state?.[MARKER]) return;
 
     options?.onBack?.();
-    // 새 항목을 추가하지 않고 현재 페이지로 복귀(스택 증가 없음)
     history.go(1);
   };
 
