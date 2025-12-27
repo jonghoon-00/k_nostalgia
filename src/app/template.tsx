@@ -202,6 +202,13 @@ export default function Template({ children }: { children: React.ReactNode }) {
     showWebChat = false;
     showWebTopButton = false;
   }
+  // 결제 페이지
+  else if (pathName === '/payment') {
+    showWebHeader = true;
+    showFooter = false;
+    showWebChat = false;
+    showWebTopButton = true;
+  }
   // 결제 확인
   else if (pathName === '/check-payment') {
     showWebHeader = false;
@@ -231,19 +238,19 @@ export default function Template({ children }: { children: React.ReactNode }) {
           />
         )}
       </div>
-      <div className="hidden md:block">{showHeader && <WebHeader />}</div>
+      <div className="hidden md:block">{showWebHeader && <WebHeader />}</div>
 
       {/* 본문 */}
       <main className="flex-grow">{children}</main>
 
       {/* 채팅/탑 버튼 */}
-      <div className="fixed bottom-[90px] right-3 z-50 flex flex-col gap-2 md:hidden  ">
+      <div className="fixed bottom-[90px] right-3 z-50 flex flex-col gap-2 md:hidden">
         {showChat && <Chat />}
         {showTopButton && <TopButton />}
       </div>
       <div className="fixed bottom-[40px] right-[41px] z-50 flex-col gap-3 hidden md:flex">
-        {showChat && <Chat />}
-        {showTopButton && <TopButton />}
+        {showWebChat && <Chat />}
+        {showWebTopButton && <TopButton />}
       </div>
 
       {/* nav 바/푸터 */}

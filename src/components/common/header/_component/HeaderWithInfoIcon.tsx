@@ -145,7 +145,7 @@ const HeaderWithInfoIcon = ({
                 {/* 화살표 */}
                 <div
                   className={clsx(
-                    'absolute top-[-0.4rem] right-[2%] transform -translate-x-1/2 w-0 h-0'
+                    'absolute top-[-0.4rem] right-[3.5%] transform -translate-x-1/2 w-0 h-0'
                   )}
                   style={{
                     borderLeft: '8px solid transparent',

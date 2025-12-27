@@ -11,6 +11,7 @@ import { productImgObject } from '@/hooks/payment/getProductImage';
 
 import DeliveryTruck from '@/components/icons/DeliveryTruck';
 import { toast } from '@/components/ui/use-toast';
+import { DELIVERY_FEE } from '@/constants';
 import clsx from 'clsx';
 import Image from 'next/image';
 
@@ -103,6 +104,7 @@ const OrderProducts = () => {
 
       <ul className={clsx('flex flex-col gap-2', 'mt-1')}>
         {products.map(({ id, name, amount, quantity }) => {
+          // amount : 배송비 포함 금액
           const imgSrc = productImgObject[name] || '/images/tigernew.png';
           return (
             <li key={id} className={clsx('flex')}>
@@ -122,7 +124,7 @@ const OrderProducts = () => {
               <div className={clsx('ml-4')}>
                 <p className={clsx('text-gray-700')}>{name}</p>
                 <p className={clsx('text-gray-500', 'text-sm')}>
-                  {formatCurrency(amount)}원 · {quantity}개
+                  {formatCurrency(amount - DELIVERY_FEE)}원 · {quantity}개
                 </p>
               </div>
             </li>
