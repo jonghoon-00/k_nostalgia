@@ -51,10 +51,25 @@ $ yarn dev
 
 ```
 
-데모는 [배포 링크](https://k-nostalgia.vercel.app/)에서 확인 가능합니다.
+---
 
 <br/>
-<hr />
+
+# Supabase Keep alive
+
+Supabase Free 플랜 프로젝트가 자동 비활성화되는 리크스를 줄이기 위해
+별도 private 레포의 GitHub Actions 스케줄러로 주기적인 health endpoint ping을 수행합니다.
+
+## What it does
+
+- `/api/dbHealthCheck/supabase`
+  - healthcheck 테이블에 `select id limit 1` 수행 (RLS로 read-only 허용)
+- GitHub Actions cron : 3일마다 health endpoint를 호출하여 최소 활동을 유지
+
+<br/>
+
+---
+
 <br/>
 
 ## 1. 전체 기능

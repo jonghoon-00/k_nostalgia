@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
@@ -160,6 +160,21 @@ export type Database = {
           code?: string
           id?: string
           image_url?: string | null
+        }
+        Relationships: []
+      }
+      healthcheck: {
+        Row: {
+          id: number
+          updated_at: string | null
+        }
+        Insert: {
+          id: number
+          updated_at?: string | null
+        }
+        Update: {
+          id?: number
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -516,6 +531,12 @@ export type Database = {
           시장전용고객주차장_보유여부: string | null
           이미지: string[] | null
         }[]
+        SetofOptions: {
+          from: "*"
+          to: "markets"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
     }
     Enums: {
